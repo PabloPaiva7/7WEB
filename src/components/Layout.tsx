@@ -22,9 +22,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/dashboard" className="flex items-center gap-3">
+                  <a href="/carteira" className="flex items-center gap-3">
                     <BarChart2 className="h-5 w-5" />
-                    <span>Dashboard</span>
+                    <span>Carteira</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
