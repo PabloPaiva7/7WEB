@@ -1,10 +1,10 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Upload, Download, BarChart } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Table,
   TableBody,
@@ -21,7 +21,84 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
+
+const columnConfig = {
+  data: {
+    label: "Data",
+    format: (value: string) => new Date(value).toLocaleDateString(),
+    type: "date",
+  },
+  resolucao: {
+    label: "Resolução",
+    type: "text",
+  },
+  contrato: {
+    label: "Contrato",
+    type: "text",
+  },
+  escritorio: {
+    label: "Escritório",
+    type: "text",
+  },
+  ultimoPagamento: {
+    label: "Último Pagamento",
+    format: (value: string) => new Date(value).toLocaleDateString(),
+    type: "date",
+  },
+  prazo: {
+    label: "Prazo",
+    type: "text",
+  },
+  entrada: {
+    label: "Entrada (Qualidade)",
+    type: "text",
+  },
+  banco: {
+    label: "Banco",
+    type: "text",
+    validate: (value: string) => value.trim().toUpperCase(),
+  },
+  codigo: {
+    label: "Código",
+    type: "text",
+    validate: (value: string) => value.trim(),
+  },
+  valorCliente: {
+    label: "Valor do Cliente",
+    type: "currency",
+    format: (value: string) => {
+      const numberValue = Number(value.replace(/[^0-9.-]+/g, ""));
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(numberValue);
+    },
+  },
+  contato: {
+    label: "Contato",
+    type: "phone",
+    format: (value: string) => {
+      const cleaned = value.replace(/\D/g, '');
+      const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+      if (match) {
+        return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+      }
+      return value;
+    },
+  },
+  negociacao: {
+    label: "Negociação",
+    type: "text",
+  },
+  situacao: {
+    label: "Situação",
+    type: "text",
+  },
+};
 
 type Cliente = {
   id: number;
@@ -40,7 +117,6 @@ type Cliente = {
   situacao: string;
 };
 
-// Dados de exemplo
 const clientesCarteira: Cliente[] = [
   {
     id: 1,
@@ -58,15 +134,17 @@ const clientesCarteira: Cliente[] = [
     negociacao: "Em andamento",
     situacao: "Ativo",
   },
-  // Adicione mais clientes conforme necessário
 ];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 const Carteira = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [clientes, setClientes] = useState<Cliente[]>(clientesCarteira);
+  const [historico, setHistorico] = useState<{data: string, acao: string}[]>([]);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
-  // Função para importar CSV
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -78,25 +156,36 @@ const Carteira = () => {
         
         const newClientes = lines.slice(1).map((line, index) => {
           const values = line.split(",");
-          return {
-            id: index + 1,
-            data: values[0] || "",
-            resolucao: values[1] || "",
-            contrato: values[2] || "",
-            escritorio: values[3] || "",
-            ultimoPagamento: values[4] || "",
-            prazo: values[5] || "",
-            entrada: values[6] || "",
-            banco: values[7] || "",
-            codigo: values[8] || "",
-            valorCliente: values[9] || "",
-            contato: values[10] || "",
-            negociacao: values[11] || "",
-            situacao: values[12] || "",
-          };
+          const cliente: Partial<Cliente> = { id: index + 1 };
+          
+          Object.keys(columnConfig).forEach((key, i) => {
+            const config = columnConfig[key as keyof typeof columnConfig];
+            let value = values[i] || "";
+            
+            if (config.validate) {
+              value = config.validate(value);
+            }
+            
+            if (config.format && value) {
+              try {
+                value = config.format(value);
+              } catch (error) {
+                console.error(`Error formatting ${key}:`, error);
+              }
+            }
+            
+            cliente[key as keyof Cliente] = value as any;
+          });
+          
+          return cliente as Cliente;
         });
 
         setClientes(newClientes);
+        setHistorico(prev => [...prev, {
+          data: new Date().toISOString(),
+          acao: `Importação de ${newClientes.length} registros`
+        }]);
+        
         toast({
           title: "Sucesso!",
           description: "Dados importados com sucesso.",
@@ -106,7 +195,6 @@ const Carteira = () => {
     }
   };
 
-  // Análise estatística básica
   const estatisticas = {
     totalClientes: clientes.length,
     porSituacao: clientes.reduce((acc, cliente) => {
@@ -117,6 +205,14 @@ const Carteira = () => {
       acc[cliente.banco] = (acc[cliente.banco] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
+    valorTotal: clientes.reduce((acc, cliente) => {
+      const valor = Number(cliente.valorCliente.replace(/[^0-9.-]+/g, "")) || 0;
+      return acc + valor;
+    }, 0),
+    mediaPrazo: clientes.reduce((acc, cliente) => {
+      const dias = parseInt(cliente.prazo) || 0;
+      return acc + dias;
+    }, 0) / clientes.length,
   };
 
   const dadosGrafico = Object.entries(estatisticas.porSituacao).map(([nome, valor]) => ({
@@ -124,12 +220,17 @@ const Carteira = () => {
     valor,
   }));
 
+  const dadosPizza = Object.entries(estatisticas.porBanco).map(([nome, valor]) => ({
+    name: nome,
+    value: valor,
+  }));
+
   return (
     <div className="space-y-6 animate-fadeIn">
-      <div className="flex justify-between items-center">
+      <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center gap-4`}>
         <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
-        <div className="flex gap-4 items-center">
-          <div className="relative w-64">
+        <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-row'} gap-4 items-center`}>
+          <div className={`relative ${isMobile ? 'w-full' : 'w-64'}`}>
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Buscar..."
@@ -157,13 +258,24 @@ const Carteira = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}>
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Análise da Carteira</h3>
           <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Total de Clientes</p>
-              <p className="text-2xl font-bold">{estatisticas.totalClientes}</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Total de Clientes</p>
+                <p className="text-2xl font-bold">{estatisticas.totalClientes}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Valor Total</p>
+                <p className="text-2xl font-bold">
+                  {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  }).format(estatisticas.valorTotal)}
+                </p>
+              </div>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-2">Distribuição por Situação</p>
@@ -183,58 +295,67 @@ const Carteira = () => {
         </Card>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Estatísticas por Banco</h3>
-          <div className="space-y-4">
-            {Object.entries(estatisticas.porBanco).map(([banco, quantidade]) => (
-              <div key={banco} className="flex justify-between items-center">
-                <span>{banco}</span>
-                <span className="font-semibold">{quantidade} clientes</span>
-              </div>
-            ))}
+          <h3 className="text-lg font-semibold mb-4">Distribuição por Banco</h3>
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={dadosPizza}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {dadosPizza.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </Card>
       </div>
 
       <Card>
-        <div className="p-6">
+        <div className="p-6 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Resolução</TableHead>
-                <TableHead>Contrato</TableHead>
-                <TableHead>Escritório</TableHead>
-                <TableHead>Último Pagamento</TableHead>
-                <TableHead>Prazo</TableHead>
-                <TableHead>Entrada</TableHead>
-                <TableHead>Banco</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Contato</TableHead>
-                <TableHead>Negociação</TableHead>
-                <TableHead>Situação</TableHead>
+                {Object.entries(columnConfig).map(([key, config]) => (
+                  <TableHead key={key}>{config.label}</TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {clientes.map((cliente) => (
                 <TableRow key={cliente.id}>
-                  <TableCell>{cliente.data}</TableCell>
-                  <TableCell>{cliente.resolucao}</TableCell>
-                  <TableCell>{cliente.contrato}</TableCell>
-                  <TableCell>{cliente.escritorio}</TableCell>
-                  <TableCell>{cliente.ultimoPagamento}</TableCell>
-                  <TableCell>{cliente.prazo}</TableCell>
-                  <TableCell>{cliente.entrada}</TableCell>
-                  <TableCell>{cliente.banco}</TableCell>
-                  <TableCell>{cliente.codigo}</TableCell>
-                  <TableCell>{cliente.valorCliente}</TableCell>
-                  <TableCell>{cliente.contato}</TableCell>
-                  <TableCell>{cliente.negociacao}</TableCell>
-                  <TableCell>{cliente.situacao}</TableCell>
+                  {Object.entries(columnConfig).map(([key, config]) => (
+                    <TableCell key={`${cliente.id}-${key}`}>
+                      {cliente[key as keyof Cliente]}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Histórico de Ações</h3>
+          <div className="space-y-2">
+            {historico.map((item, index) => (
+              <div key={index} className="flex justify-between text-sm">
+                <span>{new Date(item.data).toLocaleString()}</span>
+                <span>{item.acao}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </Card>
     </div>
