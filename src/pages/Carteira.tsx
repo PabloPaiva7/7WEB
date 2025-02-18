@@ -25,6 +25,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { CarteiraSidebar } from "@/components/CarteiraSidebar";
 
 type ColumnConfigBase = {
   label: string;
@@ -156,9 +157,49 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 const Carteira = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [clientes, setClientes] = useState<Cliente[]>(clientesCarteira);
+  const [filteredClientes, setFilteredClientes] = useState<Cliente[]>(clientesCarteira);
+  const [filters, setFilters] = useState({
+    banco: "",
+    escritorio: "",
+    prazo: ""
+  });
   const [historico, setHistorico] = useState<{data: string, acao: string}[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+
+  const bancos = Array.from(new Set(clientes.map(c => c.banco))).sort();
+  const escritorios = Array.from(new Set(clientes.map(c => c.escritorio))).sort();
+  const prazos = Array.from(new Set(clientes.map(c => c.prazo))).sort();
+
+  const handleFilterChange = (type: string, value: string) => {
+    const newFilters = { ...filters, [type]: value };
+    setFilters(newFilters);
+    
+    let filtered = clientes;
+    if (newFilters.banco) {
+      filtered = filtered.filter(c => c.banco === newFilters.banco);
+    }
+    if (newFilters.escritorio) {
+      filtered = filtered.filter(c => c.escritorio === newFilters.escritorio);
+    }
+    if (newFilters.prazo) {
+      filtered = filtered.filter(c => c.prazo === newFilters.prazo);
+    }
+    if (searchTerm) {
+      filtered = filtered.filter(c => 
+        Object.values(c).some(value => 
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+    
+    setFilteredClientes(filtered);
+    
+    setHistorico(prev => [...prev, {
+      data: new Date().toISOString(),
+      acao: `Filtro aplicado: ${type} = ${value}`
+    }]);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -210,23 +251,23 @@ const Carteira = () => {
   };
 
   const estatisticas = {
-    totalClientes: clientes.length,
-    porSituacao: clientes.reduce((acc, cliente) => {
+    totalClientes: filteredClientes.length,
+    porSituacao: filteredClientes.reduce((acc, cliente) => {
       acc[cliente.situacao] = (acc[cliente.situacao] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
-    porBanco: clientes.reduce((acc, cliente) => {
+    porBanco: filteredClientes.reduce((acc, cliente) => {
       acc[cliente.banco] = (acc[cliente.banco] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
-    valorTotal: clientes.reduce((acc, cliente) => {
+    valorTotal: filteredClientes.reduce((acc, cliente) => {
       const valor = Number(cliente.valorCliente.replace(/[^0-9.-]+/g, "")) || 0;
       return acc + valor;
     }, 0),
-    mediaPrazo: clientes.reduce((acc, cliente) => {
+    mediaPrazo: filteredClientes.reduce((acc, cliente) => {
       const dias = parseInt(cliente.prazo) || 0;
       return acc + dias;
-    }, 0) / clientes.length,
+    }, 0) / filteredClientes.length,
   };
 
   const dadosGrafico = Object.entries(estatisticas.porSituacao).map(([nome, valor]) => ({
@@ -240,138 +281,148 @@ const Carteira = () => {
   }));
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center gap-4`}>
-        <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
-        <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-row'} gap-4 items-center`}>
-          <div className={`relative ${isMobile ? 'w-full' : 'w-64'}`}>
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar..."
-              className="pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <Button variant="outline" className="gap-2">
-            <Upload className="h-4 w-4" />
-            <label className="cursor-pointer">
-              Importar CSV
-              <input
-                type="file"
-                accept=".csv"
-                className="hidden"
-                onChange={handleFileUpload}
+    <div className="flex gap-6">
+      {!isMobile && (
+        <CarteiraSidebar
+          bancos={bancos}
+          escritorios={escritorios}
+          prazos={prazos}
+          onFilterChange={handleFilterChange}
+        />
+      )}
+      <div className="flex-1 space-y-6 animate-fadeIn min-w-0">
+        <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center gap-4`}>
+          <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
+          <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-row'} gap-4 items-center`}>
+            <div className={`relative ${isMobile ? 'w-full' : 'w-64'}`}>
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Buscar..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </label>
-          </Button>
-          <Button variant="outline">
-            <Download className="h-4 w-4" />
-            Exportar CSV
-          </Button>
+            </div>
+            <Button variant="outline" className="gap-2">
+              <Upload className="h-4 w-4" />
+              <label className="cursor-pointer">
+                Importar CSV
+                <input
+                  type="file"
+                  accept=".csv"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+              </label>
+            </Button>
+            <Button variant="outline">
+              <Download className="h-4 w-4" />
+              Exportar CSV
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}>
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Análise da Carteira</h3>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Total de Clientes</p>
-                <p className="text-2xl font-bold">{estatisticas.totalClientes}</p>
+        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}>
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Análise da Carteira</h3>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total de Clientes</p>
+                  <p className="text-2xl font-bold">{estatisticas.totalClientes}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Valor Total</p>
+                  <p className="text-2xl font-bold">
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(estatisticas.valorTotal)}
+                  </p>
+                </div>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Valor Total</p>
-                <p className="text-2xl font-bold">
-                  {new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(estatisticas.valorTotal)}
-                </p>
+                <p className="text-sm text-muted-foreground mb-2">Distribuição por Situação</p>
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsBarChart data={dadosGrafico}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="nome" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="valor" fill="#8884d8" />
+                    </RechartsBarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Distribuição por Situação</p>
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsBarChart data={dadosGrafico}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="nome" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="valor" fill="#8884d8" />
-                  </RechartsBarChart>
-                </ResponsiveContainer>
-              </div>
+          </Card>
+
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Distribuição por Banco</h3>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={dadosPizza}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {dadosPizza.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
 
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Distribuição por Banco</h3>
-          <div className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={dadosPizza}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {dadosPizza.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-      </div>
-
-      <Card>
-        <div className="p-6 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {Object.entries(columnConfig).map(([key, config]) => (
-                  <TableHead key={key}>{config.label}</TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clientes.map((cliente) => (
-                <TableRow key={cliente.id}>
+        <Card>
+          <div className="p-6 overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
                   {Object.entries(columnConfig).map(([key, config]) => (
-                    <TableCell key={`${cliente.id}-${key}`}>
-                      {cliente[key as keyof Cliente]}
-                    </TableCell>
+                    <TableHead key={key}>{config.label}</TableHead>
                   ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </Card>
-
-      <Card>
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Histórico de Ações</h3>
-          <div className="space-y-2">
-            {historico.map((item, index) => (
-              <div key={index} className="flex justify-between text-sm">
-                <span>{new Date(item.data).toLocaleString()}</span>
-                <span>{item.acao}</span>
-              </div>
-            ))}
+              </TableHeader>
+              <TableBody>
+                {filteredClientes.map((cliente) => (
+                  <TableRow key={cliente.id}>
+                    {Object.entries(columnConfig).map(([key, config]) => (
+                      <TableCell key={`${cliente.id}-${key}`}>
+                        {cliente[key as keyof Cliente]}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        </div>
-      </Card>
+        </Card>
+
+        <Card>
+          <div className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Histórico de Ações</h3>
+            <div className="space-y-2">
+              {historico.map((item, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span>{new Date(item.data).toLocaleString()}</span>
+                  <span>{item.acao}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
