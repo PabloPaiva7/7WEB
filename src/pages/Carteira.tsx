@@ -206,46 +206,70 @@ const Carteira = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const text = e.target?.result as string;
-        const lines = text.split("\n");
-        const headers = lines[0].split(",");
-        
-        const newClientes = lines.slice(1).map((line, index) => {
-          const values = line.split(",");
-          const cliente: Partial<Cliente> = { id: index + 1 };
+        try {
+          const text = e.target?.result as string;
+          const lines = text.split("\n").filter(line => line.trim());
+          const headers = lines[0].split(",").map(header => header.trim());
           
-          Object.entries(columnConfig).forEach(([key, config], i) => {
-            let value = values[i] || "";
+          const newClientes = lines.slice(1).map((line, index) => {
+            const values = line.split(",").map(value => value.trim());
+            const cliente: Partial<Cliente> = { id: index + 1 };
             
-            if (config.validate) {
-              value = config.validate(value);
-            }
-            
-            if (config.format) {
+            Object.keys(columnConfig).forEach((key, i) => {
+              const config = columnConfig[key];
+              let value = values[i] || "";
+              
               try {
-                value = config.format(value);
+                if (config.validate) {
+                  value = config.validate(value);
+                }
+                
+                if (config.format) {
+                  value = config.format(value);
+                }
+                
+                (cliente[key as keyof Cliente] as any) = value;
               } catch (error) {
-                console.error(`Error formatting ${key}:`, error);
+                console.error(`Erro ao processar ${key}:`, error);
+                (cliente[key as keyof Cliente] as any) = value;
               }
-            }
+            });
             
-            (cliente[key as keyof Cliente] as any) = value;
+            return cliente as Cliente;
+          });
+
+          setClientes(newClientes);
+          setFilteredClientes(newClientes);
+          
+          setHistorico(prev => [...prev, {
+            data: new Date().toISOString(),
+            acao: `Importação de ${newClientes.length} registros`
+          }]);
+          
+          toast({
+            title: "Sucesso!",
+            description: `${newClientes.length} registros importados com sucesso.`,
           });
           
-          return cliente as Cliente;
-        });
-
-        setClientes(newClientes);
-        setHistorico(prev => [...prev, {
-          data: new Date().toISOString(),
-          acao: `Importação de ${newClientes.length} registros`
-        }]);
-        
+          event.target.value = '';
+        } catch (error) {
+          console.error("Erro ao processar arquivo:", error);
+          toast({
+            title: "Erro",
+            description: "Erro ao processar o arquivo. Verifique o formato do CSV.",
+            variant: "destructive",
+          });
+        }
+      };
+      
+      reader.onerror = () => {
         toast({
-          title: "Sucesso!",
-          description: "Dados importados com sucesso.",
+          title: "Erro",
+          description: "Erro ao ler o arquivo.",
+          variant: "destructive",
         });
       };
+      
       reader.readAsText(file);
     }
   };
@@ -300,7 +324,10 @@ const Carteira = () => {
                 placeholder="Buscar..."
                 className="pl-10"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  handleFilterChange('search', e.target.value);
+                }}
               />
             </div>
             <Button variant="outline" className="gap-2">
