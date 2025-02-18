@@ -20,12 +20,12 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
         <div className="space-y-6">
           <div className="space-y-2">
             <Label>Banco</Label>
-            <Select onValueChange={(value) => onFilterChange('banco', value)}>
+            <Select onValueChange={(value) => onFilterChange('banco', value === "all" ? "" : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um banco" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {bancos.map((banco) => (
                   <SelectItem key={banco} value={banco}>{banco}</SelectItem>
                 ))}
@@ -37,12 +37,12 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
 
           <div className="space-y-2">
             <Label>Escritório</Label>
-            <Select onValueChange={(value) => onFilterChange('escritorio', value)}>
+            <Select onValueChange={(value) => onFilterChange('escritorio', value === "all" ? "" : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um escritório" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {escritorios.map((escritorio) => (
                   <SelectItem key={escritorio} value={escritorio}>{escritorio}</SelectItem>
                 ))}
@@ -54,12 +54,12 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
 
           <div className="space-y-2">
             <Label>Prazo</Label>
-            <Select onValueChange={(value) => onFilterChange('prazo', value)}>
+            <Select onValueChange={(value) => onFilterChange('prazo', value === "all" ? "" : value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um prazo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {prazos.map((prazo) => (
                   <SelectItem key={prazo} value={prazo}>{prazo}</SelectItem>
                 ))}
