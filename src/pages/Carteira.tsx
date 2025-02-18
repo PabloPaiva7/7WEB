@@ -1,8 +1,27 @@
 
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, Upload, Download, BarChart } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  BarChart as RechartsBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 type Cliente = {
   id: number;
@@ -44,62 +63,180 @@ const clientesCarteira: Cliente[] = [
 
 const Carteira = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [clientes, setClientes] = useState<Cliente[]>(clientesCarteira);
+  const { toast } = useToast();
+
+  // Função para importar CSV
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        const lines = text.split("\n");
+        const headers = lines[0].split(",");
+        
+        const newClientes = lines.slice(1).map((line, index) => {
+          const values = line.split(",");
+          return {
+            id: index + 1,
+            data: values[0] || "",
+            resolucao: values[1] || "",
+            contrato: values[2] || "",
+            escritorio: values[3] || "",
+            ultimoPagamento: values[4] || "",
+            prazo: values[5] || "",
+            entrada: values[6] || "",
+            banco: values[7] || "",
+            codigo: values[8] || "",
+            valorCliente: values[9] || "",
+            contato: values[10] || "",
+            negociacao: values[11] || "",
+            situacao: values[12] || "",
+          };
+        });
+
+        setClientes(newClientes);
+        toast({
+          title: "Sucesso!",
+          description: "Dados importados com sucesso.",
+        });
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Análise estatística básica
+  const estatisticas = {
+    totalClientes: clientes.length,
+    porSituacao: clientes.reduce((acc, cliente) => {
+      acc[cliente.situacao] = (acc[cliente.situacao] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    porBanco: clientes.reduce((acc, cliente) => {
+      acc[cliente.banco] = (acc[cliente.banco] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+  };
+
+  const dadosGrafico = Object.entries(estatisticas.porSituacao).map(([nome, valor]) => ({
+    nome,
+    valor,
+  }));
 
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Buscar..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex gap-4 items-center">
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Buscar..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" className="gap-2">
+            <Upload className="h-4 w-4" />
+            <label className="cursor-pointer">
+              Importar CSV
+              <input
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+            </label>
+          </Button>
+          <Button variant="outline">
+            <Download className="h-4 w-4" />
+            Exportar CSV
+          </Button>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-muted/50">
-              <th className="p-4 text-left font-medium">Data</th>
-              <th className="p-4 text-left font-medium">Resolução</th>
-              <th className="p-4 text-left font-medium">Contrato</th>
-              <th className="p-4 text-left font-medium">Escritório</th>
-              <th className="p-4 text-left font-medium">Último Pagamento</th>
-              <th className="p-4 text-left font-medium">Prazo</th>
-              <th className="p-4 text-left font-medium">Entrada</th>
-              <th className="p-4 text-left font-medium">Banco</th>
-              <th className="p-4 text-left font-medium">Código</th>
-              <th className="p-4 text-left font-medium">Valor</th>
-              <th className="p-4 text-left font-medium">Contato</th>
-              <th className="p-4 text-left font-medium">Negociação</th>
-              <th className="p-4 text-left font-medium">Situação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clientesCarteira.map((cliente) => (
-              <tr key={cliente.id} className="border-b hover:bg-muted/50">
-                <td className="p-4">{cliente.data}</td>
-                <td className="p-4">{cliente.resolucao}</td>
-                <td className="p-4">{cliente.contrato}</td>
-                <td className="p-4">{cliente.escritorio}</td>
-                <td className="p-4">{cliente.ultimoPagamento}</td>
-                <td className="p-4">{cliente.prazo}</td>
-                <td className="p-4">{cliente.entrada}</td>
-                <td className="p-4">{cliente.banco}</td>
-                <td className="p-4">{cliente.codigo}</td>
-                <td className="p-4">{cliente.valorCliente}</td>
-                <td className="p-4">{cliente.contato}</td>
-                <td className="p-4">{cliente.negociacao}</td>
-                <td className="p-4">{cliente.situacao}</td>
-              </tr>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Análise da Carteira</h3>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Total de Clientes</p>
+              <p className="text-2xl font-bold">{estatisticas.totalClientes}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Distribuição por Situação</p>
+              <div className="h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsBarChart data={dadosGrafico}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="nome" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="valor" fill="#8884d8" />
+                  </RechartsBarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Estatísticas por Banco</h3>
+          <div className="space-y-4">
+            {Object.entries(estatisticas.porBanco).map(([banco, quantidade]) => (
+              <div key={banco} className="flex justify-between items-center">
+                <span>{banco}</span>
+                <span className="font-semibold">{quantidade} clientes</span>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </Card>
       </div>
+
+      <Card>
+        <div className="p-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Data</TableHead>
+                <TableHead>Resolução</TableHead>
+                <TableHead>Contrato</TableHead>
+                <TableHead>Escritório</TableHead>
+                <TableHead>Último Pagamento</TableHead>
+                <TableHead>Prazo</TableHead>
+                <TableHead>Entrada</TableHead>
+                <TableHead>Banco</TableHead>
+                <TableHead>Código</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Contato</TableHead>
+                <TableHead>Negociação</TableHead>
+                <TableHead>Situação</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {clientes.map((cliente) => (
+                <TableRow key={cliente.id}>
+                  <TableCell>{cliente.data}</TableCell>
+                  <TableCell>{cliente.resolucao}</TableCell>
+                  <TableCell>{cliente.contrato}</TableCell>
+                  <TableCell>{cliente.escritorio}</TableCell>
+                  <TableCell>{cliente.ultimoPagamento}</TableCell>
+                  <TableCell>{cliente.prazo}</TableCell>
+                  <TableCell>{cliente.entrada}</TableCell>
+                  <TableCell>{cliente.banco}</TableCell>
+                  <TableCell>{cliente.codigo}</TableCell>
+                  <TableCell>{cliente.valorCliente}</TableCell>
+                  <TableCell>{cliente.contato}</TableCell>
+                  <TableCell>{cliente.negociacao}</TableCell>
+                  <TableCell>{cliente.situacao}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
     </div>
   );
 };
