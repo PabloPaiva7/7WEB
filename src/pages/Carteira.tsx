@@ -26,7 +26,22 @@ import {
   Cell,
 } from "recharts";
 
-const columnConfig = {
+type ColumnConfigBase = {
+  label: string;
+  type: string;
+};
+
+type ColumnConfigWithFormat = ColumnConfigBase & {
+  format?: (value: string) => string;
+};
+
+type ColumnConfigWithValidate = ColumnConfigBase & {
+  validate?: (value: string) => string;
+};
+
+type ColumnConfig = ColumnConfigWithFormat & ColumnConfigWithValidate;
+
+const columnConfig: Record<string, ColumnConfig> = {
   data: {
     label: "Data",
     format: (value: string) => new Date(value).toLocaleDateString(),
@@ -158,15 +173,14 @@ const Carteira = () => {
           const values = line.split(",");
           const cliente: Partial<Cliente> = { id: index + 1 };
           
-          Object.keys(columnConfig).forEach((key, i) => {
-            const config = columnConfig[key as keyof typeof columnConfig];
+          Object.entries(columnConfig).forEach(([key, config], i) => {
             let value = values[i] || "";
             
             if (config.validate) {
               value = config.validate(value);
             }
             
-            if (config.format && value) {
+            if (config.format) {
               try {
                 value = config.format(value);
               } catch (error) {
@@ -174,7 +188,7 @@ const Carteira = () => {
               }
             }
             
-            cliente[key as keyof Cliente] = value as any;
+            (cliente[key as keyof Cliente] as any) = value;
           });
           
           return cliente as Cliente;
