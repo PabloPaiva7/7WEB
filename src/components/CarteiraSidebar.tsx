@@ -13,6 +13,11 @@ type FilterProps = {
 };
 
 export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }: FilterProps) {
+  // Filtra arrays para remover valores vazios ou undefined
+  const filteredBancos = bancos.filter(banco => banco && banco.trim() !== '');
+  const filteredEscritorios = escritorios.filter(escritorio => escritorio && escritorio.trim() !== '');
+  const filteredPrazos = prazos.filter(prazo => prazo && prazo.trim() !== '');
+
   return (
     <Card className="p-4 h-[calc(100vh-2rem)] w-64">
       <h3 className="font-semibold mb-4">Filtros</h3>
@@ -26,8 +31,8 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_all">Todos</SelectItem>
-                {bancos.map((banco) => (
-                  banco && <SelectItem key={banco} value={banco}>{banco}</SelectItem>
+                {filteredBancos.map((banco) => (
+                  <SelectItem key={banco} value={banco}>{banco}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -43,8 +48,8 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_all">Todos</SelectItem>
-                {escritorios.map((escritorio) => (
-                  escritorio && <SelectItem key={escritorio} value={escritorio}>{escritorio}</SelectItem>
+                {filteredEscritorios.map((escritorio) => (
+                  <SelectItem key={escritorio} value={escritorio}>{escritorio}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -60,8 +65,8 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_all">Todos</SelectItem>
-                {prazos.map((prazo) => (
-                  prazo && <SelectItem key={prazo} value={prazo}>{prazo}</SelectItem>
+                {filteredPrazos.map((prazo) => (
+                  <SelectItem key={prazo} value={prazo}>{prazo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
