@@ -432,42 +432,44 @@ const Carteira = () => {
                     {editingCliente ? "Editar Cliente" : "Novo Cliente"}
                   </DialogTitle>
                 </DialogHeader>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(columnConfig).map(([key, config]) => (
-                      key !== 'id' && (
-                        <FormField
-                          key={key}
-                          control={form.control}
-                          name={key as keyof Cliente}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{config.label}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type={config.type === 'date' ? 'date' : 'text'}
-                                  {...field}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      )
-                    ))}
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => {
-                      setIsDialogOpen(false);
-                      setEditingCliente(null);
-                      form.reset();
-                    }}>
-                      Cancelar
-                    </Button>
-                    <Button type="submit">
-                      {editingCliente ? "Salvar" : "Adicionar"}
-                    </Button>
-                  </div>
-                </form>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Object.entries(columnConfig).map(([key, config]) => (
+                        key !== 'id' && (
+                          <FormField
+                            key={key}
+                            control={form.control}
+                            name={key as keyof Cliente}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{config.label}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type={config.type === 'date' ? 'date' : 'text'}
+                                    {...field}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        )
+                      ))}
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" variant="outline" onClick={() => {
+                        setIsDialogOpen(false);
+                        setEditingCliente(null);
+                        form.reset();
+                      }}>
+                        Cancelar
+                      </Button>
+                      <Button type="submit">
+                        {editingCliente ? "Salvar" : "Adicionar"}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
               </DialogContent>
             </Dialog>
             <Button variant="outline" className="gap-2">
