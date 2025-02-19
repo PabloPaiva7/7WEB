@@ -1,10 +1,24 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Upload, Download, BarChart } from "lucide-react";
+import { Search, Upload, Download, BarChart, Plus, Trash, Edit } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import {
   Table,
   TableBody,
@@ -26,6 +40,7 @@ import {
   Cell,
 } from "recharts";
 import { CarteiraSidebar } from "@/components/CarteiraSidebar";
+import { useForm } from "react-hook-form";
 
 type ColumnConfigBase = {
   label: string;
@@ -164,41 +179,81 @@ const Carteira = () => {
     prazo: ""
   });
   const [historico, setHistorico] = useState<{data: string, acao: string}[]>([]);
+  const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
-  const bancos = Array.from(new Set(clientes.map(c => c.banco))).sort();
-  const escritorios = Array.from(new Set(clientes.map(c => c.escritorio))).sort();
-  const prazos = Array.from(new Set(clientes.map(c => c.prazo))).sort();
+  const form = useForm<Cliente>({
+    defaultValues: {
+      id: 0,
+      data: new Date().toISOString().split('T')[0],
+      resolucao: "",
+      contrato: "",
+      escritorio: "",
+      ultimoPagamento: new Date().toISOString().split('T')[0],
+      prazo: "",
+      entrada: "",
+      banco: "",
+      codigo: "",
+      valorCliente: "",
+      contato: "",
+      negociacao: "",
+      situacao: "",
+    }
+  });
 
-  const handleFilterChange = (type: string, value: string) => {
-    const newFilters = { ...filters, [type]: value };
-    setFilters(newFilters);
-    
-    let filtered = clientes;
-    if (newFilters.banco) {
-      filtered = filtered.filter(c => c.banco === newFilters.banco);
-    }
-    if (newFilters.escritorio) {
-      filtered = filtered.filter(c => c.escritorio === newFilters.escritorio);
-    }
-    if (newFilters.prazo) {
-      filtered = filtered.filter(c => c.prazo === newFilters.prazo);
-    }
-    if (searchTerm) {
-      filtered = filtered.filter(c => 
-        Object.values(c).some(value => 
-          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
+  const handleSubmit = (data: Cliente) => {
+    if (editingCliente) {
+      const updatedClientes = clientes.map(c => 
+        c.id === editingCliente.id ? { ...data, id: editingCliente.id } : c
       );
+      setClientes(updatedClientes);
+      setFilteredClientes(updatedClientes);
+      toast({
+        title: "Sucesso!",
+        description: "Cliente atualizado com sucesso.",
+      });
+    } else {
+      const newCliente = {
+        ...data,
+        id: clientes.length + 1,
+      };
+      const newClientes = [...clientes, newCliente];
+      setClientes(newClientes);
+      setFilteredClientes(newClientes);
+      toast({
+        title: "Sucesso!",
+        description: "Cliente adicionado com sucesso.",
+      });
     }
-    
-    setFilteredClientes(filtered);
-    
     setHistorico(prev => [...prev, {
       data: new Date().toISOString(),
-      acao: `Filtro aplicado: ${type} = ${value}`
+      acao: editingCliente ? `Cliente ${editingCliente.id} editado` : "Novo cliente adicionado"
     }]);
+    setIsDialogOpen(false);
+    setEditingCliente(null);
+    form.reset();
+  };
+
+  const handleDelete = (cliente: Cliente) => {
+    const newClientes = clientes.filter(c => c.id !== cliente.id);
+    setClientes(newClientes);
+    setFilteredClientes(newClientes);
+    setHistorico(prev => [...prev, {
+      data: new Date().toISOString(),
+      acao: `Cliente ${cliente.id} removido`
+    }]);
+    toast({
+      title: "Sucesso!",
+      description: "Cliente removido com sucesso.",
+    });
+  };
+
+  const handleEdit = (cliente: Cliente) => {
+    setEditingCliente(cliente);
+    form.reset(cliente);
+    setIsDialogOpen(true);
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -274,6 +329,40 @@ const Carteira = () => {
     }
   };
 
+  const bancos = Array.from(new Set(clientes.map(c => c.banco))).sort();
+  const escritorios = Array.from(new Set(clientes.map(c => c.escritorio))).sort();
+  const prazos = Array.from(new Set(clientes.map(c => c.prazo))).sort();
+
+  const handleFilterChange = (type: string, value: string) => {
+    const newFilters = { ...filters, [type]: value };
+    setFilters(newFilters);
+    
+    let filtered = clientes;
+    if (newFilters.banco) {
+      filtered = filtered.filter(c => c.banco === newFilters.banco);
+    }
+    if (newFilters.escritorio) {
+      filtered = filtered.filter(c => c.escritorio === newFilters.escritorio);
+    }
+    if (newFilters.prazo) {
+      filtered = filtered.filter(c => c.prazo === newFilters.prazo);
+    }
+    if (searchTerm) {
+      filtered = filtered.filter(c => 
+        Object.values(c).some(value => 
+          value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+    
+    setFilteredClientes(filtered);
+    
+    setHistorico(prev => [...prev, {
+      data: new Date().toISOString(),
+      acao: `Filtro aplicado: ${type} = ${value}`
+    }]);
+  };
+
   const estatisticas = {
     totalClientes: filteredClientes.length,
     porSituacao: filteredClientes.reduce((acc, cliente) => {
@@ -330,6 +419,57 @@ const Carteira = () => {
                 }}
               />
             </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="default" className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Novo Cliente
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingCliente ? "Editar Cliente" : "Novo Cliente"}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(columnConfig).map(([key, config]) => (
+                      key !== 'id' && (
+                        <FormField
+                          key={key}
+                          control={form.control}
+                          name={key as keyof Cliente}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{config.label}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type={config.type === 'date' ? 'date' : 'text'}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )
+                    ))}
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => {
+                      setIsDialogOpen(false);
+                      setEditingCliente(null);
+                      form.reset();
+                    }}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit">
+                      {editingCliente ? "Salvar" : "Adicionar"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
             <Button variant="outline" className="gap-2">
               <Upload className="h-4 w-4" />
               <label className="cursor-pointer">
@@ -419,16 +559,35 @@ const Carteira = () => {
                   {Object.entries(columnConfig).map(([key, config]) => (
                     <TableHead key={key}>{config.label}</TableHead>
                   ))}
+                  <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredClientes.map((cliente) => (
                   <TableRow key={cliente.id}>
-                    {Object.entries(columnConfig).map(([key, config]) => (
+                    {Object.entries(columnConfig).map(([key]) => (
                       <TableCell key={`${cliente.id}-${key}`}>
                         {cliente[key as keyof Cliente]}
                       </TableCell>
                     ))}
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleEdit(cliente)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleDelete(cliente)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
