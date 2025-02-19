@@ -354,9 +354,9 @@ const Carteira = () => {
     }
   };
 
-  const bancos = Array.from(new Set(clientes.map(c => c.banco))).sort();
-  const escritorios = Array.from(new Set(clientes.map(c => c.escritorio))).sort();
-  const prazos = Array.from(new Set(clientes.map(c => c.prazo))).sort();
+  const bancos = Array.from(new Set(clientes.map(c => c.banco))).filter(banco => banco && banco.trim() !== '').sort();
+  const escritorios = Array.from(new Set(clientes.map(c => c.escritorio))).filter(escritorio => escritorio && escritorio.trim() !== '').sort();
+  const prazos = Array.from(new Set(clientes.map(c => c.prazo))).filter(prazo => prazo && prazo.trim() !== '').sort();
 
   const handleFilterChange = (type: string, value: string) => {
     const newFilters = { ...filters, [type]: value };

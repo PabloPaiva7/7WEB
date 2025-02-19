@@ -13,11 +13,6 @@ type FilterProps = {
 };
 
 export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }: FilterProps) {
-  // Filtra arrays para remover valores vazios ou undefined
-  const filteredBancos = bancos.filter(banco => banco && banco.trim() !== '');
-  const filteredEscritorios = escritorios.filter(escritorio => escritorio && escritorio.trim() !== '');
-  const filteredPrazos = prazos.filter(prazo => prazo && prazo.trim() !== '');
-
   return (
     <Card className="p-4 h-[calc(100vh-2rem)] w-64">
       <h3 className="font-semibold mb-4">Filtros</h3>
@@ -31,7 +26,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_all">Todos</SelectItem>
-                {filteredBancos.map((banco) => (
+                {bancos.map((banco) => (
                   <SelectItem key={banco} value={banco}>{banco}</SelectItem>
                 ))}
               </SelectContent>
@@ -48,7 +43,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_all">Todos</SelectItem>
-                {filteredEscritorios.map((escritorio) => (
+                {escritorios.map((escritorio) => (
                   <SelectItem key={escritorio} value={escritorio}>{escritorio}</SelectItem>
                 ))}
               </SelectContent>
@@ -65,7 +60,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="_all">Todos</SelectItem>
-                {filteredPrazos.map((prazo) => (
+                {prazos.map((prazo) => (
                   <SelectItem key={prazo} value={prazo}>{prazo}</SelectItem>
                 ))}
               </SelectContent>
