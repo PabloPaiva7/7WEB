@@ -259,59 +259,84 @@ const Carteira = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      console.log("Arquivo selecionado:", file.name); // Debug log
       const reader = new FileReader();
+      
       reader.onload = (e) => {
         try {
           const text = e.target?.result as string;
+          console.log("Conteúdo do arquivo:", text.substring(0, 100)); // Debug log dos primeiros 100 caracteres
+          
           const lines = text.split("\n").filter(line => line.trim());
           const headers = lines[0].split(",").map(header => header.trim());
+          console.log("Headers detectados:", headers); // Debug log
           
           const newClientes = lines.slice(1).map((line, index) => {
             const values = line.split(",").map(value => value.trim());
-            const cliente: Partial<Cliente> = { id: index + 1 };
+            console.log(`Processando linha ${index + 1}:`, values); // Debug log
             
-            Object.keys(columnConfig).forEach((key, i) => {
-              const config = columnConfig[key];
-              let value = values[i] || "";
+            const cliente: Partial<Cliente> = { id: clientes.length + index + 1 };
+            
+            headers.forEach((header, i) => {
+              const key = Object.keys(columnConfig).find(
+                k => columnConfig[k].label.toLowerCase() === header.toLowerCase()
+              );
               
-              try {
-                if (config.validate) {
-                  value = config.validate(value);
-                }
+              if (key) {
+                const config = columnConfig[key];
+                let value = values[i] || "";
                 
-                if (config.format) {
-                  value = config.format(value);
+                try {
+                  if (config.validate) {
+                    value = config.validate(value);
+                  }
+                  
+                  if (config.format) {
+                    value = config.format(value);
+                  }
+                  
+                  (cliente[key as keyof Cliente] as any) = value;
+                } catch (error) {
+                  console.error(`Erro ao processar ${key}:`, error);
+                  toast({
+                    title: "Erro no processamento",
+                    description: `Erro ao processar o campo ${config.label} na linha ${index + 1}`,
+                    variant: "destructive",
+                  });
                 }
-                
-                (cliente[key as keyof Cliente] as any) = value;
-              } catch (error) {
-                console.error(`Erro ao processar ${key}:`, error);
-                (cliente[key as keyof Cliente] as any) = value;
               }
             });
             
             return cliente as Cliente;
           });
 
-          setClientes(newClientes);
-          setFilteredClientes(newClientes);
+          console.log("Clientes processados:", newClientes); // Debug log
           
-          setHistorico(prev => [...prev, {
-            data: new Date().toISOString(),
-            acao: `Importação de ${newClientes.length} registros`
-          }]);
-          
-          toast({
-            title: "Sucesso!",
-            description: `${newClientes.length} registros importados com sucesso.`,
-          });
-          
-          event.target.value = '';
+          if (newClientes.length > 0) {
+            setClientes(prev => [...prev, ...newClientes]);
+            setFilteredClientes(prev => [...prev, ...newClientes]);
+            
+            setHistorico(prev => [...prev, {
+              data: new Date().toISOString(),
+              acao: `Importação de ${newClientes.length} registros via CSV`
+            }]);
+            
+            toast({
+              title: "Sucesso!",
+              description: `${newClientes.length} registros importados com sucesso.`,
+            });
+          } else {
+            toast({
+              title: "Aviso",
+              description: "Nenhum registro válido encontrado no arquivo CSV.",
+              variant: "destructive",
+            });
+          }
         } catch (error) {
           console.error("Erro ao processar arquivo:", error);
           toast({
             title: "Erro",
-            description: "Erro ao processar o arquivo. Verifique o formato do CSV.",
+            description: "Erro ao processar o arquivo. Verifique se o formato do CSV está correto.",
             variant: "destructive",
           });
         }
@@ -472,15 +497,16 @@ const Carteira = () => {
                 </Form>
               </DialogContent>
             </Dialog>
-            <Button variant="outline" className="gap-2">
-              <Upload className="h-4 w-4" />
+            <Button variant="outline" className="gap-2" asChild>
               <label className="cursor-pointer">
+                <Upload className="h-4 w-4" />
                 Importar CSV
                 <input
                   type="file"
                   accept=".csv"
                   className="hidden"
                   onChange={handleFileUpload}
+                  onClick={(e) => (e.currentTarget.value = '')}
                 />
               </label>
             </Button>
