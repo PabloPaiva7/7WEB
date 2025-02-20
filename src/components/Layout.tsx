@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { Users, BarChart2, Calendar, Settings } from "lucide-react";
+import { Calculadora } from "./Calculadora";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -46,6 +47,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
+            <div className="px-3 mt-6">
+              <Calculadora />
+            </div>
           </SidebarContent>
         </Sidebar>
         <main className="flex-1 overflow-y-auto">
