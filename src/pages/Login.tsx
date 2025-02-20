@@ -45,9 +45,21 @@ const Login = () => {
         navigate('/', { replace: true });
       }
     } catch (error: any) {
+      let errorMessage = "Ocorreu um erro. Tente novamente.";
+      
+      if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Por favor, confirme seu email antes de fazer login.";
+      } else if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Email ou senha incorretos.";
+      } else if (error.message.includes("User already registered")) {
+        errorMessage = "Este email já está registrado.";
+      } else if (error.message.includes("Password should be at least")) {
+        errorMessage = "A senha deve ter pelo menos 6 caracteres.";
+      }
+
       toast({
         title: "Erro!",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -69,6 +81,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="w-full"
             />
           </div>
           <div>
@@ -78,6 +91,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="w-full"
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
