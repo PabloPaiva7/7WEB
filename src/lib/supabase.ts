@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Criar cliente com verificação de credenciais
 const createSupabaseClient = () => {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error('Credenciais do Supabase não encontradas');
@@ -15,9 +14,16 @@ const createSupabaseClient = () => {
 
 export const supabase = createSupabaseClient();
 
-export type CarteiraItem = {
+export type CarteiraUpload = {
   id: string;
-  user_id: string;
+  nome_arquivo: string;
+  data_upload: string;
+  registros_importados: number;
+};
+
+export type CarteiraCliente = {
+  id: string;
+  upload_id: string;
   data: string;
   resolucao: string;
   contrato: string;
@@ -31,13 +37,5 @@ export type CarteiraItem = {
   contato: string;
   negociacao: string;
   situacao: string;
-};
-
-export type Contato = {
-  id: string;
-  user_id: string;
-  nome: string;
-  telefone: string;
-  email: string;
-  observacoes: string;
+  created_at: string;
 };

@@ -9,27 +9,89 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      profiles: {
+      carteira_clientes: {
         Row: {
+          banco: string | null
+          codigo: string | null
+          contato: string | null
+          contrato: string | null
           created_at: string
-          email: string | null
+          data: string | null
+          entrada: string | null
+          escritorio: string | null
           id: string
-          nome: string | null
-          updated_at: string
+          negociacao: string | null
+          prazo: string | null
+          resolucao: string | null
+          situacao: string | null
+          ultimo_pagamento: string | null
+          upload_id: string | null
+          valor_cliente: number | null
         }
         Insert: {
+          banco?: string | null
+          codigo?: string | null
+          contato?: string | null
+          contrato?: string | null
           created_at?: string
-          email?: string | null
-          id: string
-          nome?: string | null
-          updated_at?: string
+          data?: string | null
+          entrada?: string | null
+          escritorio?: string | null
+          id?: string
+          negociacao?: string | null
+          prazo?: string | null
+          resolucao?: string | null
+          situacao?: string | null
+          ultimo_pagamento?: string | null
+          upload_id?: string | null
+          valor_cliente?: number | null
         }
         Update: {
+          banco?: string | null
+          codigo?: string | null
+          contato?: string | null
+          contrato?: string | null
           created_at?: string
-          email?: string | null
+          data?: string | null
+          entrada?: string | null
+          escritorio?: string | null
           id?: string
-          nome?: string | null
-          updated_at?: string
+          negociacao?: string | null
+          prazo?: string | null
+          resolucao?: string | null
+          situacao?: string | null
+          ultimo_pagamento?: string | null
+          upload_id?: string | null
+          valor_cliente?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carteira_clientes_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "carteira_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carteira_uploads: {
+        Row: {
+          data_upload: string
+          id: string
+          nome_arquivo: string
+          registros_importados: number
+        }
+        Insert: {
+          data_upload?: string
+          id?: string
+          nome_arquivo: string
+          registros_importados: number
+        }
+        Update: {
+          data_upload?: string
+          id?: string
+          nome_arquivo?: string
+          registros_importados?: number
         }
         Relationships: []
       }
