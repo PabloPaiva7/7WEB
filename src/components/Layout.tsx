@@ -1,6 +1,7 @@
 
+import { Link } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { Users, BarChart2, Calendar, Settings, Search } from "lucide-react";
+import { Users, BarChart2, Calendar, Settings } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,34 +15,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/" className="flex items-center gap-3">
+                  <Link to="/" className="flex items-center gap-3">
                     <Users className="h-5 w-5" />
                     <span>Clientes</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/carteira" className="flex items-center gap-3">
+                  <Link to="/carteira" className="flex items-center gap-3">
                     <BarChart2 className="h-5 w-5" />
                     <span>Carteira</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/calendario" className="flex items-center gap-3">
+                  <Link to="/calendario" className="flex items-center gap-3">
                     <Calendar className="h-5 w-5" />
                     <span>Calendário</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/configuracoes" className="flex items-center gap-3">
+                  <Link to="/configuracoes" className="flex items-center gap-3">
                     <Settings className="h-5 w-5" />
                     <span>Configurações</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
