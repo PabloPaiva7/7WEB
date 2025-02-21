@@ -370,13 +370,14 @@ const Carteira = () => {
     setFilters(newFilters);
     
     let filtered = clientes;
-    if (newFilters.banco) {
+    
+    if (newFilters.banco && newFilters.banco !== 'todos') {
       filtered = filtered.filter(c => c.banco === newFilters.banco);
     }
-    if (newFilters.escritorio) {
+    if (newFilters.escritorio && newFilters.escritorio !== 'todos') {
       filtered = filtered.filter(c => c.escritorio === newFilters.escritorio);
     }
-    if (newFilters.prazo) {
+    if (newFilters.prazo && newFilters.prazo !== 'todos') {
       filtered = filtered.filter(c => c.prazo === newFilters.prazo);
     }
     if (searchTerm) {
