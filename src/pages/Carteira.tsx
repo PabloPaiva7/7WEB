@@ -5,6 +5,7 @@ import { Search, Upload, Download, BarChart, Plus, Trash, Edit } from "lucide-re
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ValidationError } from "@/utils/csvUtils";
 import {
   Dialog,
   DialogContent,
