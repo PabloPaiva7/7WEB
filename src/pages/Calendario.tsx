@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +11,7 @@ type Compromisso = {
   descricao: string;
 };
 
-const Calendario = () => {
+export default function Calendario() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const { toast } = useToast();
   
@@ -93,6 +92,4 @@ const Calendario = () => {
       </div>
     </div>
   );
-};
-
-export default Calendario;
+}
