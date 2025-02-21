@@ -181,6 +181,12 @@ const Carteira = () => {
   const [historico, setHistorico] = useState<{data: string, acao: string}[]>([]);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewHeaders, setPreviewHeaders] = useState<string[]>([]);
+  const [previewErrors, setPreviewErrors] = useState<ValidationError[]>([]);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 

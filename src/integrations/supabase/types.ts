@@ -77,21 +77,30 @@ export type Database = {
       carteira_uploads: {
         Row: {
           data_upload: string
+          erro_mensagem: string | null
           id: string
+          mapeamento: Json | null
           nome_arquivo: string
           registros_importados: number
+          status: Database["public"]["Enums"]["upload_status"] | null
         }
         Insert: {
           data_upload?: string
+          erro_mensagem?: string | null
           id?: string
+          mapeamento?: Json | null
           nome_arquivo: string
           registros_importados: number
+          status?: Database["public"]["Enums"]["upload_status"] | null
         }
         Update: {
           data_upload?: string
+          erro_mensagem?: string | null
           id?: string
+          mapeamento?: Json | null
           nome_arquivo?: string
           registros_importados?: number
+          status?: Database["public"]["Enums"]["upload_status"] | null
         }
         Relationships: []
       }
@@ -103,7 +112,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      upload_status: "pendente" | "processando" | "concluido" | "erro"
     }
     CompositeTypes: {
       [_ in never]: never
