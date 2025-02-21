@@ -25,7 +25,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
                 <SelectValue placeholder="Selecione um banco" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="todos">Todos</SelectItem>
                 {bancos.map((banco) => (
                   <SelectItem key={banco} value={banco}>{banco}</SelectItem>
                 ))}
@@ -42,7 +42,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
                 <SelectValue placeholder="Selecione um escritório" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="todos">Todos</SelectItem>
                 {escritorios.map((escritorio) => (
                   <SelectItem key={escritorio} value={escritorio}>{escritorio}</SelectItem>
                 ))}
@@ -59,7 +59,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
                 <SelectValue placeholder="Selecione um prazo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="todos">Todos</SelectItem>
                 {prazos.map((prazo) => (
                   <SelectItem key={prazo} value={prazo}>{prazo}</SelectItem>
                 ))}
