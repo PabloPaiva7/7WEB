@@ -44,7 +44,6 @@ export function Calculadora() {
       setPorcentagem(percent);
       setPorcentagemInput(percent.toFixed(2));
 
-      // Adicionar ao histórico
       setHistorico(prev => [...prev, {
         id: Date.now(),
         saldoDevedor: saldo,
@@ -98,20 +97,13 @@ export function Calculadora() {
     calcularDesconto();
   };
 
-  const copiarResultado = () => {
-    if (resultado !== null && porcentagem !== null) {
-      const texto = `Saldo Devedor: ${saldoDevedor}
-Desconto: ${desconto}
-Valor Final: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado)}
-Desconto: ${porcentagem.toFixed(2)}%`;
-      
-      navigator.clipboard.writeText(texto).then(() => {
-        toast({
-          title: "Copiado!",
-          description: "O resultado foi copiado para a área de transferência.",
-        });
+  const copiarValor = (valor: string, campo: string) => {
+    navigator.clipboard.writeText(valor).then(() => {
+      toast({
+        title: "Copiado!",
+        description: `O valor do campo ${campo} foi copiado para a área de transferência.`,
       });
-    }
+    });
   };
 
   return (
@@ -167,13 +159,24 @@ Desconto: ${porcentagem.toFixed(2)}%`;
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="saldo">Saldo Devedor</Label>
-          <Input
-            id="saldo"
-            value={saldoDevedor}
-            onChange={(e) => handleSaldoChange(e.target.value)}
-            placeholder="R$ 0,00"
-          />
+          <div className="relative">
+            <Input
+              id="saldo"
+              value={saldoDevedor}
+              onChange={(e) => handleSaldoChange(e.target.value)}
+              placeholder="R$ 0,00"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              onClick={() => copiarValor(saldoDevedor, "Saldo Devedor")}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="porcentagem">Porcentagem de Desconto</Label>
           <div className="relative">
@@ -184,37 +187,80 @@ Desconto: ${porcentagem.toFixed(2)}%`;
               placeholder="0.00"
               className="pr-8"
             />
-            <Percent className="h-4 w-4 absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              onClick={() => copiarValor(porcentagemInput, "Porcentagem")}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Percent className="h-4 w-4 absolute right-8 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
           </div>
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="desconto">Valor do Desconto</Label>
-          <Input
-            id="desconto"
-            value={desconto}
-            onChange={(e) => handleDescontoChange(e.target.value)}
-            placeholder="R$ 0,00"
-          />
+          <div className="relative">
+            <Input
+              id="desconto"
+              value={desconto}
+              onChange={(e) => handleDescontoChange(e.target.value)}
+              placeholder="R$ 0,00"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              onClick={() => copiarValor(desconto, "Valor do Desconto")}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+
         {resultado !== null && porcentagem !== null && (
           <div className="space-y-2 pt-2">
             <div className="flex justify-between items-center">
               <div className="space-y-1">
-                <div className="text-sm">
+                <div className="text-sm relative group">
                   <span className="font-medium">Valor Final:</span>{" "}
-                  {new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(resultado)}
+                  <span className="group-hover:bg-accent/50 rounded px-1">
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(resultado)}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute -right-8 top-1/2 -translate-y-1/2"
+                    onClick={() => copiarValor(
+                      new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(resultado),
+                      "Valor Final"
+                    )}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
                 </div>
-                <div className="text-sm">
+                <div className="text-sm relative group">
                   <span className="font-medium">Desconto:</span>{" "}
-                  {porcentagem.toFixed(2)}%
+                  <span className="group-hover:bg-accent/50 rounded px-1">
+                    {porcentagem.toFixed(2)}%
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute -right-8 top-1/2 -translate-y-1/2"
+                    onClick={() => copiarValor(`${porcentagem.toFixed(2)}%`, "Porcentagem de Desconto")}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-              <Button variant="outline" size="icon" onClick={copiarResultado}>
-                <Copy className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         )}
