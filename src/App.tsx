@@ -1,11 +1,11 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
-import { Index } from "./pages/Index";
-import { Carteira } from "./pages/Carteira";
-import { Calendario } from "./pages/Calendario";
+import Index from "./pages/Index";
+import Carteira from "./pages/Carteira";
+import Calendario from "./pages/Calendario";
 import { Configuracoes } from "./pages/Configuracoes";
-import { NotFound } from "./pages/NotFound";
+import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
