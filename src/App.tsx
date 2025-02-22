@@ -5,6 +5,7 @@ import Index from "./pages/Index";
 import Carteira from "./pages/Carteira";
 import Calendario from "./pages/Calendario";
 import { Configuracoes } from "./pages/Configuracoes";
+import DetalhesCliente from "./pages/DetalhesCliente";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/carteira" element={<Carteira />} />
           <Route path="/calendario" element={<Calendario />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
+          <Route path="/cliente/:id" element={<DetalhesCliente />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Dados de exemplo
 const clientesExemplo = [
@@ -24,11 +25,15 @@ const clientesExemplo = [
     regiao: "Sudeste",
     status: "Pendente",
   },
-  // Adicione mais clientes de exemplo conforme necessário
 ];
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  const handleClienteClick = (id: number) => {
+    navigate(`/cliente/${id}`);
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -47,7 +52,11 @@ const Index = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {clientesExemplo.map((cliente) => (
-          <Card key={cliente.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card 
+            key={cliente.id} 
+            className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => handleClienteClick(cliente.id)}
+          >
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-muted-foreground">Cliente</p>
