@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,50 @@ const cores = [
   { nome: "Rosa", hex: "#ec4899" },
 ];
 
+const hexToHsl = (hex: string) => {
+  // Remove o # se existir
+  hex = hex.replace(/^#/, '');
+
+  // Converte para RGB
+  let r = parseInt(hex.substring(0, 2), 16) / 255;
+  let g = parseInt(hex.substring(2, 4), 16) / 255;
+  let b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  // Encontra o mínimo e máximo dos valores RGB
+  let max = Math.max(r, g, b);
+  let min = Math.min(r, g, b);
+  
+  let h = 0;
+  let s = 0;
+  let l = (max + min) / 2;
+
+  if (max !== min) {
+    let d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    
+    h /= 6;
+  }
+
+  // Converte para os valores que o CSS espera
+  h = Math.round(h * 360);
+  s = Math.round(s * 100);
+  l = Math.round(l * 100);
+
+  return `${h} ${s}% ${l}%`;
+};
+
 export function Configuracoes() {
   const [corSelecionada, setCorSelecionada] = useState(cores[0].hex);
   const [corPersonalizada, setCorPersonalizada] = useState("");
@@ -22,7 +66,8 @@ export function Configuracoes() {
   const aplicarCor = (cor: string) => {
     // Validar se é uma cor hex válida
     if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(cor)) {
-      document.documentElement.style.setProperty('--primary', cor);
+      const hsl = hexToHsl(cor);
+      document.documentElement.style.setProperty('--primary', hsl);
       localStorage.setItem('tema-cor', cor);
       toast({
         title: "Tema atualizado!",
@@ -42,14 +87,14 @@ export function Configuracoes() {
     aplicarCor(corPersonalizada);
   };
 
-  // Recuperar cor salva ao carregar a página
-  useState(() => {
+  // Recuperar e aplicar cor salva ao carregar a página
+  useEffect(() => {
     const corSalva = localStorage.getItem('tema-cor');
     if (corSalva) {
-      document.documentElement.style.setProperty('--primary', corSalva);
       setCorSelecionada(corSalva);
+      aplicarCor(corSalva);
     }
-  });
+  }, []);
 
   return (
     <div className="container mx-auto py-6">
@@ -97,6 +142,7 @@ export function Configuracoes() {
                 <form onSubmit={handleCorPersonalizada} className="flex gap-3">
                   <div className="flex-1">
                     <Input
+                      type="text"
                       placeholder="#000000"
                       value={corPersonalizada}
                       onChange={(e) => setCorPersonalizada(e.target.value)}
