@@ -4,28 +4,53 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
-// Dados de exemplo
+// Dados de exemplo atualizados com valores
 const clientesExemplo = [
   {
     id: 1,
     nome: "João Silva",
-    banco: "Banco A",
+    banco: "Banco BV",
     mesesAtraso: 3,
     codigoAssessoria: "ASS001",
     regiao: "Sul",
     status: "Em andamento",
+    valorDivida: 200000,
   },
   {
     id: 2,
     nome: "Maria Santos",
-    banco: "Banco B",
+    banco: "Banco Santander",
     mesesAtraso: 2,
     codigoAssessoria: "ASS002",
     regiao: "Sudeste",
     status: "Pendente",
+    valorDivida: 100000,
+  },
+  {
+    id: 3,
+    nome: "Pedro Costa",
+    banco: "Banco BV",
+    mesesAtraso: 4,
+    codigoAssessoria: "ASS003",
+    regiao: "Norte",
+    status: "Em andamento",
+    valorDivida: 150000,
+  },
+  {
+    id: 4,
+    nome: "Ana Lima",
+    banco: "Banco Itaú",
+    mesesAtraso: 1,
+    codigoAssessoria: "ASS004",
+    regiao: "Nordeste",
+    status: "Pendente",
+    valorDivida: 50000,
   },
 ];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +59,28 @@ const Index = () => {
   const handleClienteClick = (id: number) => {
     navigate(`/cliente/${id}`);
   };
+
+  // Calcular valores por banco
+  const valoresPorBanco = clientesExemplo.reduce((acc, cliente) => {
+    acc[cliente.banco] = (acc[cliente.banco] || 0) + cliente.valorDivida;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Preparar dados para o gráfico
+  const dadosGrafico = Object.entries(valoresPorBanco).map(([banco, valor]) => ({
+    banco,
+    valor,
+  }));
+
+  // Calcular valor total
+  const valorTotal = Object.values(valoresPorBanco).reduce((a, b) => a + b, 0);
+
+  // Filtrar clientes baseado na busca
+  const clientesFiltrados = clientesExemplo.filter(cliente =>
+    cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cliente.banco.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    cliente.codigoAssessoria.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -50,8 +97,71 @@ const Index = () => {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4">Análise de Valores por Banco</h2>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Valor Total da Carteira</p>
+              <p className="text-2xl font-bold text-primary">
+                {new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                }).format(valorTotal)}
+              </p>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(valoresPorBanco).map(([banco, valor]) => (
+                <div key={banco} className="flex justify-between items-center">
+                  <span className="font-medium">{banco}</span>
+                  <span className="text-muted-foreground">
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(valor)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4">Distribuição por Banco</h2>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={dadosGrafico}
+                  dataKey="valor"
+                  nameKey="banco"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={({ banco, percent }) => 
+                    `${banco} (${(percent * 100).toFixed(0)}%)`
+                  }
+                >
+                  {dadosGrafico.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value: number) => 
+                    new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(value)
+                  }
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {clientesExemplo.map((cliente) => (
+        {clientesFiltrados.map((cliente) => (
           <Card 
             key={cliente.id} 
             className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
@@ -77,8 +187,13 @@ const Index = () => {
                   <p className="font-medium">{cliente.regiao}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Código</p>
-                  <p className="font-medium">{cliente.codigoAssessoria}</p>
+                  <p className="text-sm text-muted-foreground">Valor</p>
+                  <p className="font-medium">
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(cliente.valorDivida)}
+                  </p>
                 </div>
               </div>
 
