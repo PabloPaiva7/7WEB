@@ -427,7 +427,7 @@ const Carteira = () => {
   }));
 
   return (
-    <div className="flex gap-6">
+    <div className="flex gap-6 h-[calc(100vh-2rem)] overflow-hidden">
       {!isMobile && (
         <CarteiraSidebar
           bancos={bancos}
@@ -436,8 +436,8 @@ const Carteira = () => {
           onFilterChange={handleFilterChange}
         />
       )}
-      <div className="flex-1 space-y-6 animate-fadeIn min-w-0">
-        <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center gap-4`}>
+      <div className="flex-1 space-y-6 overflow-y-auto pr-4">
+        <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center gap-4 sticky top-0 bg-background z-10 pb-4`}>
           <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
           <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-row'} gap-4 items-center`}>
             <div className={`relative ${isMobile ? 'w-full' : 'w-64'}`}>
@@ -526,7 +526,7 @@ const Carteira = () => {
         </div>
 
         <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}>
-          <Card className="p-6">
+          <Card className="p-6 overflow-hidden">
             <h3 className="text-lg font-semibold mb-4">Análise da Carteira</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -544,28 +544,25 @@ const Carteira = () => {
                   </p>
                 </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Distribuição por Situação</p>
-                <div className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsBarChart data={dadosGrafico}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="nome" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="valor" fill="#8884d8" />
-                    </RechartsBarChart>
-                  </ResponsiveContainer>
-                </div>
+              <div className="h-[200px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsBarChart data={dadosGrafico} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="nome" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="valor" fill="#8884d8" />
+                  </RechartsBarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 overflow-hidden">
             <h3 className="text-lg font-semibold mb-4">Distribuição por Banco</h3>
-            <div className="h-[250px]">
+            <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
                   <Pie
                     data={dadosPizza}
                     cx="50%"
@@ -587,8 +584,8 @@ const Carteira = () => {
           </Card>
         </div>
 
-        <Card>
-          <div className="p-6 overflow-x-auto">
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
