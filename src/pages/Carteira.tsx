@@ -1,7 +1,8 @@
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Upload, Download, BarChart, Plus, Trash, Edit } from "lucide-react";
+import { Search, Upload, Download, Plus, Trash, Edit } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -427,7 +428,7 @@ const Carteira = () => {
   }));
 
   return (
-    <div className="flex gap-6 h-[calc(100vh-2rem)] overflow-hidden">
+    <div className="flex gap-4 h-[calc(100vh-2rem)]">
       {!isMobile && (
         <CarteiraSidebar
           bancos={bancos}
@@ -436,107 +437,110 @@ const Carteira = () => {
           onFilterChange={handleFilterChange}
         />
       )}
-      <div className="flex-1 space-y-6 overflow-y-auto pr-4">
-        <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center gap-4 sticky top-0 bg-background z-10 pb-4`}>
-          <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
-          <div className={`flex ${isMobile ? 'flex-col w-full' : 'flex-row'} gap-4 items-center`}>
-            <div className={`relative ${isMobile ? 'w-full' : 'w-64'}`}>
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Buscar..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  handleFilterChange('search', e.target.value);
-                }}
-              />
-            </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="default" className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Novo Cliente
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingCliente ? "Editar Cliente" : "Novo Cliente"}
-                  </DialogTitle>
-                </DialogHeader>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {Object.entries(columnConfig).map(([key, config]) => (
-                        key !== 'id' && (
-                          <FormField
-                            key={key}
-                            control={form.control}
-                            name={key as keyof Cliente}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{config.label}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type={config.type === 'date' ? 'date' : 'text'}
-                                    {...field}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                        )
-                      ))}
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <Button type="button" variant="outline" onClick={() => {
-                        setIsDialogOpen(false);
-                        setEditingCliente(null);
-                        form.reset();
-                      }}>
-                        Cancelar
-                      </Button>
-                      <Button type="submit">
-                        {editingCliente ? "Salvar" : "Adicionar"}
-                      </Button>
-                    </div>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
-            <Button variant="outline" className="gap-2" asChild>
-              <label className="cursor-pointer">
-                <Upload className="h-4 w-4" />
-                Importar CSV
-                <input
-                  type="file"
-                  accept=".csv"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                  onClick={(e) => (e.currentTarget.value = '')}
+      <div className="flex-1 overflow-y-auto space-y-4">
+        <div className="sticky top-0 bg-background z-10 pb-2">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
+            <div className="flex flex-wrap gap-2 items-center">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Buscar..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    handleFilterChange('search', e.target.value);
+                  }}
                 />
-              </label>
-            </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
+              </div>
+              <div className="flex gap-2">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="default" size="sm" className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      Novo
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingCliente ? "Editar Cliente" : "Novo Cliente"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {Object.entries(columnConfig).map(([key, config]) => (
+                            key !== 'id' && (
+                              <FormField
+                                key={key}
+                                control={form.control}
+                                name={key as keyof Cliente}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>{config.label}</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        type={config.type === 'date' ? 'date' : 'text'}
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            )
+                          ))}
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button type="button" variant="outline" onClick={() => {
+                            setIsDialogOpen(false);
+                            setEditingCliente(null);
+                            form.reset();
+                          }}>
+                            Cancelar
+                          </Button>
+                          <Button type="submit">
+                            {editingCliente ? "Salvar" : "Adicionar"}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+                <Button variant="outline" size="sm" className="gap-2" asChild>
+                  <label className="cursor-pointer">
+                    <Upload className="h-4 w-4" />
+                    CSV
+                    <input
+                      type="file"
+                      accept=".csv"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                      onClick={(e) => (e.currentTarget.value = '')}
+                    />
+                  </label>
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-6`}>
-          <Card className="p-6 overflow-hidden">
-            <h3 className="text-lg font-semibold mb-4">Análise da Carteira</h3>
-            <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-2">Análise da Carteira</h3>
+            <div className="space-y-2">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Total de Clientes</p>
-                  <p className="text-2xl font-bold">{estatisticas.totalClientes}</p>
+                  <p className="text-xl font-bold">{estatisticas.totalClientes}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Valor Total</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-xl font-bold">
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
@@ -544,7 +548,7 @@ const Carteira = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-[200px] w-full">
+              <div className="h-[180px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsBarChart data={dadosGrafico} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -558,11 +562,11 @@ const Carteira = () => {
             </div>
           </Card>
 
-          <Card className="p-6 overflow-hidden">
-            <h3 className="text-lg font-semibold mb-4">Distribuição por Banco</h3>
-            <div className="h-[250px] w-full">
+          <Card className="p-4">
+            <h3 className="text-lg font-semibold mb-2">Distribuição por Banco</h3>
+            <div className="h-[200px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                <PieChart>
                   <Pie
                     data={dadosPizza}
                     cx="50%"
@@ -604,7 +608,7 @@ const Carteira = () => {
                       </TableCell>
                     ))}
                     <TableCell>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1">
                         <Button
                           variant="outline"
                           size="icon"
@@ -629,12 +633,12 @@ const Carteira = () => {
         </Card>
 
         <Card>
-          <div className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Histórico de Ações</h3>
-            <div className="space-y-2">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold mb-2">Histórico de Ações</h3>
+            <div className="space-y-1">
               {historico.map((item, index) => (
                 <div key={index} className="flex justify-between text-sm">
-                  <span>{new Date(item.data).toLocaleString()}</span>
+                  <span className="text-muted-foreground">{new Date(item.data).toLocaleString()}</span>
                   <span>{item.acao}</span>
                 </div>
               ))}
