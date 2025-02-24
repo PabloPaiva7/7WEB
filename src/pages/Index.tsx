@@ -2,67 +2,57 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-
-// Dados de exemplo atualizados com valores
-const clientesExemplo = [
-  {
-    id: 1,
-    nome: "João Silva",
-    banco: "Banco BV",
-    mesesAtraso: 3,
-    codigoAssessoria: "ASS001",
-    regiao: "Sul",
-    status: "Em andamento",
-    valorDivida: 200000,
-  },
-  {
-    id: 2,
-    nome: "Maria Santos",
-    banco: "Banco Santander",
-    mesesAtraso: 2,
-    codigoAssessoria: "ASS002",
-    regiao: "Sudeste",
-    status: "Pendente",
-    valorDivida: 100000,
-  },
-  {
-    id: 3,
-    nome: "Pedro Costa",
-    banco: "Banco BV",
-    mesesAtraso: 4,
-    codigoAssessoria: "ASS003",
-    regiao: "Norte",
-    status: "Em andamento",
-    valorDivida: 150000,
-  },
-  {
-    id: 4,
-    nome: "Ana Lima",
-    banco: "Banco Itaú",
-    mesesAtraso: 1,
-    codigoAssessoria: "ASS004",
-    regiao: "Nordeste",
-    status: "Pendente",
-    valorDivida: 50000,
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
+interface Cliente {
+  id: string;
+  contrato: string;
+  banco: string;
+  valor_cliente: number;
+  escritorio: string;
+  data: string;
+  situacao: string;
+}
+
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const navigate = useNavigate();
 
-  const handleClienteClick = (id: number) => {
+  const handleClienteClick = (id: string) => {
     navigate(`/cliente/${id}`);
   };
 
+  // Buscar dados do Supabase
+  useEffect(() => {
+    const fetchClientes = async () => {
+      const { data, error } = await supabase
+        .from("carteira_clientes")
+        .select("*");
+
+      if (error) {
+        console.error("Erro ao buscar clientes:", error);
+        return;
+      }
+
+      if (data) {
+        setClientes(data);
+      }
+    };
+
+    fetchClientes();
+  }, []);
+
   // Calcular valores por banco
-  const valoresPorBanco = clientesExemplo.reduce((acc, cliente) => {
-    acc[cliente.banco] = (acc[cliente.banco] || 0) + cliente.valorDivida;
+  const valoresPorBanco = clientes.reduce((acc, cliente) => {
+    if (cliente.banco && cliente.valor_cliente) {
+      acc[cliente.banco] = (acc[cliente.banco] || 0) + cliente.valor_cliente;
+    }
     return acc;
   }, {} as Record<string, number>);
 
@@ -76,14 +66,14 @@ const Index = () => {
   const valorTotal = Object.values(valoresPorBanco).reduce((a, b) => a + b, 0);
 
   // Filtrar clientes baseado na busca
-  const clientesFiltrados = clientesExemplo.filter(cliente =>
-    cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.banco.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.codigoAssessoria.toLowerCase().includes(searchTerm.toLowerCase())
+  const clientesFiltrados = clientes.filter(cliente =>
+    (cliente.contrato && cliente.contrato.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (cliente.banco && cliente.banco.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (cliente.escritorio && cliente.escritorio.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-4 animate-fadeIn">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-foreground">Carteira de Clientes</h1>
         <div className="relative w-64">
@@ -97,8 +87,8 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="p-4">
           <h2 className="text-lg font-semibold mb-4">Análise de Valores por Banco</h2>
           <div className="space-y-4">
             <div>
@@ -126,7 +116,7 @@ const Index = () => {
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4">
           <h2 className="text-lg font-semibold mb-4">Distribuição por Banco</h2>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -164,13 +154,13 @@ const Index = () => {
         {clientesFiltrados.map((cliente) => (
           <Card 
             key={cliente.id} 
-            className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+            className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
             onClick={() => handleClienteClick(cliente.id)}
           >
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-muted-foreground">Cliente</p>
-                <h3 className="text-lg font-medium">{cliente.nome}</h3>
+                <p className="text-sm text-muted-foreground">Contrato</p>
+                <h3 className="text-lg font-medium">{cliente.contrato}</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -179,12 +169,12 @@ const Index = () => {
                   <p className="font-medium">{cliente.banco}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Meses em Atraso</p>
-                  <p className="font-medium">{cliente.mesesAtraso}</p>
+                  <p className="text-sm text-muted-foreground">Escritório</p>
+                  <p className="font-medium">{cliente.escritorio}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Região</p>
-                  <p className="font-medium">{cliente.regiao}</p>
+                  <p className="text-sm text-muted-foreground">Data</p>
+                  <p className="font-medium">{new Date(cliente.data).toLocaleDateString('pt-BR')}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Valor</p>
@@ -192,18 +182,18 @@ const Index = () => {
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
-                    }).format(cliente.valorDivida)}
+                    }).format(cliente.valor_cliente)}
                   </p>
                 </div>
               </div>
 
               <div className="pt-2">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  cliente.status === "Em andamento" 
+                  cliente.situacao === "Em andamento" 
                     ? "bg-blue-100 text-blue-800" 
                     : "bg-yellow-100 text-yellow-800"
                 }`}>
-                  {cliente.status}
+                  {cliente.situacao}
                 </span>
               </div>
             </div>
