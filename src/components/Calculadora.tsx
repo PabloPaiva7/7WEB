@@ -157,28 +157,40 @@ export function Calculadora() {
         </Dialog>
       </div>
       <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="saldo">Saldo Devedor</Label>
-          <div className="relative">
-            <Input
-              id="saldo"
-              value={saldoDevedor}
-              onChange={(e) => handleSaldoChange(e.target.value)}
-              placeholder="R$ 0,00"
-            />
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <Label htmlFor="saldo">Saldo Devedor</Label>
             <Button
               variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+              size="sm"
               onClick={() => copiarValor(saldoDevedor, "Saldo Devedor")}
+              className="h-6"
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3 w-3 mr-1" />
+              Copiar
             </Button>
           </div>
+          <Input
+            id="saldo"
+            value={saldoDevedor}
+            onChange={(e) => handleSaldoChange(e.target.value)}
+            placeholder="R$ 0,00"
+          />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="porcentagem">Porcentagem de Desconto</Label>
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <Label htmlFor="porcentagem">Porcentagem de Desconto</Label>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => copiarValor(porcentagemInput, "Porcentagem")}
+              className="h-6"
+            >
+              <Copy className="h-3 w-3 mr-1" />
+              Copiar
+            </Button>
+          </div>
           <div className="relative">
             <Input
               id="porcentagem"
@@ -187,45 +199,38 @@ export function Calculadora() {
               placeholder="0.00"
               className="pr-8"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2"
-              onClick={() => copiarValor(porcentagemInput, "Porcentagem")}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-            <Percent className="h-4 w-4 absolute right-8 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Percent className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="desconto">Valor do Desconto</Label>
-          <div className="relative">
-            <Input
-              id="desconto"
-              value={desconto}
-              onChange={(e) => handleDescontoChange(e.target.value)}
-              placeholder="R$ 0,00"
-            />
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <Label htmlFor="desconto">Valor do Desconto</Label>
             <Button
               variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+              size="sm"
               onClick={() => copiarValor(desconto, "Valor do Desconto")}
+              className="h-6"
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3 w-3 mr-1" />
+              Copiar
             </Button>
           </div>
+          <Input
+            id="desconto"
+            value={desconto}
+            onChange={(e) => handleDescontoChange(e.target.value)}
+            placeholder="R$ 0,00"
+          />
         </div>
 
         {resultado !== null && porcentagem !== null && (
-          <div className="space-y-2 pt-2">
-            <div className="flex justify-between items-center">
-              <div className="space-y-1">
-                <div className="text-sm relative group">
-                  <span className="font-medium">Valor Final:</span>{" "}
-                  <span className="group-hover:bg-accent/50 rounded px-1">
+          <div className="pt-2">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Valor Final</span>
+                <div className="flex items-center gap-2">
+                  <span>
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
@@ -233,8 +238,7 @@ export function Calculadora() {
                   </span>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="absolute -right-8 top-1/2 -translate-y-1/2"
+                    size="sm"
                     onClick={() => copiarValor(
                       new Intl.NumberFormat('pt-BR', {
                         style: 'currency',
@@ -242,22 +246,25 @@ export function Calculadora() {
                       }).format(resultado),
                       "Valor Final"
                     )}
+                    className="h-6"
                   >
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-3 w-3 mr-1" />
+                    Copiar
                   </Button>
                 </div>
-                <div className="text-sm relative group">
-                  <span className="font-medium">Desconto:</span>{" "}
-                  <span className="group-hover:bg-accent/50 rounded px-1">
-                    {porcentagem.toFixed(2)}%
-                  </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Desconto</span>
+                <div className="flex items-center gap-2">
+                  <span>{porcentagem.toFixed(2)}%</span>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="absolute -right-8 top-1/2 -translate-y-1/2"
+                    size="sm"
                     onClick={() => copiarValor(`${porcentagem.toFixed(2)}%`, "Porcentagem de Desconto")}
+                    className="h-6"
                   >
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-3 w-3 mr-1" />
+                    Copiar
                   </Button>
                 </div>
               </div>

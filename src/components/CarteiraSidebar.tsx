@@ -13,6 +13,10 @@ type FilterProps = {
 };
 
 export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }: FilterProps) {
+  const handleFilterChange = (type: string, value: string | null) => {
+    onFilterChange(type, value || 'todos');
+  };
+
   return (
     <Card className="p-4 h-[calc(100vh-2rem)] w-64">
       <h3 className="font-semibold mb-4">Filtros</h3>
@@ -20,7 +24,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
         <div className="space-y-6">
           <div className="space-y-2">
             <Label>Banco</Label>
-            <Select onValueChange={(value) => onFilterChange('banco', value)}>
+            <Select onValueChange={(value) => handleFilterChange('banco', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um banco" />
               </SelectTrigger>
@@ -37,7 +41,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
 
           <div className="space-y-2">
             <Label>Escritório</Label>
-            <Select onValueChange={(value) => onFilterChange('escritorio', value)}>
+            <Select onValueChange={(value) => handleFilterChange('escritorio', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um escritório" />
               </SelectTrigger>
@@ -54,7 +58,7 @@ export function CarteiraSidebar({ bancos, escritorios, prazos, onFilterChange }:
 
           <div className="space-y-2">
             <Label>Prazo</Label>
-            <Select onValueChange={(value) => onFilterChange('prazo', value)}>
+            <Select onValueChange={(value) => handleFilterChange('prazo', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um prazo" />
               </SelectTrigger>
