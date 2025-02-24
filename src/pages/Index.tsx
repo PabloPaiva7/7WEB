@@ -12,11 +12,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 interface Cliente {
   id: string;
   contrato: string;
-  banco: string;
-  valor_cliente: number;
-  escritorio: string;
-  data: string;
-  situacao: string;
+  banco: string | null;
+  valor_cliente: string | null;
+  escritorio: string | null;
+  data: string | null;
+  situacao: string | null;
 }
 
 const Index = () => {
@@ -41,6 +41,7 @@ const Index = () => {
       }
 
       if (data) {
+        console.log("Dados recebidos:", data);
         setClientes(data);
       }
     };
@@ -48,10 +49,19 @@ const Index = () => {
     fetchClientes();
   }, []);
 
+  // Função para converter string de valor em número
+  const parseValorCliente = (valor: string | null): number => {
+    if (!valor) return 0;
+    // Remove R$ e outros caracteres não numéricos, exceto ponto e vírgula
+    const numeroLimpo = valor.replace(/[R$\s.]/g, '').replace(',', '.');
+    return parseFloat(numeroLimpo) || 0;
+  };
+
   // Calcular valores por banco
   const valoresPorBanco = clientes.reduce((acc, cliente) => {
-    if (cliente.banco && cliente.valor_cliente) {
-      acc[cliente.banco] = (acc[cliente.banco] || 0) + cliente.valor_cliente;
+    if (cliente.banco) {
+      const valorNumerico = parseValorCliente(cliente.valor_cliente);
+      acc[cliente.banco] = (acc[cliente.banco] || 0) + valorNumerico;
     }
     return acc;
   }, {} as Record<string, number>);
@@ -174,16 +184,13 @@ const Index = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Data</p>
-                  <p className="font-medium">{new Date(cliente.data).toLocaleDateString('pt-BR')}</p>
+                  <p className="font-medium">
+                    {cliente.data ? new Date(cliente.data).toLocaleDateString('pt-BR') : '-'}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Valor</p>
-                  <p className="font-medium">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(cliente.valor_cliente)}
-                  </p>
+                  <p className="font-medium">{cliente.valor_cliente || 'R$ 0,00'}</p>
                 </div>
               </div>
 
@@ -193,7 +200,7 @@ const Index = () => {
                     ? "bg-blue-100 text-blue-800" 
                     : "bg-yellow-100 text-yellow-800"
                 }`}>
-                  {cliente.situacao}
+                  {cliente.situacao || 'Pendente'}
                 </span>
               </div>
             </div>
