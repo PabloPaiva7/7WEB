@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,21 +80,33 @@ const Documentos = () => {
   const handleNovaPasta = async () => {
     if (novaPasta.trim()) {
       try {
+        // Criar novo bucket no Storage com configurações atualizadas
         const { error } = await supabase.storage.createBucket(novaPasta.toLowerCase(), {
-          public: true
+          public: true,
+          fileSizeLimit: 52428800, // 50MB
+          allowedMimeTypes: [
+            'image/jpeg',
+            'image/png',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/csv'
+          ]
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erro detalhado:', error);
+          throw error;
+        }
 
-        setPastas([
-          ...pastas,
-          {
-            id: Date.now(),
-            nome: novaPasta,
-            documentos: [],
-          },
-        ]);
-        
+        // Atualizar a lista de pastas localmente
+        const novaPastaObj = {
+          id: Date.now(),
+          nome: novaPasta.toLowerCase(),
+          documentos: [],
+        };
+
+        setPastas(prevPastas => [...prevPastas, novaPastaObj]);
         setNovaPasta("");
         setDialogAberto(false);
         
@@ -101,12 +114,15 @@ const Documentos = () => {
           title: "Pasta criada",
           description: "A pasta foi criada com sucesso."
         });
-      } catch (error) {
+
+        // Recarregar pastas para garantir sincronização
+        await carregarPastas();
+      } catch (error: any) {
         console.error('Erro ao criar pasta:', error);
         toast({
           variant: "destructive",
           title: "Erro ao criar pasta",
-          description: "Não foi possível criar a pasta."
+          description: error.message || "Não foi possível criar a pasta."
         });
       }
     }
