@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, Download, DollarSign, FileText, Mail, Phone, User, Save, Upload } from "lucide-react";
+import { ArrowLeft, Calendar, Download, DollarSign, FileText, Mail, Phone, User, Save, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
