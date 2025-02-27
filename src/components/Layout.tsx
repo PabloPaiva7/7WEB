@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { Users, BarChart2, Calendar, Settings, FolderOpen } from "lucide-react";
+import { Users, BarChart2, Calendar, Settings, FolderOpen, LayoutPanelLeft } from "lucide-react";
 import { Calculadora } from "./Calculadora";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -43,6 +43,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <Link to="/documentos" className="flex items-center gap-3">
                     <FolderOpen className="h-5 w-5" />
                     <span>Documentos</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/painel" className="flex items-center gap-3">
+                    <LayoutPanelLeft className="h-5 w-5" />
+                    <span>Painel</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
