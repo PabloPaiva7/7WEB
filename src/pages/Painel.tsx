@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { InfoIcon, HelpCircle, Percent, DollarSign, Award, PieChart } from "lucide-react";
+import { InfoIcon, HelpCircle, Percent, DollarSign, Award, PieChart, Users } from "lucide-react";
 
 const Painel = () => {
   return (
