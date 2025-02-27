@@ -13,7 +13,7 @@ interface Cliente {
   id: string;
   contrato: string;
   banco: string | null;
-  valor_cliente: number | null;  // Alterado para number | null
+  valor_cliente: number | null;
   escritorio: string | null;
   data: string | null;
   situacao: string | null;
@@ -34,6 +34,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handleClienteClick = (id: string) => {
+    console.log("Navegando para o cliente:", id);
     navigate(`/cliente/${id}`);
   };
 
