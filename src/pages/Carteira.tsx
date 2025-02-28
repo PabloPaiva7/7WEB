@@ -1,8 +1,8 @@
 
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Upload, Download, Plus, Trash, Edit } from "lucide-react";
+import { Search, Upload, Download, Plus, Trash, Edit, HelpCircle, ArrowRight, AlertTriangle, CheckCircle2, Clock, CreditCard, Users, FileText, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -40,6 +40,9 @@ import {
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
+  Legend,
 } from "recharts";
 import { CarteiraSidebar } from "@/components/CarteiraSidebar";
 import { useForm } from "react-hook-form";
@@ -414,7 +417,7 @@ const Carteira = () => {
     mediaPrazo: filteredClientes.reduce((acc, cliente) => {
       const dias = parseInt(cliente.prazo) || 0;
       return acc + dias;
-    }, 0) / filteredClientes.length,
+    }, 0) / (filteredClientes.length || 1),
   };
 
   const dadosGrafico = Object.entries(estatisticas.porSituacao).map(([nome, valor]) => ({
@@ -426,6 +429,87 @@ const Carteira = () => {
     name: nome,
     value: valor,
   }));
+
+  // Dados para o gráfico de tendência
+  const dadosTendencia = [
+    { mes: 'Jan', valor: 42000 },
+    { mes: 'Fev', valor: 53000 },
+    { mes: 'Mar', valor: 48000 },
+    { mes: 'Abr', valor: 62000 },
+    { mes: 'Mai', valor: 78000 },
+    { mes: 'Jun', valor: 83000 },
+  ];
+
+  // Cards informativos para o dashboard 
+  const cardsDashboard = [
+    { 
+      titulo: 'Guia de Início Rápido', 
+      descricao: 'Como gerenciar seus contratos e carteira de clientes',
+      icone: <HelpCircle className="h-8 w-8 text-blue-500" />,
+      cor: 'bg-blue-50 border-blue-200',
+      acoes: [
+        { texto: 'Ver tutorial', icone: <ArrowRight className="h-4 w-4" /> }
+      ]
+    },
+    { 
+      titulo: 'Contratos Próximos do Vencimento', 
+      descricao: '3 contratos vencem nos próximos 7 dias',
+      icone: <AlertTriangle className="h-8 w-8 text-amber-500" />,
+      cor: 'bg-amber-50 border-amber-200',
+      acoes: [
+        { texto: 'Ver lista', icone: <ArrowRight className="h-4 w-4" /> }
+      ]
+    },
+    { 
+      titulo: 'Clientes Pendentes', 
+      descricao: '7 clientes aguardando análise de documentação',
+      icone: <Clock className="h-8 w-8 text-purple-500" />,
+      cor: 'bg-purple-50 border-purple-200',
+      acoes: [
+        { texto: 'Verificar', icone: <ArrowRight className="h-4 w-4" /> }
+      ]
+    },
+    { 
+      titulo: 'Contratos Aprovados', 
+      descricao: '12 contratos aprovados no último mês',
+      icone: <CheckCircle2 className="h-8 w-8 text-green-500" />,
+      cor: 'bg-green-50 border-green-200',
+      acoes: [
+        { texto: 'Ver detalhes', icone: <ArrowRight className="h-4 w-4" /> }
+      ]
+    }
+  ];
+
+  // KPIs principais
+  const kpis = [
+    { 
+      valor: estatisticas.totalClientes.toString(),
+      label: 'Clientes Ativos',
+      icone: <Users className="h-6 w-6 text-indigo-500" />,
+      cor: 'bg-indigo-50 border-indigo-200'
+    },
+    { 
+      valor: new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(estatisticas.valorTotal),
+      label: 'Carteira Total',
+      icone: <Wallet className="h-6 w-6 text-emerald-500" />,
+      cor: 'bg-emerald-50 border-emerald-200'
+    },
+    { 
+      valor: '27',
+      label: 'Contratos Pendentes',
+      icone: <FileText className="h-6 w-6 text-amber-500" />,
+      cor: 'bg-amber-50 border-amber-200'
+    },
+    { 
+      valor: `${Math.round(estatisticas.mediaPrazo)} dias`,
+      label: 'Prazo Médio',
+      icone: <CreditCard className="h-6 w-6 text-blue-500" />,
+      cor: 'bg-blue-50 border-blue-200'
+    }
+  ];
 
   return (
     <div className="flex gap-4 h-[calc(100vh-2rem)]">
@@ -529,66 +613,166 @@ const Carteira = () => {
           </div>
         </div>
 
+        {/* Cards informativos/Dashboard */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {kpis.map((kpi, index) => (
+            <Card key={index} className={`${kpi.cor}`}>
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{kpi.label}</p>
+                  <p className="text-2xl font-bold">{kpi.valor}</p>
+                </div>
+                <div className="p-3 rounded-full bg-white">
+                  {kpi.icone}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Cards informativos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {cardsDashboard.map((card, index) => (
+            <Card key={index} className={`${card.cor}`}>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-base font-semibold">{card.titulo}</CardTitle>
+                  {card.icone}
+                </div>
+                <CardDescription>{card.descricao}</CardDescription>
+              </CardHeader>
+              <CardContent className="pb-4">
+                <div className="flex space-x-2 mt-2">
+                  {card.acoes.map((acao, i) => (
+                    <Button key={i} variant="outline" size="sm" className="bg-white hover:bg-white/90">
+                      {acao.texto}
+                      {acao.icone}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Análise da Carteira</h3>
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total de Clientes</p>
-                  <p className="text-xl font-bold">{estatisticas.totalClientes}</p>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Análise da Carteira</CardTitle>
+              <CardDescription>Distribuição de contratos por situação</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total de Clientes</p>
+                    <p className="text-xl font-bold">{estatisticas.totalClientes}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Valor Total</p>
+                    <p className="text-xl font-bold">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(estatisticas.valorTotal)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Valor Total</p>
-                  <p className="text-xl font-bold">
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(estatisticas.valorTotal)}
-                  </p>
+                <div className="h-[180px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsBarChart data={dadosGrafico} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="nome" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="valor" fill="#8884d8" />
+                    </RechartsBarChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
-              <div className="h-[180px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsBarChart data={dadosGrafico} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="nome" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="valor" fill="#8884d8" />
-                  </RechartsBarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            </CardContent>
           </Card>
 
-          <Card className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Distribuição por Banco</h3>
-            <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={dadosPizza}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {dadosPizza.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Distribuição por Banco</CardTitle>
+              <CardDescription>Análise do volume por instituição financeira</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={dadosPizza}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {dadosPizza.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
           </Card>
         </div>
 
+        {/* Gráfico de Tendência */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Evolução da Carteira</CardTitle>
+            <CardDescription>Valores totais nos últimos 6 meses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={dadosTendencia}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="mes" />
+                  <YAxis 
+                    tickFormatter={(value) => 
+                      new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                        notation: 'compact',
+                        compactDisplay: 'short'
+                      }).format(value)
+                    } 
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => 
+                      new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(value)
+                    }
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="valor" 
+                    stroke="#8884d8" 
+                    strokeWidth={2}
+                    activeDot={{ r: 8 }} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="overflow-hidden">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Tabela de Contratos</CardTitle>
+            <CardDescription>Lista completa de contratos na carteira</CardDescription>
+          </CardHeader>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -633,8 +817,11 @@ const Carteira = () => {
         </Card>
 
         <Card>
-          <div className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Histórico de Ações</h3>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Histórico de Ações</CardTitle>
+            <CardDescription>Registro das últimas alterações na carteira</CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-1">
               {historico.map((item, index) => (
                 <div key={index} className="flex justify-between text-sm">
@@ -643,7 +830,7 @@ const Carteira = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </CardContent>
         </Card>
       </div>
     </div>

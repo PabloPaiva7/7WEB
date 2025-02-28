@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { Users, BarChart2, Calendar, Settings, FolderOpen, LayoutPanelLeft } from "lucide-react";
+import { Users, BarChart2, Calendar, Settings, FolderOpen, LayoutPanelLeft, CalendarClock } from "lucide-react";
 import { Calculadora } from "./Calculadora";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -35,6 +35,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <Link to="/calendario" className="flex items-center gap-3">
                     <Calendar className="h-5 w-5" />
                     <span>Calendário</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/agenda" className="flex items-center gap-3">
+                    <CalendarClock className="h-5 w-5" />
+                    <span>Agenda</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
