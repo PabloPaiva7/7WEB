@@ -1,8 +1,7 @@
-
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Upload, Download, Plus, Trash, Edit, HelpCircle, ArrowRight, AlertTriangle, CheckCircle2, Clock, CreditCard, Users, FileText, Wallet } from "lucide-react";
+import { Search, Upload, Download, Plus, Trash, Edit, HelpCircle, ArrowRight, AlertTriangle, CheckCircle2, Clock, CreditCard, Users, FileText, Wallet, Filter } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -44,8 +43,8 @@ import {
   Line,
   Legend,
 } from "recharts";
-import { CarteiraSidebar } from "@/components/CarteiraSidebar";
 import { useForm } from "react-hook-form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type ColumnConfigBase = {
   label: string;
@@ -430,7 +429,6 @@ const Carteira = () => {
     value: valor,
   }));
 
-  // Dados para o gráfico de tendência
   const dadosTendencia = [
     { mes: 'Jan', valor: 42000 },
     { mes: 'Fev', valor: 53000 },
@@ -440,7 +438,6 @@ const Carteira = () => {
     { mes: 'Jun', valor: 83000 },
   ];
 
-  // Cards informativos para o dashboard 
   const cardsDashboard = [
     { 
       titulo: 'Guia de Início Rápido', 
@@ -480,7 +477,6 @@ const Carteira = () => {
     }
   ];
 
-  // KPIs principais
   const kpis = [
     { 
       valor: estatisticas.totalClientes.toString(),
@@ -512,327 +508,367 @@ const Carteira = () => {
   ];
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-2rem)]">
-      {!isMobile && (
-        <CarteiraSidebar
-          bancos={bancos}
-          escritorios={escritorios}
-          prazos={prazos}
-          onFilterChange={handleFilterChange}
-        />
-      )}
-      <div className="flex-1 overflow-y-auto space-y-4">
-        <div className="sticky top-0 bg-background z-10 pb-2">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
-            <div className="flex flex-wrap gap-2 items-center">
-              <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Buscar..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    handleFilterChange('search', e.target.value);
-                  }}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="default" size="sm" className="gap-2">
-                      <Plus className="h-4 w-4" />
-                      Novo
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>
-                        {editingCliente ? "Editar Cliente" : "Novo Cliente"}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {Object.entries(columnConfig).map(([key, config]) => (
-                            key !== 'id' && (
-                              <FormField
-                                key={key}
-                                control={form.control}
-                                name={key as keyof Cliente}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>{config.label}</FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        type={config.type === 'date' ? 'date' : 'text'}
-                                        {...field}
-                                      />
-                                    </FormControl>
-                                  </FormItem>
-                                )}
-                              />
-                            )
-                          ))}
-                        </div>
-                        <div className="flex justify-end gap-2">
-                          <Button type="button" variant="outline" onClick={() => {
-                            setIsDialogOpen(false);
-                            setEditingCliente(null);
-                            form.reset();
-                          }}>
-                            Cancelar
-                          </Button>
-                          <Button type="submit">
-                            {editingCliente ? "Salvar" : "Adicionar"}
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </Dialog>
-                <Button variant="outline" size="sm" className="gap-2" asChild>
-                  <label className="cursor-pointer">
-                    <Upload className="h-4 w-4" />
-                    CSV
-                    <input
-                      type="file"
-                      accept=".csv"
-                      className="hidden"
-                      onChange={handleFileUpload}
-                      onClick={(e) => (e.currentTarget.value = '')}
-                    />
-                  </label>
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4" />
-                </Button>
-              </div>
+    <div className="space-y-4">
+      <div className="sticky top-0 bg-background z-10 pb-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
+          <div className="flex flex-wrap gap-2 items-center">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Buscar..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  handleFilterChange('search', e.target.value);
+                }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm" className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Novo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingCliente ? "Editar Cliente" : "Novo Cliente"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(columnConfig).map(([key, config]) => (
+                          key !== 'id' && (
+                            <FormField
+                              key={key}
+                              control={form.control}
+                              name={key as keyof Cliente}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{config.label}</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type={config.type === 'date' ? 'date' : 'text'}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          )
+                        ))}
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button type="button" variant="outline" onClick={() => {
+                          setIsDialogOpen(false);
+                          setEditingCliente(null);
+                          form.reset();
+                        }}>
+                          Cancelar
+                        </Button>
+                        <Button type="submit">
+                          {editingCliente ? "Salvar" : "Adicionar"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+              <Button variant="outline" size="sm" className="gap-2" asChild>
+                <label className="cursor-pointer">
+                  <Upload className="h-4 w-4" />
+                  CSV
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                    onClick={(e) => (e.currentTarget.value = '')}
+                  />
+                </label>
+              </Button>
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Cards informativos/Dashboard */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {kpis.map((kpi, index) => (
-            <Card key={index} className={`${kpi.cor}`}>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{kpi.label}</p>
-                  <p className="text-2xl font-bold">{kpi.valor}</p>
+      <Card className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Select onValueChange={(value) => handleFilterChange('banco', value)}>
+              <SelectTrigger>
+                <div className="flex items-center">
+                  <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="Filtrar por banco" />
                 </div>
-                <div className="p-3 rounded-full bg-white">
-                  {kpi.icone}
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os bancos</SelectItem>
+                {bancos.map((banco) => (
+                  <SelectItem key={banco} value={banco}>{banco}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Select onValueChange={(value) => handleFilterChange('escritorio', value)}>
+              <SelectTrigger>
+                <div className="flex items-center">
+                  <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="Filtrar por escritório" />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os escritórios</SelectItem>
+                {escritorios.map((escritorio) => (
+                  <SelectItem key={escritorio} value={escritorio}>{escritorio}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Select onValueChange={(value) => handleFilterChange('prazo', value)}>
+              <SelectTrigger>
+                <div className="flex items-center">
+                  <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="Filtrar por prazo" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os prazos</SelectItem>
+                {prazos.map((prazo) => (
+                  <SelectItem key={prazo} value={prazo}>{prazo}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+      </Card>
 
-        {/* Cards informativos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {cardsDashboard.map((card, index) => (
-            <Card key={index} className={`${card.cor}`}>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-base font-semibold">{card.titulo}</CardTitle>
-                  {card.icone}
-                </div>
-                <CardDescription>{card.descricao}</CardDescription>
-              </CardHeader>
-              <CardContent className="pb-4">
-                <div className="flex space-x-2 mt-2">
-                  {card.acoes.map((acao, i) => (
-                    <Button key={i} variant="outline" size="sm" className="bg-white hover:bg-white/90">
-                      {acao.texto}
-                      {acao.icone}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Análise da Carteira</CardTitle>
-              <CardDescription>Distribuição de contratos por situação</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total de Clientes</p>
-                    <p className="text-xl font-bold">{estatisticas.totalClientes}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Valor Total</p>
-                    <p className="text-xl font-bold">
-                      {new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      }).format(estatisticas.valorTotal)}
-                    </p>
-                  </div>
-                </div>
-                <div className="h-[180px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsBarChart data={dadosGrafico} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="nome" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="valor" fill="#8884d8" />
-                    </RechartsBarChart>
-                  </ResponsiveContainer>
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {kpis.map((kpi, index) => (
+          <Card key={index} className={`${kpi.cor}`}>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">{kpi.label}</p>
+                <p className="text-2xl font-bold">{kpi.valor}</p>
+              </div>
+              <div className="p-3 rounded-full bg-white">
+                {kpi.icone}
               </div>
             </CardContent>
           </Card>
+        ))}
+      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Distribuição por Banco</CardTitle>
-              <CardDescription>Análise do volume por instituição financeira</CardDescription>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {cardsDashboard.map((card, index) => (
+          <Card key={index} className={`${card.cor}`}>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-base font-semibold">{card.titulo}</CardTitle>
+                {card.icone}
+              </div>
+              <CardDescription>{card.descricao}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={dadosPizza}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {dadosPizza.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+            <CardContent className="pb-4">
+              <div className="flex space-x-2 mt-2">
+                {card.acoes.map((acao, i) => (
+                  <Button key={i} variant="outline" size="sm" className="bg-white hover:bg-white/90">
+                    {acao.texto}
+                    {acao.icone}
+                  </Button>
+                ))}
               </div>
             </CardContent>
           </Card>
-        </div>
+        ))}
+      </div>
 
-        {/* Gráfico de Tendência */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Evolução da Carteira</CardTitle>
-            <CardDescription>Valores totais nos últimos 6 meses</CardDescription>
+            <CardTitle className="text-lg font-semibold">Análise da Carteira</CardTitle>
+            <CardDescription>Distribuição de contratos por situação</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px] w-full">
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total de Clientes</p>
+                  <p className="text-xl font-bold">{estatisticas.totalClientes}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Valor Total</p>
+                  <p className="text-xl font-bold">
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(estatisticas.valorTotal)}
+                  </p>
+                </div>
+              </div>
+              <div className="h-[180px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsBarChart data={dadosGrafico} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="nome" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="valor" fill="#8884d8" />
+                  </RechartsBarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Distribuição por Banco</CardTitle>
+            <CardDescription>Análise do volume por instituição financeira</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[200px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dadosTendencia}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="mes" />
-                  <YAxis 
-                    tickFormatter={(value) => 
-                      new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                        notation: 'compact',
-                        compactDisplay: 'short'
-                      }).format(value)
-                    } 
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => 
-                      new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      }).format(value)
-                    }
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="valor" 
-                    stroke="#8884d8" 
-                    strokeWidth={2}
-                    activeDot={{ r: 8 }} 
-                  />
-                </LineChart>
+                <PieChart>
+                  <Pie
+                    data={dadosPizza}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {dadosPizza.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
-
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Tabela de Contratos</CardTitle>
-            <CardDescription>Lista completa de contratos na carteira</CardDescription>
-          </CardHeader>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {Object.entries(columnConfig).map(([key, config]) => (
-                    <TableHead key={key}>{config.label}</TableHead>
-                  ))}
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClientes.map((cliente) => (
-                  <TableRow key={cliente.id}>
-                    {Object.entries(columnConfig).map(([key]) => (
-                      <TableCell key={`${cliente.id}-${key}`}>
-                        {cliente[key as keyof Cliente]}
-                      </TableCell>
-                    ))}
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleEdit(cliente)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleDelete(cliente)}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Histórico de Ações</CardTitle>
-            <CardDescription>Registro das últimas alterações na carteira</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              {historico.map((item, index) => (
-                <div key={index} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{new Date(item.data).toLocaleString()}</span>
-                  <span>{item.acao}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Evolução da Carteira</CardTitle>
+          <CardDescription>Valores totais nos últimos 6 meses</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={dadosTendencia}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="mes" />
+                <YAxis 
+                  tickFormatter={(value) => 
+                    new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                      notation: 'compact',
+                      compactDisplay: 'short'
+                    }).format(value)
+                  } 
+                />
+                <Tooltip 
+                  formatter={(value: number) => 
+                    new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(value)
+                  }
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="valor" 
+                  stroke="#8884d8" 
+                  strokeWidth={2}
+                  activeDot={{ r: 8 }} 
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Tabela de Contratos</CardTitle>
+          <CardDescription>Lista completa de contratos na carteira</CardDescription>
+        </CardHeader>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {Object.entries(columnConfig).map(([key, config]) => (
+                  <TableHead key={key}>{config.label}</TableHead>
+                ))}
+                <TableHead>Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredClientes.map((cliente) => (
+                <TableRow key={cliente.id}>
+                  {Object.entries(columnConfig).map(([key]) => (
+                    <TableCell key={`${cliente.id}-${key}`}>
+                      {cliente[key as keyof Cliente]}
+                    </TableCell>
+                  ))}
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEdit(cliente)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleDelete(cliente)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Histórico de Ações</CardTitle>
+          <CardDescription>Registro das últimas alterações na carteira</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1">
+            {historico.map((item, index) => (
+              <div key={index} className="flex justify-between text-sm">
+                <span className="text-muted-foreground">{new Date(item.data).toLocaleString()}</span>
+                <span>{item.acao}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
