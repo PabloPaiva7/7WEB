@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -16,34 +15,12 @@ import {
   AlertTriangle,
   FileText
 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Painel = () => {
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-foreground">Painel do Colaborador</h1>
-        
-        <div className="w-64">
-          <Select defaultValue="todos">
-            <SelectTrigger>
-              <SelectValue placeholder="Filtrar por status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os status</SelectItem>
-              <SelectItem value="pendente">Pendente</SelectItem>
-              <SelectItem value="prioridade_total">Prioridade Total</SelectItem>
-              <SelectItem value="prioridade">Prioridade</SelectItem>
-              <SelectItem value="verificado">Verificado</SelectItem>
-              <SelectItem value="analise">Análise</SelectItem>
-              <SelectItem value="aprovado">Aprovado</SelectItem>
-              <SelectItem value="quitado">Quitado</SelectItem>
-              <SelectItem value="apreendido">Apreendido</SelectItem>
-              <SelectItem value="cancelado">Cancelado</SelectItem>
-              <SelectItem value="outros_acordos">Outros Acordos</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       {/* Avisos importantes - seção fixa no topo */}

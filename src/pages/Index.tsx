@@ -1,11 +1,12 @@
 
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -30,6 +31,7 @@ interface Cliente {
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const navigate = useNavigate();
 
@@ -76,25 +78,76 @@ const Index = () => {
   // Calcular valor total
   const valorTotal = Object.values(valoresPorBanco).reduce((a, b) => a + b, 0);
 
-  // Filtrar clientes baseado na busca
+  // Filtrar clientes baseado na busca e no status selecionado
   const clientesFiltrados = clientes.filter(cliente =>
     (cliente.contrato && cliente.contrato.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (cliente.banco && cliente.banco.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (cliente.escritorio && cliente.escritorio.toLowerCase().includes(searchTerm.toLowerCase()))
+  ).filter(cliente => 
+    statusFilter === "todos" || 
+    (cliente.situacao && cliente.situacao.toLowerCase() === statusFilter)
   );
+
+  // Gerar alguns status de exemplo para teste
+  const gerarStatusAleatorio = () => {
+    const status = [
+      "Pendente", 
+      "Prioridade Total", 
+      "Prioridade", 
+      "Verificado", 
+      "Análise", 
+      "Aprovado", 
+      "Quitado", 
+      "Apreendido", 
+      "Cancelado", 
+      "Outros Acordos"
+    ];
+    return status[Math.floor(Math.random() * status.length)];
+  };
+
+  // Gerar dados adicionais de teste para clientes que não têm situação definida
+  const clientesComStatus = clientes.map(cliente => ({
+    ...cliente,
+    situacao: cliente.situacao || gerarStatusAleatorio()
+  }));
 
   return (
     <div className="space-y-4 animate-fadeIn">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-foreground">Carteira de Clientes</h1>
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Buscar cliente..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex gap-2 items-center">
+          <div className="w-48">
+            <Select defaultValue="todos" onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-9">
+                <div className="flex items-center">
+                  <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="Filtrar por status" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os status</SelectItem>
+                <SelectItem value="pendente">Pendente</SelectItem>
+                <SelectItem value="prioridade total">Prioridade Total</SelectItem>
+                <SelectItem value="prioridade">Prioridade</SelectItem>
+                <SelectItem value="verificado">Verificado</SelectItem>
+                <SelectItem value="análise">Análise</SelectItem>
+                <SelectItem value="aprovado">Aprovado</SelectItem>
+                <SelectItem value="quitado">Quitado</SelectItem>
+                <SelectItem value="apreendido">Apreendido</SelectItem>
+                <SelectItem value="cancelado">Cancelado</SelectItem>
+                <SelectItem value="outros acordos">Outros Acordos</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Buscar cliente..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -162,7 +215,7 @@ const Index = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {clientesFiltrados.map((cliente) => (
+        {clientesComStatus.map((cliente) => (
           <Card 
             key={cliente.id} 
             className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
@@ -205,9 +258,25 @@ const Index = () => {
 
               <div className="pt-2">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  cliente.situacao === "Em andamento" 
-                    ? "bg-blue-100 text-blue-800" 
-                    : "bg-yellow-100 text-yellow-800"
+                  cliente.situacao === "Pendente" 
+                    ? "bg-yellow-100 text-yellow-800" 
+                    : cliente.situacao === "Prioridade Total"
+                    ? "bg-red-100 text-red-800"
+                    : cliente.situacao === "Prioridade"
+                    ? "bg-orange-100 text-orange-800"
+                    : cliente.situacao === "Verificado"
+                    ? "bg-green-100 text-green-800"
+                    : cliente.situacao === "Análise"
+                    ? "bg-blue-100 text-blue-800"
+                    : cliente.situacao === "Aprovado"
+                    ? "bg-emerald-100 text-emerald-800"
+                    : cliente.situacao === "Quitado"
+                    ? "bg-teal-100 text-teal-800"
+                    : cliente.situacao === "Apreendido"
+                    ? "bg-purple-100 text-purple-800"
+                    : cliente.situacao === "Cancelado"
+                    ? "bg-slate-100 text-slate-800"
+                    : "bg-gray-100 text-gray-800"
                 }`}>
                   {cliente.situacao || 'Pendente'}
                 </span>
@@ -215,6 +284,94 @@ const Index = () => {
             </div>
           </Card>
         ))}
+      </div>
+
+      {/* Cards adicionais para testes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[...Array(6)].map((_, index) => {
+          const status = [
+            "Pendente", 
+            "Prioridade Total", 
+            "Prioridade", 
+            "Verificado", 
+            "Análise", 
+            "Aprovado", 
+            "Quitado", 
+            "Apreendido", 
+            "Cancelado", 
+            "Outros Acordos"
+          ][index % 10];
+          
+          const bancos = ["Banco do Brasil", "Itaú", "Caixa", "Santander", "Bradesco", "Nubank"];
+          const escritorios = ["São Paulo", "Rio de Janeiro", "Belo Horizonte", "Curitiba", "Porto Alegre", "Brasília"];
+          const valores = [15000, 25000, 75000, 35000, 45000, 55000];
+          
+          return (
+            <Card 
+              key={`test-card-${index}`} 
+              className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
+            >
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Contrato</p>
+                  <h3 className="text-lg font-medium">TESTE-{index + 1000}</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Banco</p>
+                    <p className="font-medium">{bancos[index % bancos.length]}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Escritório</p>
+                    <p className="font-medium">{escritorios[index % escritorios.length]}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Data</p>
+                    <p className="font-medium">
+                      {new Date(2023, 5, index + 1).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Valor</p>
+                    <p className="font-medium">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(valores[index % valores.length])}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    status === "Pendente" 
+                      ? "bg-yellow-100 text-yellow-800" 
+                      : status === "Prioridade Total"
+                      ? "bg-red-100 text-red-800"
+                      : status === "Prioridade"
+                      ? "bg-orange-100 text-orange-800"
+                      : status === "Verificado"
+                      ? "bg-green-100 text-green-800"
+                      : status === "Análise"
+                      ? "bg-blue-100 text-blue-800"
+                      : status === "Aprovado"
+                      ? "bg-emerald-100 text-emerald-800"
+                      : status === "Quitado"
+                      ? "bg-teal-100 text-teal-800"
+                      : status === "Apreendido"
+                      ? "bg-purple-100 text-purple-800"
+                      : status === "Cancelado"
+                      ? "bg-slate-100 text-slate-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}>
+                    {status}
+                  </span>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
