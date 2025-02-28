@@ -8,6 +8,7 @@ import { Configuracoes } from "./pages/Configuracoes";
 import DetalhesCliente from "./pages/DetalhesCliente";
 import Documentos from "./pages/Documentos";
 import Painel from "./pages/Painel";
+import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/calendario" element={<Calendario />} />
           <Route path="/documentos" element={<Documentos />} />
           <Route path="/painel" element={<Painel />} />
+          <Route path="/agenda" element={<Agenda />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/cliente/:id" element={<DetalhesCliente />} />
           <Route path="*" element={<NotFound />} />
