@@ -16,12 +16,34 @@ import {
   AlertTriangle,
   FileText
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Painel = () => {
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-foreground">Painel do Colaborador</h1>
+        
+        <div className="w-64">
+          <Select defaultValue="todos">
+            <SelectTrigger>
+              <SelectValue placeholder="Filtrar por status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os status</SelectItem>
+              <SelectItem value="pendente">Pendente</SelectItem>
+              <SelectItem value="prioridade_total">Prioridade Total</SelectItem>
+              <SelectItem value="prioridade">Prioridade</SelectItem>
+              <SelectItem value="verificado">Verificado</SelectItem>
+              <SelectItem value="analise">Análise</SelectItem>
+              <SelectItem value="aprovado">Aprovado</SelectItem>
+              <SelectItem value="quitado">Quitado</SelectItem>
+              <SelectItem value="apreendido">Apreendido</SelectItem>
+              <SelectItem value="cancelado">Cancelado</SelectItem>
+              <SelectItem value="outros_acordos">Outros Acordos</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Avisos importantes - seção fixa no topo */}
@@ -46,6 +68,27 @@ const Painel = () => {
               <div>
                 <p className="font-medium">Sistema de pagamentos em manutenção</p>
                 <p className="text-sm text-muted-foreground">Amanhã das 8h às 10h - Utilize procedimentos manuais durante este período</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 p-2 rounded bg-white">
+              <InfoIcon className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Novo procedimento de verificação</p>
+                <p className="text-sm text-muted-foreground">A partir de 01/06 - Todos os contratos precisarão passar pela etapa de verificação adicional</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 p-2 rounded bg-white">
+              <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Meta mensal atingida</p>
+                <p className="text-sm text-muted-foreground">Parabéns! A equipe atingiu 105% da meta de conversão para o mês de maio</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 p-2 rounded bg-white">
+              <Calendar className="h-5 w-5 text-purple-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Feriado próximo</p>
+                <p className="text-sm text-muted-foreground">09/06 será feriado municipal - Planeje suas entregas com antecedência</p>
               </div>
             </div>
           </div>
