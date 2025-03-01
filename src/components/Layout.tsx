@@ -1,10 +1,12 @@
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { Users, BarChart2, Calendar, Settings, FolderOpen, LayoutPanelLeft, CalendarClock } from "lucide-react";
 import { Calculadora } from "./Calculadora";
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -15,7 +17,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild active={location.pathname === "/"}>
                   <Link to="/" className="flex items-center gap-3">
                     <Users className="h-5 w-5" />
                     <span>Clientes</span>
@@ -23,7 +25,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild active={location.pathname === "/carteira"}>
                   <Link to="/carteira" className="flex items-center gap-3">
                     <BarChart2 className="h-5 w-5" />
                     <span>Carteira</span>
@@ -31,7 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild active={location.pathname === "/calendario"}>
                   <Link to="/calendario" className="flex items-center gap-3">
                     <Calendar className="h-5 w-5" />
                     <span>Calendário</span>
@@ -39,7 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild active={location.pathname === "/agenda"}>
                   <Link to="/agenda" className="flex items-center gap-3">
                     <CalendarClock className="h-5 w-5" />
                     <span>Agenda</span>
@@ -47,7 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild active={location.pathname === "/documentos"}>
                   <Link to="/documentos" className="flex items-center gap-3">
                     <FolderOpen className="h-5 w-5" />
                     <span>Documentos</span>
@@ -55,7 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild active={location.pathname === "/painel"}>
                   <Link to="/painel" className="flex items-center gap-3">
                     <LayoutPanelLeft className="h-5 w-5" />
                     <span>Painel</span>
@@ -63,7 +65,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild active={location.pathname === "/configuracoes"}>
                   <Link to="/configuracoes" className="flex items-center gap-3">
                     <Settings className="h-5 w-5" />
                     <span>Configurações</span>
