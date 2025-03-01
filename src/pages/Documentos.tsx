@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Folder, FolderPlus, File, Search, UploadCloud, X, ArrowLeft } from "luc
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface Documento {
   id: number;
@@ -38,6 +38,7 @@ const Documentos = () => {
   const [pastaAberta, setPastaAberta] = useState<Pasta | null>(null);
   const [dialogAberto, setDialogAberto] = useState(false);
   const [carregando, setCarregando] = useState(true);
+  const [permissionError, setPermissionError] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,20 +52,34 @@ const Documentos = () => {
       // Carregar todas as pastas existentes primeiro
       const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
       
-      if (bucketsError) throw bucketsError;
+      if (bucketsError) {
+        console.error("Erro ao listar buckets:", bucketsError);
+        // Verificar se é um erro de permissão
+        if (bucketsError.message?.includes("violates row-level security policy")) {
+          setPermissionError(true);
+        }
+        throw bucketsError;
+      }
       
       // Verificar quais pastas predefinidas existem
       const bucketsExistentes = (buckets || []).map(b => b.name);
       console.log("Buckets existentes:", bucketsExistentes);
       
-      // Criar pastas que não existem (mas não falhar se houver erro)
-      for (const pasta of pastasPredefinidas) {
-        if (!bucketsExistentes.includes(pasta)) {
-          try {
-            await criarPasta(pasta);
-          } catch (error) {
-            console.error(`Não foi possível criar a pasta ${pasta}:`, error);
-            // Continuar mesmo se falhar
+      // Não tentar criar pastas se encontramos um erro de permissão
+      if (!permissionError) {
+        // Tentar criar apenas as pastas predefinidas que não existem
+        for (const pasta of pastasPredefinidas) {
+          if (!bucketsExistentes.includes(pasta)) {
+            try {
+              await criarPasta(pasta);
+            } catch (error: any) {
+              console.error(`Não foi possível criar a pasta ${pasta}:`, error);
+              // Verificar se é um erro de permissão
+              if (error?.message?.includes("violates row-level security policy")) {
+                setPermissionError(true);
+                break; // Parar de tentar criar mais pastas
+              }
+            }
           }
         }
       }
@@ -72,97 +87,55 @@ const Documentos = () => {
       // Carregar novamente os buckets para incluir os que foram criados com sucesso
       const { data: bucketsAtualizados, error: bucketUpdateError } = await supabase.storage.listBuckets();
       
-      if (bucketUpdateError) throw bucketUpdateError;
+      if (bucketUpdateError) {
+        if (bucketUpdateError.message?.includes("violates row-level security policy")) {
+          setPermissionError(true);
+        }
+        throw bucketUpdateError;
+      }
 
       const pastasCarregadas: Pasta[] = [];
 
-      // Primeiro adicionar as pastas predefinidas que existem
-      for (const pastaPredef of pastasPredefinidas) {
-        const bucketExiste = bucketsAtualizados?.find(b => b.name === pastaPredef);
-        
-        if (bucketExiste) {
-          try {
-            const { data: files, error: filesError } = await supabase.storage
-              .from(bucketExiste.name)
-              .list();
-
-            if (filesError) {
-              console.error(`Erro ao listar arquivos da pasta ${bucketExiste.name}:`, filesError);
-              // Adicionar pasta mesmo sem arquivos
-              pastasCarregadas.push({
-                id: Date.now() + Math.random(),
-                nome: bucketExiste.name,
-                documentos: []
-              });
-            } else {
-              const documentos: Documento[] = files
-                ?.filter(file => !file.metadata?.isFolder)
-                .map(file => ({
-                  id: Date.now() + Math.random(),
-                  nome: file.name,
-                  data: new Date(file.created_at || '').toISOString(),
-                  tipo: file.metadata?.mimetype || 'unknown',
-                  url: `${supabase.storage.from(bucketExiste.name).getPublicUrl(file.name).data.publicUrl}`
-                })) || [];
-
-              pastasCarregadas.push({
-                id: Date.now() + Math.random(),
-                nome: bucketExiste.name,
-                documentos
-              });
-            }
-          } catch (error) {
-            console.error(`Erro ao processar pasta ${bucketExiste.name}:`, error);
-            // Adicionar pasta mesmo em caso de erro
-            pastasCarregadas.push({
-              id: Date.now() + Math.random(),
-              nome: bucketExiste.name,
-              documentos: []
-            });
-          }
-        }
-      }
-      
-      // Adicionar outras pastas que não são predefinidas
+      // Adicionar todas as pastas que existem (tanto predefinidas quanto outras)
       for (const bucket of bucketsAtualizados || []) {
-        if (!pastasPredefinidas.includes(bucket.name) && !pastasCarregadas.some(p => p.nome === bucket.name)) {
-          try {
-            const { data: files, error: filesError } = await supabase.storage
-              .from(bucket.name)
-              .list();
+        try {
+          const { data: files, error: filesError } = await supabase.storage
+            .from(bucket.name)
+            .list();
 
-            if (filesError) {
-              console.error(`Erro ao listar arquivos da pasta ${bucket.name}:`, filesError);
-              pastasCarregadas.push({
-                id: Date.now() + Math.random(),
-                nome: bucket.name,
-                documentos: []
-              });
-            } else {
-              const documentos: Documento[] = files
-                ?.filter(file => !file.metadata?.isFolder)
-                .map(file => ({
-                  id: Date.now() + Math.random(),
-                  nome: file.name,
-                  data: new Date(file.created_at || '').toISOString(),
-                  tipo: file.metadata?.mimetype || 'unknown',
-                  url: `${supabase.storage.from(bucket.name).getPublicUrl(file.name).data.publicUrl}`
-                })) || [];
-
-              pastasCarregadas.push({
-                id: Date.now() + Math.random(),
-                nome: bucket.name,
-                documentos
-              });
-            }
-          } catch (error) {
-            console.error(`Erro ao processar pasta ${bucket.name}:`, error);
+          if (filesError) {
+            console.error(`Erro ao listar arquivos da pasta ${bucket.name}:`, filesError);
+            // Adicionar pasta mesmo sem arquivos
             pastasCarregadas.push({
               id: Date.now() + Math.random(),
               nome: bucket.name,
               documentos: []
             });
+          } else {
+            const documentos: Documento[] = files
+              ?.filter(file => !file.metadata?.isFolder)
+              .map(file => ({
+                id: Date.now() + Math.random(),
+                nome: file.name,
+                data: new Date(file.created_at || '').toISOString(),
+                tipo: file.metadata?.mimetype || 'unknown',
+                url: `${supabase.storage.from(bucket.name).getPublicUrl(file.name).data.publicUrl}`
+              })) || [];
+
+            pastasCarregadas.push({
+              id: Date.now() + Math.random(),
+              nome: bucket.name,
+              documentos
+            });
           }
+        } catch (error) {
+          console.error(`Erro ao processar pasta ${bucket.name}:`, error);
+          // Adicionar pasta mesmo em caso de erro
+          pastasCarregadas.push({
+            id: Date.now() + Math.random(),
+            nome: bucket.name,
+            documentos: []
+          });
         }
       }
 
@@ -205,12 +178,9 @@ const Documentos = () => {
 
       if (error) {
         console.error('Erro ao criar pasta:', error);
-        // Se o erro for relacionado a RLS, ainda retornamos true para não bloquear a UI
+        // Se o erro for relacionado a RLS, marcamos como erro de permissão
         if (error.message?.includes("violates row-level security policy")) {
-          toast({
-            title: "Aviso de permissão",
-            description: "Você não tem permissão para criar pastas. Por favor, contate o administrador."
-          });
+          setPermissionError(true);
           return false;
         }
         return false;
@@ -220,10 +190,7 @@ const Documentos = () => {
     } catch (error: any) {
       console.error(`Erro ao criar pasta ${nomePasta}:`, error);
       if (error.message?.includes("violates row-level security policy")) {
-        toast({
-          title: "Aviso de permissão",
-          description: "Você não tem permissão para criar pastas. Por favor, contate o administrador."
-        });
+        setPermissionError(true);
       }
       return false;
     }
@@ -384,31 +351,44 @@ const Documentos = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Dialog open={dialogAberto} onOpenChange={setDialogAberto}>
-            <DialogTrigger asChild>
-              <Button>
-                <FolderPlus className="mr-2 h-4 w-4" />
-                Nova Pasta
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Criar Nova Pasta</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <Input
-                  placeholder="Nome da pasta"
-                  value={novaPasta}
-                  onChange={(e) => setNovaPasta(e.target.value)}
-                />
-                <Button onClick={handleNovaPasta} className="w-full">
-                  Criar Pasta
+          {!permissionError && (
+            <Dialog open={dialogAberto} onOpenChange={setDialogAberto}>
+              <DialogTrigger asChild>
+                <Button>
+                  <FolderPlus className="mr-2 h-4 w-4" />
+                  Nova Pasta
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Criar Nova Pasta</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <Input
+                    placeholder="Nome da pasta"
+                    value={novaPasta}
+                    onChange={(e) => setNovaPasta(e.target.value)}
+                  />
+                  <Button onClick={handleNovaPasta} className="w-full">
+                    Criar Pasta
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
+
+      {permissionError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTitle>Aviso de permissão</AlertTitle>
+          <AlertDescription>
+            Você não tem permissões suficientes para gerenciar pastas no armazenamento. 
+            Você ainda pode visualizar pastas e documentos existentes, mas não pode criar novas pastas.
+            Entre em contato com o administrador para solicitar acesso completo.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {carregando ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -436,24 +416,26 @@ const Documentos = () => {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-medium">Documentos</h2>
-                <div className="relative">
-                  <Input
-                    type="file"
-                    className="hidden"
-                    id="file-upload"
-                    multiple
-                    accept=".pdf,.doc,.docx,.csv,.png,.jpg,.jpeg"
-                    onChange={(e) => e.target.files && handleUpload(pastaAberta.id, e.target.files)}
-                  />
-                  <label htmlFor="file-upload">
-                    <Button asChild>
-                      <div>
-                        <UploadCloud className="mr-2 h-4 w-4" />
-                        Upload
-                      </div>
-                    </Button>
-                  </label>
-                </div>
+                {!permissionError && (
+                  <div className="relative">
+                    <Input
+                      type="file"
+                      className="hidden"
+                      id="file-upload"
+                      multiple
+                      accept=".pdf,.doc,.docx,.csv,.png,.jpg,.jpeg"
+                      onChange={(e) => e.target.files && handleUpload(pastaAberta.id, e.target.files)}
+                    />
+                    <label htmlFor="file-upload">
+                      <Button asChild>
+                        <div>
+                          <UploadCloud className="mr-2 h-4 w-4" />
+                          Upload
+                        </div>
+                      </Button>
+                    </label>
+                  </div>
+                )}
               </div>
 
               <div className="grid gap-4">
@@ -478,13 +460,15 @@ const Documentos = () => {
                         </p>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveDocumento(pastaAberta.id, doc.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                    {!permissionError && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveDocumento(pastaAberta.id, doc.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
 
@@ -492,7 +476,9 @@ const Documentos = () => {
                   <div className="text-center py-12 text-muted-foreground">
                     <UploadCloud className="mx-auto h-12 w-12 mb-4" />
                     <p>Nenhum documento encontrado</p>
-                    <p className="text-sm">Faça upload de arquivos para começar</p>
+                    <p className="text-sm">
+                      {!permissionError ? "Faça upload de arquivos para começar" : "Entre em contato com o administrador para adicionar documentos"}
+                    </p>
                   </div>
                 )}
               </div>
@@ -532,7 +518,12 @@ const Documentos = () => {
         <div className="text-center py-12 text-muted-foreground">
           <FolderPlus className="mx-auto h-12 w-12 mb-4" />
           <p>Nenhuma pasta encontrada</p>
-          <p className="text-sm">Crie uma pasta para começar a adicionar documentos</p>
+          <p className="text-sm">
+            {!permissionError ? 
+              "Crie uma pasta para começar a adicionar documentos" : 
+              "Entre em contato com o administrador para adicionar pastas e documentos"
+            }
+          </p>
         </div>
       )}
     </div>
