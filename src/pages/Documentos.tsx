@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Folder, FolderPlus, File, Search, UploadCloud, X, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Documento {
   id: number;
@@ -46,38 +47,123 @@ const Documentos = () => {
   const carregarPastas = async () => {
     try {
       setCarregando(true);
-      // Verificar se existem as pastas predefinidas
-      await criarPastasPredefinidas();
       
-      // Carregar todas as pastas após garantir que as predefinidas existem
+      // Carregar todas as pastas existentes primeiro
       const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
       
       if (bucketsError) throw bucketsError;
+      
+      // Verificar quais pastas predefinidas existem
+      const bucketsExistentes = (buckets || []).map(b => b.name);
+      console.log("Buckets existentes:", bucketsExistentes);
+      
+      // Criar pastas que não existem (mas não falhar se houver erro)
+      for (const pasta of pastasPredefinidas) {
+        if (!bucketsExistentes.includes(pasta)) {
+          try {
+            await criarPasta(pasta);
+          } catch (error) {
+            console.error(`Não foi possível criar a pasta ${pasta}:`, error);
+            // Continuar mesmo se falhar
+          }
+        }
+      }
+      
+      // Carregar novamente os buckets para incluir os que foram criados com sucesso
+      const { data: bucketsAtualizados, error: bucketUpdateError } = await supabase.storage.listBuckets();
+      
+      if (bucketUpdateError) throw bucketUpdateError;
 
       const pastasCarregadas: Pasta[] = [];
 
-      for (const bucket of buckets || []) {
-        const { data: files, error: filesError } = await supabase.storage
-          .from(bucket.name)
-          .list();
+      // Primeiro adicionar as pastas predefinidas que existem
+      for (const pastaPredef of pastasPredefinidas) {
+        const bucketExiste = bucketsAtualizados?.find(b => b.name === pastaPredef);
+        
+        if (bucketExiste) {
+          try {
+            const { data: files, error: filesError } = await supabase.storage
+              .from(bucketExiste.name)
+              .list();
 
-        if (filesError) throw filesError;
+            if (filesError) {
+              console.error(`Erro ao listar arquivos da pasta ${bucketExiste.name}:`, filesError);
+              // Adicionar pasta mesmo sem arquivos
+              pastasCarregadas.push({
+                id: Date.now() + Math.random(),
+                nome: bucketExiste.name,
+                documentos: []
+              });
+            } else {
+              const documentos: Documento[] = files
+                ?.filter(file => !file.metadata?.isFolder)
+                .map(file => ({
+                  id: Date.now() + Math.random(),
+                  nome: file.name,
+                  data: new Date(file.created_at || '').toISOString(),
+                  tipo: file.metadata?.mimetype || 'unknown',
+                  url: `${supabase.storage.from(bucketExiste.name).getPublicUrl(file.name).data.publicUrl}`
+                })) || [];
 
-        const documentos: Documento[] = files
-          ?.filter(file => !file.metadata?.isFolder)
-          .map(file => ({
-            id: Date.now() + Math.random(),
-            nome: file.name,
-            data: new Date(file.created_at || '').toISOString(),
-            tipo: file.metadata?.mimetype || 'unknown',
-            url: `${supabase.storage.from(bucket.name).getPublicUrl(file.name).data.publicUrl}`
-          })) || [];
+              pastasCarregadas.push({
+                id: Date.now() + Math.random(),
+                nome: bucketExiste.name,
+                documentos
+              });
+            }
+          } catch (error) {
+            console.error(`Erro ao processar pasta ${bucketExiste.name}:`, error);
+            // Adicionar pasta mesmo em caso de erro
+            pastasCarregadas.push({
+              id: Date.now() + Math.random(),
+              nome: bucketExiste.name,
+              documentos: []
+            });
+          }
+        }
+      }
+      
+      // Adicionar outras pastas que não são predefinidas
+      for (const bucket of bucketsAtualizados || []) {
+        if (!pastasPredefinidas.includes(bucket.name) && !pastasCarregadas.some(p => p.nome === bucket.name)) {
+          try {
+            const { data: files, error: filesError } = await supabase.storage
+              .from(bucket.name)
+              .list();
 
-        pastasCarregadas.push({
-          id: Date.now() + Math.random(),
-          nome: bucket.name,
-          documentos
-        });
+            if (filesError) {
+              console.error(`Erro ao listar arquivos da pasta ${bucket.name}:`, filesError);
+              pastasCarregadas.push({
+                id: Date.now() + Math.random(),
+                nome: bucket.name,
+                documentos: []
+              });
+            } else {
+              const documentos: Documento[] = files
+                ?.filter(file => !file.metadata?.isFolder)
+                .map(file => ({
+                  id: Date.now() + Math.random(),
+                  nome: file.name,
+                  data: new Date(file.created_at || '').toISOString(),
+                  tipo: file.metadata?.mimetype || 'unknown',
+                  url: `${supabase.storage.from(bucket.name).getPublicUrl(file.name).data.publicUrl}`
+                })) || [];
+
+              pastasCarregadas.push({
+                id: Date.now() + Math.random(),
+                nome: bucket.name,
+                documentos
+              });
+            }
+          } catch (error) {
+            console.error(`Erro ao processar pasta ${bucket.name}:`, error);
+            pastasCarregadas.push({
+              id: Date.now() + Math.random(),
+              nome: bucket.name,
+              documentos: []
+            });
+          }
+        }
       }
 
       setPastas(pastasCarregadas);
@@ -93,36 +179,17 @@ const Documentos = () => {
     }
   };
 
-  const criarPastasPredefinidas = async () => {
-    try {
-      // Listar todos os buckets existentes
-      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-      
-      if (bucketsError) throw bucketsError;
-      
-      // Verificar quais pastas predefinidas ainda não existem
-      const bucketsExistentes = (buckets || []).map(b => b.name);
-      const pastasParaCriar = pastasPredefinidas.filter(pasta => !bucketsExistentes.includes(pasta));
-      
-      // Criar as pastas que não existem
-      for (const pasta of pastasParaCriar) {
-        await criarPasta(pasta);
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Erro ao criar pastas predefinidas:', error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao criar pastas predefinidas",
-        description: "Algumas pastas não puderam ser criadas."
-      });
-      return false;
-    }
-  };
-
   const criarPasta = async (nomePasta: string) => {
     try {
+      // Verificar se o bucket já existe
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExiste = buckets?.some(b => b.name === nomePasta);
+      
+      if (bucketExiste) {
+        console.log(`Bucket ${nomePasta} já existe.`);
+        return true;
+      }
+      
       const { error } = await supabase.storage.createBucket(nomePasta, {
         public: true,
         fileSizeLimit: 52428800, // 50MB
@@ -138,12 +205,26 @@ const Documentos = () => {
 
       if (error) {
         console.error('Erro ao criar pasta:', error);
+        // Se o erro for relacionado a RLS, ainda retornamos true para não bloquear a UI
+        if (error.message?.includes("violates row-level security policy")) {
+          toast({
+            title: "Aviso de permissão",
+            description: "Você não tem permissão para criar pastas. Por favor, contate o administrador."
+          });
+          return false;
+        }
         return false;
       }
       
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Erro ao criar pasta ${nomePasta}:`, error);
+      if (error.message?.includes("violates row-level security policy")) {
+        toast({
+          title: "Aviso de permissão",
+          description: "Você não tem permissão para criar pastas. Por favor, contate o administrador."
+        });
+      }
       return false;
     }
   };
@@ -330,8 +411,10 @@ const Documentos = () => {
       </div>
 
       {carregando ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
         </div>
       ) : pastaAberta ? (
         <div className="space-y-6">
@@ -416,7 +499,7 @@ const Documentos = () => {
             </div>
           </Card>
         </div>
-      ) : (
+      ) : pastas.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {pastas.map((pasta) => (
             <Card
@@ -444,6 +527,12 @@ const Documentos = () => {
               </div>
             </Card>
           ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 text-muted-foreground">
+          <FolderPlus className="mx-auto h-12 w-12 mb-4" />
+          <p>Nenhuma pasta encontrada</p>
+          <p className="text-sm">Crie uma pasta para começar a adicionar documentos</p>
         </div>
       )}
     </div>
