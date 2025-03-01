@@ -17,7 +17,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/"}>
                   <Link to="/" className="flex items-center gap-3">
                     <Users className="h-5 w-5" />
                     <span>Clientes</span>
@@ -25,7 +25,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/carteira"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/carteira"}>
                   <Link to="/carteira" className="flex items-center gap-3">
                     <BarChart2 className="h-5 w-5" />
                     <span>Carteira</span>
@@ -33,7 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/calendario"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/calendario"}>
                   <Link to="/calendario" className="flex items-center gap-3">
                     <Calendar className="h-5 w-5" />
                     <span>Calendário</span>
@@ -41,7 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/agenda"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/agenda"}>
                   <Link to="/agenda" className="flex items-center gap-3">
                     <CalendarClock className="h-5 w-5" />
                     <span>Agenda</span>
@@ -49,7 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/documentos"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/documentos"}>
                   <Link to="/documentos" className="flex items-center gap-3">
                     <FolderOpen className="h-5 w-5" />
                     <span>Documentos</span>
@@ -57,7 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/painel"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/painel"}>
                   <Link to="/painel" className="flex items-center gap-3">
                     <LayoutPanelLeft className="h-5 w-5" />
                     <span>Painel</span>
@@ -65,7 +65,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild active={location.pathname === "/configuracoes"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/configuracoes"}>
                   <Link to="/configuracoes" className="flex items-center gap-3">
                     <Settings className="h-5 w-5" />
                     <span>Configurações</span>
