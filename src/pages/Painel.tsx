@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,65 @@ import {
   AlertTriangle,
   FileText
 } from "lucide-react";
+import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+// Define task type interface
+interface Task {
+  id: number;
+  title: string;
+  priority: "alta" | "média" | "baixa";
+  dueDate: string;
+  completed: boolean;
+  type: "contrato" | "pagamento" | "relatório" | "administrativo";
+}
 
 const Painel = () => {
+  // Initial tasks state
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 1, title: "Atualizar status de contratos (5)", priority: "alta", dueDate: "Hoje", completed: false, type: "contrato" },
+    { id: 2, title: "Contactar clientes com pagamentos em atraso", priority: "média", dueDate: "em 2 dias", completed: false, type: "pagamento" },
+    { id: 3, title: "Preparar relatório semanal", priority: "média", dueDate: "em 3 dias", completed: false, type: "relatório" },
+    { id: 4, title: "Arquivar documentos", priority: "baixa", dueDate: "em 5 dias", completed: false, type: "administrativo" },
+  ]);
+
+  // Function to toggle task completion
+  const toggleTaskCompletion = (taskId: number) => {
+    setTasks(
+      tasks.map(task => 
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  // Calculate task statistics
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(task => task.completed).length;
+  const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  
+  // Count task types
+  const taskTypeCount = {
+    contrato: tasks.filter(task => task.type === "contrato" && task.completed).length,
+    pagamento: tasks.filter(task => task.type === "pagamento" && task.completed).length,
+    relatório: tasks.filter(task => task.type === "relatório" && task.completed).length,
+    administrativo: tasks.filter(task => task.type === "administrativo" && task.completed).length,
+  };
+
+  // Count tasks by priority
+  const priorityCount = {
+    alta: tasks.filter(task => task.priority === "alta" && task.completed).length,
+    média: tasks.filter(task => task.priority === "média" && task.completed).length,
+    baixa: tasks.filter(task => task.priority === "baixa" && task.completed).length,
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex justify-between items-center">
@@ -130,58 +188,138 @@ const Painel = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <CheckCircle2 className="mr-2 h-5 w-5 text-green-500" />
-                Tarefas Pendentes
+                Dashboard de Progresso
               </CardTitle>
               <CardDescription>
-                Tarefas que precisam ser concluídas
+                Acompanhamento de tarefas concluídas e pendentes
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
-                    <div>
-                      <p className="font-medium">Atualizar status de contratos (5)</p>
-                      <p className="text-sm text-muted-foreground">Prioridade alta - Vence hoje</p>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Progresso Geral</h3>
+                  <div className="flex items-baseline mb-2">
+                    <span className="text-2xl font-bold mr-2">{completionPercentage}%</span>
+                    <span className="text-sm text-gray-500">concluído</span>
                   </div>
-                  <Button size="sm" variant="ghost">Detalhes</Button>
+                  <Progress value={completionPercentage} className="h-2 mb-2" />
+                  <p className="text-sm text-gray-500">{completedTasks} de {totalTasks} tarefas</p>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Por Tipo</h3>
+                  <div className="space-y-2">
                     <div>
-                      <p className="font-medium">Contactar clientes com pagamentos em atraso</p>
-                      <p className="text-sm text-muted-foreground">Prioridade média - Vence em 2 dias</p>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Contratos</span>
+                        <span className="font-medium">{taskTypeCount.contrato}</span>
+                      </div>
+                      <Progress value={(taskTypeCount.contrato / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-blue-100" indicatorClassName="bg-blue-500" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Pagamentos</span>
+                        <span className="font-medium">{taskTypeCount.pagamento}</span>
+                      </div>
+                      <Progress value={(taskTypeCount.pagamento / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-green-100" indicatorClassName="bg-green-500" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Relatórios</span>
+                        <span className="font-medium">{taskTypeCount.relatório}</span>
+                      </div>
+                      <Progress value={(taskTypeCount.relatório / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-amber-100" indicatorClassName="bg-amber-500" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Administrativo</span>
+                        <span className="font-medium">{taskTypeCount.administrativo}</span>
+                      </div>
+                      <Progress value={(taskTypeCount.administrativo / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-purple-100" indicatorClassName="bg-purple-500" />
                     </div>
                   </div>
-                  <Button size="sm" variant="ghost">Detalhes</Button>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Por Prioridade</h3>
+                  <div className="space-y-2">
                     <div>
-                      <p className="font-medium">Preparar relatório semanal</p>
-                      <p className="text-sm text-muted-foreground">Prioridade média - Vence em 3 dias</p>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Alta</span>
+                        <span className="font-medium">{priorityCount.alta}</span>
+                      </div>
+                      <Progress value={(priorityCount.alta / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-red-100" indicatorClassName="bg-red-500" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Média</span>
+                        <span className="font-medium">{priorityCount.média}</span>
+                      </div>
+                      <Progress value={(priorityCount.média / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-orange-100" indicatorClassName="bg-orange-500" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Baixa</span>
+                        <span className="font-medium">{priorityCount.baixa}</span>
+                      </div>
+                      <Progress value={(priorityCount.baixa / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-blue-100" indicatorClassName="bg-blue-500" />
                     </div>
                   </div>
-                  <Button size="sm" variant="ghost">Detalhes</Button>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
-                    <div>
-                      <p className="font-medium">Arquivar documentos</p>
-                      <p className="text-sm text-muted-foreground">Prioridade baixa - Vence em 5 dias</p>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="ghost">Detalhes</Button>
                 </div>
               </div>
+              
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]">Status</TableHead>
+                    <TableHead>Tarefa</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Prioridade</TableHead>
+                    <TableHead>Vencimento</TableHead>
+                    <TableHead className="text-right">Ação</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tasks.map(task => (
+                    <TableRow key={task.id} className={task.completed ? "bg-gray-50" : ""}>
+                      <TableCell>
+                        <input 
+                          type="checkbox" 
+                          checked={task.completed} 
+                          onChange={() => toggleTaskCompletion(task.id)}
+                          className="h-4 w-4 rounded border-gray-300"
+                        />
+                      </TableCell>
+                      <TableCell className={task.completed ? "line-through text-gray-500" : ""}>
+                        {task.title}
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          task.type === "contrato" ? "bg-blue-100 text-blue-700" :
+                          task.type === "pagamento" ? "bg-green-100 text-green-700" :
+                          task.type === "relatório" ? "bg-amber-100 text-amber-700" :
+                          "bg-purple-100 text-purple-700"
+                        }`}>
+                          {task.type}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          task.priority === "alta" ? "bg-red-100 text-red-700" :
+                          task.priority === "média" ? "bg-orange-100 text-orange-700" :
+                          "bg-blue-100 text-blue-700"
+                        }`}>
+                          {task.priority}
+                        </span>
+                      </TableCell>
+                      <TableCell>{task.dueDate}</TableCell>
+                      <TableCell className="text-right">
+                        <Button size="sm" variant="ghost">Detalhes</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
               
               <div className="mt-4 flex justify-end">
                 <Button size="sm">Adicionar tarefa</Button>
