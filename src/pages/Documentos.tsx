@@ -22,12 +22,21 @@ interface Pasta {
   documentos: Documento[];
 }
 
+const pastasPredefinidas = [
+  "minutas",
+  "comprovantes",
+  "boletos",
+  "procuracoes",
+  "notificacao_extrajudicial"
+];
+
 const Documentos = () => {
   const [pastas, setPastas] = useState<Pasta[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [novaPasta, setNovaPasta] = useState("");
   const [pastaAberta, setPastaAberta] = useState<Pasta | null>(null);
   const [dialogAberto, setDialogAberto] = useState(false);
+  const [carregando, setCarregando] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,6 +45,11 @@ const Documentos = () => {
 
   const carregarPastas = async () => {
     try {
+      setCarregando(true);
+      // Verificar se existem as pastas predefinidas
+      await criarPastasPredefinidas();
+      
+      // Carregar todas as pastas após garantir que as predefinidas existem
       const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
       
       if (bucketsError) throw bucketsError;
@@ -50,14 +64,14 @@ const Documentos = () => {
         if (filesError) throw filesError;
 
         const documentos: Documento[] = files
-          .filter(file => !file.metadata?.isFolder)
+          ?.filter(file => !file.metadata?.isFolder)
           .map(file => ({
             id: Date.now() + Math.random(),
             nome: file.name,
             data: new Date(file.created_at || '').toISOString(),
             tipo: file.metadata?.mimetype || 'unknown',
             url: `${supabase.storage.from(bucket.name).getPublicUrl(file.name).data.publicUrl}`
-          }));
+          })) || [];
 
         pastasCarregadas.push({
           id: Date.now() + Math.random(),
@@ -74,6 +88,63 @@ const Documentos = () => {
         title: "Erro ao carregar pastas",
         description: "Não foi possível carregar as pastas e documentos."
       });
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const criarPastasPredefinidas = async () => {
+    try {
+      // Listar todos os buckets existentes
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) throw bucketsError;
+      
+      // Verificar quais pastas predefinidas ainda não existem
+      const bucketsExistentes = (buckets || []).map(b => b.name);
+      const pastasParaCriar = pastasPredefinidas.filter(pasta => !bucketsExistentes.includes(pasta));
+      
+      // Criar as pastas que não existem
+      for (const pasta of pastasParaCriar) {
+        await criarPasta(pasta);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Erro ao criar pastas predefinidas:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao criar pastas predefinidas",
+        description: "Algumas pastas não puderam ser criadas."
+      });
+      return false;
+    }
+  };
+
+  const criarPasta = async (nomePasta: string) => {
+    try {
+      const { error } = await supabase.storage.createBucket(nomePasta, {
+        public: true,
+        fileSizeLimit: 52428800, // 50MB
+        allowedMimeTypes: [
+          'image/jpeg',
+          'image/png',
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'text/csv'
+        ]
+      });
+
+      if (error) {
+        console.error('Erro ao criar pasta:', error);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error(`Erro ao criar pasta ${nomePasta}:`, error);
+      return false;
     }
   };
 
@@ -81,22 +152,10 @@ const Documentos = () => {
     if (novaPasta.trim()) {
       try {
         // Criar novo bucket no Storage com configurações atualizadas
-        const { error } = await supabase.storage.createBucket(novaPasta.toLowerCase(), {
-          public: true,
-          fileSizeLimit: 52428800, // 50MB
-          allowedMimeTypes: [
-            'image/jpeg',
-            'image/png',
-            'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'text/csv'
-          ]
-        });
+        const success = await criarPasta(novaPasta.toLowerCase());
 
-        if (error) {
-          console.error('Erro detalhado:', error);
-          throw error;
+        if (!success) {
+          throw new Error("Falha ao criar pasta");
         }
 
         // Atualizar a lista de pastas localmente
@@ -270,13 +329,24 @@ const Documentos = () => {
         </div>
       </div>
 
-      {pastaAberta ? (
+      {carregando ? (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      ) : pastaAberta ? (
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => setPastaAberta(null)}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
             </Button>
-            <h1 className="text-2xl font-semibold text-foreground">{pastaAberta.nome}</h1>
+            <h1 className="text-2xl font-semibold text-foreground">
+              {pastaAberta.nome === "minutas" ? "MINUTAS" :
+               pastaAberta.nome === "comprovantes" ? "COMPROVANTES" :
+               pastaAberta.nome === "boletos" ? "BOLETOS" :
+               pastaAberta.nome === "procuracoes" ? "PROCURAÇÕES" :
+               pastaAberta.nome === "notificacao_extrajudicial" ? "NOTIFICAÇÃO EXTRAJUDICIAL" :
+               pastaAberta.nome}
+            </h1>
           </div>
 
           <Card className="p-6">
@@ -358,7 +428,14 @@ const Documentos = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <Folder className="h-5 w-5 text-primary" />
-                    <h3 className="font-medium">{pasta.nome}</h3>
+                    <h3 className="font-medium">
+                      {pasta.nome === "minutas" ? "MINUTAS" :
+                       pasta.nome === "comprovantes" ? "COMPROVANTES" :
+                       pasta.nome === "boletos" ? "BOLETOS" :
+                       pasta.nome === "procuracoes" ? "PROCURAÇÕES" :
+                       pasta.nome === "notificacao_extrajudicial" ? "NOTIFICAÇÃO EXTRAJUDICIAL" :
+                       pasta.nome}
+                    </h3>
                   </div>
                   <span className="text-sm text-muted-foreground">
                     {pasta.documentos.length} {pasta.documentos.length === 1 ? 'documento' : 'documentos'}
