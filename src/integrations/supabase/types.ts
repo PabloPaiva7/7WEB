@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      CARTEIRA: {
+        Row: {
+          BANCO: string | null
+          CÓD: string | null
+          CONTATO: string | null
+          CONTRATO: number | null
+          DATA: string | null
+          ENTRADA: string | null
+          ESCRITÓRIO: string
+          NEGOCIAÇÃO: string | null
+          OBSERVAÇÃO: string | null
+          PRAZO: number | null
+          "PRAZO _1": number | null
+          RESOLUÇÃO: string | null
+          SITUAÇÃO: string | null
+          "ÚLTIMO PAGAMENTO": string | null
+          "VALOR DO CLIENTE": string | null
+        }
+        Insert: {
+          BANCO?: string | null
+          CÓD?: string | null
+          CONTATO?: string | null
+          CONTRATO?: number | null
+          DATA?: string | null
+          ENTRADA?: string | null
+          ESCRITÓRIO: string
+          NEGOCIAÇÃO?: string | null
+          OBSERVAÇÃO?: string | null
+          PRAZO?: number | null
+          "PRAZO _1"?: number | null
+          RESOLUÇÃO?: string | null
+          SITUAÇÃO?: string | null
+          "ÚLTIMO PAGAMENTO"?: string | null
+          "VALOR DO CLIENTE"?: string | null
+        }
+        Update: {
+          BANCO?: string | null
+          CÓD?: string | null
+          CONTATO?: string | null
+          CONTRATO?: number | null
+          DATA?: string | null
+          ENTRADA?: string | null
+          ESCRITÓRIO?: string
+          NEGOCIAÇÃO?: string | null
+          OBSERVAÇÃO?: string | null
+          PRAZO?: number | null
+          "PRAZO _1"?: number | null
+          RESOLUÇÃO?: string | null
+          SITUAÇÃO?: string | null
+          "ÚLTIMO PAGAMENTO"?: string | null
+          "VALOR DO CLIENTE"?: string | null
+        }
+        Relationships: []
+      }
       carteira_clientes: {
         Row: {
           banco: string | null
