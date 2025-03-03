@@ -1,717 +1,654 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  InfoIcon, 
-  HelpCircle, 
-  Percent, 
-  DollarSign, 
-  Award, 
-  PieChart, 
-  Users,
-  Bell,
-  Calendar,
-  CheckCircle2,
-  AlertTriangle,
-  FileText
-} from "lucide-react";
-import { useState } from "react";
-import { Progress } from "@/components/ui/progress";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line
+} from 'recharts';
+import { AlertTriangle, CheckCircle2, Clock, DollarSign, FileText, Flag, Inbox, List, Pencil, Plus, Trash, Users } from "lucide-react";
+import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PermissionAlert } from "@/components/Documentos/PermissionAlert";
 
-// Define task type interface
-interface Task {
-  id: number;
-  title: string;
-  priority: "alta" | "média" | "baixa";
-  dueDate: string;
-  completed: boolean;
-  type: "contrato" | "pagamento" | "relatório" | "administrativo";
-}
+// Dados de exemplo
+const data = [
+  { name: 'Jan', valor: 4000 },
+  { name: 'Fev', valor: 3000 },
+  { name: 'Mar', valor: 2000 },
+  { name: 'Abr', valor: 2780 },
+  { name: 'Mai', valor: 1890 },
+  { name: 'Jun', valor: 2390 },
+];
 
-const Painel = () => {
-  // Initial tasks state
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: 1, title: "Atualizar status de contratos (5)", priority: "alta", dueDate: "Hoje", completed: false, type: "contrato" },
-    { id: 2, title: "Contactar clientes com pagamentos em atraso", priority: "média", dueDate: "em 2 dias", completed: false, type: "pagamento" },
-    { id: 3, title: "Preparar relatório semanal", priority: "média", dueDate: "em 3 dias", completed: false, type: "relatório" },
-    { id: 4, title: "Arquivar documentos", priority: "baixa", dueDate: "em 5 dias", completed: false, type: "administrativo" },
+const pieData = [
+  { name: 'Contrato', value: 400 },
+  { name: 'Processo', value: 300 },
+  { name: 'Audiência', value: 300 },
+  { name: 'Documento', value: 200 },
+];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+type Demanda = {
+  id: string;
+  titulo: string;
+  descricao: string;
+  status: 'pendente' | 'em_andamento' | 'concluida';
+  prioridade: 'baixa' | 'media' | 'alta';
+  criacao: Date;
+};
+
+export default function Painel() {
+  const [demandas, setDemandas] = useState<Demanda[]>([
+    {
+      id: '1',
+      titulo: 'Contrato 12345 - Documentação adicional',
+      descricao: 'Necessário envio de documentação adicional para o contrato 12345',
+      status: 'pendente',
+      prioridade: 'alta',
+      criacao: new Date(2023, 5, 15)
+    },
+    {
+      id: '2',
+      titulo: 'Cliente João Silva - Assinatura',
+      descricao: 'Pendência de assinatura em contrato do cliente João Silva',
+      status: 'em_andamento',
+      prioridade: 'media',
+      criacao: new Date(2023, 6, 20)
+    },
+    {
+      id: '3',
+      titulo: 'Processo 789/2023 - Recurso',
+      descricao: 'Prazo de 5 dias para recurso no processo 789/2023',
+      status: 'pendente',
+      prioridade: 'alta',
+      criacao: new Date(2023, 7, 1)
+    },
+    {
+      id: '4',
+      titulo: 'Notificação extrajudicial - Maria Oliveira',
+      descricao: 'Notificação extrajudicial para cliente Maria Oliveira',
+      status: 'concluida',
+      prioridade: 'baixa',
+      criacao: new Date(2023, 4, 10)
+    },
+    {
+      id: '5',
+      titulo: 'Contrato 56789 - Reconhecimento de firma',
+      descricao: 'Necessário reconhecimento de firma no contrato 56789',
+      status: 'em_andamento',
+      prioridade: 'media',
+      criacao: new Date(2023, 7, 5)
+    },
+    {
+      id: '6',
+      titulo: 'Ação judicial 2022/456 - Audiência',
+      descricao: 'Audiência marcada para ação judicial 2022/456',
+      status: 'pendente',
+      prioridade: 'alta',
+      criacao: new Date(2023, 8, 15)
+    },
   ]);
 
-  // Function to toggle task completion
-  const toggleTaskCompletion = (taskId: number) => {
-    setTasks(
-      tasks.map(task => 
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const [selectedDemanda, setSelectedDemanda] = useState<string | null>(null);
+  const [demandaAtual, setDemandaAtual] = useState<Demanda | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [novaDemanda, setNovaDemanda] = useState<Partial<Demanda>>({
+    titulo: '',
+    descricao: '',
+    status: 'pendente',
+    prioridade: 'media',
+  });
+  const { toast } = useToast();
+
+  const demandasPendentes = demandas.filter(d => d.status === 'pendente');
+  const demandasEmAndamento = demandas.filter(d => d.status === 'em_andamento');
+  const demandasConcluidas = demandas.filter(d => d.status === 'concluida');
+
+  const estatisticas = {
+    total: demandas.length,
+    pendentes: demandasPendentes.length,
+    emAndamento: demandasEmAndamento.length,
+    concluidas: demandasConcluidas.length,
+    prioridadeAlta: demandas.filter(d => d.prioridade === 'alta').length,
   };
 
-  // Calculate task statistics
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(task => task.completed).length;
-  const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  
-  // Count task types
-  const taskTypeCount = {
-    contrato: tasks.filter(task => task.type === "contrato" && task.completed).length,
-    pagamento: tasks.filter(task => task.type === "pagamento" && task.completed).length,
-    relatório: tasks.filter(task => task.type === "relatório" && task.completed).length,
-    administrativo: tasks.filter(task => task.type === "administrativo" && task.completed).length,
+  const handleDemandaSelect = (demandaId: string) => {
+    const demanda = demandas.find(d => d.id === demandaId);
+    if (demanda) {
+      setSelectedDemanda(demanda.titulo);
+      toast({
+        title: "Demanda Selecionada",
+        description: `A demanda "${demanda.titulo}" foi selecionada e precisa de atenção.`,
+        variant: "destructive",
+      });
+    }
   };
 
-  // Count tasks by priority
-  const priorityCount = {
-    alta: tasks.filter(task => task.priority === "alta" && task.completed).length,
-    média: tasks.filter(task => task.priority === "média" && task.completed).length,
-    baixa: tasks.filter(task => task.priority === "baixa" && task.completed).length,
+  const handleResolveDemanda = () => {
+    setSelectedDemanda(null);
+    toast({
+      title: "Demanda resolvida",
+      description: `A demanda foi marcada como resolvida.`,
+    });
+  };
+
+  const handleStatusChange = (demandaId: string, novoStatus: 'pendente' | 'em_andamento' | 'concluida') => {
+    setDemandas(demandas.map(d => 
+      d.id === demandaId ? { ...d, status: novoStatus } : d
+    ));
+    
+    toast({
+      title: "Status atualizado",
+      description: `Status da demanda atualizado para ${novoStatus.replace('_', ' ')}`,
+    });
+  };
+
+  const handleAddDemanda = () => {
+    if (novaDemanda.titulo && novaDemanda.descricao) {
+      const newDemanda: Demanda = {
+        id: Math.random().toString(36).substring(2, 9),
+        titulo: novaDemanda.titulo,
+        descricao: novaDemanda.descricao,
+        status: novaDemanda.status as 'pendente' | 'em_andamento' | 'concluida',
+        prioridade: novaDemanda.prioridade as 'baixa' | 'media' | 'alta',
+        criacao: new Date(),
+      };
+      
+      setDemandas([...demandas, newDemanda]);
+      setIsAddDialogOpen(false);
+      setNovaDemanda({
+        titulo: '',
+        descricao: '',
+        status: 'pendente',
+        prioridade: 'media',
+      });
+      
+      toast({
+        title: "Demanda adicionada",
+        description: "Nova demanda adicionada com sucesso.",
+      });
+    }
+  };
+
+  const handleEditDemanda = () => {
+    if (demandaAtual && demandaAtual.titulo && demandaAtual.descricao) {
+      setDemandas(demandas.map(d => 
+        d.id === demandaAtual.id ? demandaAtual : d
+      ));
+      
+      setIsEditDialogOpen(false);
+      setDemandaAtual(null);
+      
+      toast({
+        title: "Demanda atualizada",
+        description: "Demanda atualizada com sucesso.",
+      });
+    }
+  };
+
+  const handleDeleteDemanda = (demandaId: string) => {
+    setDemandas(demandas.filter(d => d.id !== demandaId));
+    
+    toast({
+      title: "Demanda removida",
+      description: "Demanda removida com sucesso.",
+    });
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-foreground">Painel do Colaborador</h1>
+    <div className="space-y-6">
+      {selectedDemanda && (
+        <DemandaAlert 
+          demanda={selectedDemanda} 
+          onResolve={handleResolveDemanda} 
+        />
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Total de Demandas</p>
+              <p className="text-2xl font-bold">{estatisticas.total}</p>
+            </div>
+            <div className="p-3 rounded-full bg-white">
+              <List className="h-6 w-6 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-amber-50 border-amber-200">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Pendentes</p>
+              <p className="text-2xl font-bold">{estatisticas.pendentes}</p>
+            </div>
+            <div className="p-3 rounded-full bg-white">
+              <Clock className="h-6 w-6 text-amber-500" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-purple-50 border-purple-200">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Em Andamento</p>
+              <p className="text-2xl font-bold">{estatisticas.emAndamento}</p>
+            </div>
+            <div className="p-3 rounded-full bg-white">
+              <Inbox className="h-6 w-6 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-green-50 border-green-200">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Concluídas</p>
+              <p className="text-2xl font-bold">{estatisticas.concluidas}</p>
+            </div>
+            <div className="p-3 rounded-full bg-white">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Avisos importantes - seção fixa no topo */}
-      <Card className="bg-amber-50 border-amber-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-amber-800">
-            <AlertTriangle className="mr-2 h-5 w-5 text-amber-500" />
-            Avisos Importantes
-          </CardTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Evolução de Demandas</CardTitle>
+            <CardDescription>Número de demandas nos últimos 6 meses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={data}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="valor" stroke="#8884d8" activeDot={{ r: 8 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Tipos de Demandas</CardTitle>
+            <CardDescription>Distribuição por categoria</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Fluxo de Demandas</CardTitle>
+            <CardDescription>Gerencie e acompanhe as demandas pendentes</CardDescription>
+          </div>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="gap-1">
+                <Plus className="h-4 w-4" />
+                Nova Demanda
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Adicionar Nova Demanda</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="titulo">Título</Label>
+                  <Input
+                    id="titulo"
+                    value={novaDemanda.titulo || ""}
+                    onChange={(e) => setNovaDemanda({...novaDemanda, titulo: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="descricao">Descrição</Label>
+                  <Input
+                    id="descricao"
+                    value={novaDemanda.descricao || ""}
+                    onChange={(e) => setNovaDemanda({...novaDemanda, descricao: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="prioridade">Prioridade</Label>
+                  <Select
+                    value={novaDemanda.prioridade}
+                    onValueChange={(value) => setNovaDemanda({...novaDemanda, prioridade: value as any})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a prioridade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="baixa">Baixa</SelectItem>
+                      <SelectItem value="media">Média</SelectItem>
+                      <SelectItem value="alta">Alta</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={novaDemanda.status}
+                    onValueChange={(value) => setNovaDemanda({...novaDemanda, status: value as any})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="em_andamento">Em andamento</SelectItem>
+                      <SelectItem value="concluida">Concluída</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleAddDemanda}>Adicionar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-start gap-2 p-2 rounded bg-white">
-              <Bell className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium">Reunião de equipe</p>
-                <p className="text-sm text-muted-foreground">Hoje às 15h na sala de conferência - Discussão de metas do trimestre</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2 p-2 rounded bg-white">
-              <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium">Sistema de pagamentos em manutenção</p>
-                <p className="text-sm text-muted-foreground">Amanhã das 8h às 10h - Utilize procedimentos manuais durante este período</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2 p-2 rounded bg-white">
-              <InfoIcon className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium">Novo procedimento de verificação</p>
-                <p className="text-sm text-muted-foreground">A partir de 01/06 - Todos os contratos precisarão passar pela etapa de verificação adicional</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2 p-2 rounded bg-white">
-              <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium">Meta mensal atingida</p>
-                <p className="text-sm text-muted-foreground">Parabéns! A equipe atingiu 105% da meta de conversão para o mês de maio</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2 p-2 rounded bg-white">
-              <Calendar className="h-5 w-5 text-purple-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium">Feriado próximo</p>
-                <p className="text-sm text-muted-foreground">09/06 será feriado municipal - Planeje suas entregas com antecedência</p>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-amber-50 border-amber-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-amber-500" />
+                  Pendentes ({demandasPendentes.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {demandasPendentes.map((demanda) => (
+                  <Card key={demanda.id} className="p-3 bg-white">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-2">
+                        {demanda.prioridade === 'alta' && (
+                          <Flag className="h-4 w-4 text-red-500 mt-1 flex-shrink-0" />
+                        )}
+                        <div>
+                          <h3 className="text-sm font-medium line-clamp-1">{demanda.titulo}</h3>
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{demanda.descricao}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-shrink-0 gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleDemandaSelect(demanda.id)}
+                        >
+                          <AlertTriangle className="h-3 w-3 text-amber-500" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleStatusChange(demanda.id, 'em_andamento')}
+                        >
+                          <Inbox className="h-3 w-3 text-purple-500" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => {
+                            setDemandaAtual(demanda);
+                            setIsEditDialogOpen(true);
+                          }}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleDeleteDemanda(demanda.id)}
+                        >
+                          <Trash className="h-3 w-3 text-red-500" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+                {demandasPendentes.length === 0 && (
+                  <p className="text-sm text-center py-4 text-muted-foreground">
+                    Nenhuma demanda pendente
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-purple-50 border-purple-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <Inbox className="h-5 w-5 text-purple-500" />
+                  Em Andamento ({demandasEmAndamento.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {demandasEmAndamento.map((demanda) => (
+                  <Card key={demanda.id} className="p-3 bg-white">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-2">
+                        {demanda.prioridade === 'alta' && (
+                          <Flag className="h-4 w-4 text-red-500 mt-1 flex-shrink-0" />
+                        )}
+                        <div>
+                          <h3 className="text-sm font-medium line-clamp-1">{demanda.titulo}</h3>
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{demanda.descricao}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-shrink-0 gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleStatusChange(demanda.id, 'pendente')}
+                        >
+                          <Clock className="h-3 w-3 text-amber-500" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleStatusChange(demanda.id, 'concluida')}
+                        >
+                          <CheckCircle2 className="h-3 w-3 text-green-500" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => {
+                            setDemandaAtual(demanda);
+                            setIsEditDialogOpen(true);
+                          }}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleDeleteDemanda(demanda.id)}
+                        >
+                          <Trash className="h-3 w-3 text-red-500" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+                {demandasEmAndamento.length === 0 && (
+                  <p className="text-sm text-center py-4 text-muted-foreground">
+                    Nenhuma demanda em andamento
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-green-50 border-green-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  Concluídas ({demandasConcluidas.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {demandasConcluidas.map((demanda) => (
+                  <Card key={demanda.id} className="p-3 bg-white">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="text-sm font-medium line-clamp-1">{demanda.titulo}</h3>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{demanda.descricao}</p>
+                      </div>
+                      <div className="flex flex-shrink-0 gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleStatusChange(demanda.id, 'em_andamento')}
+                        >
+                          <Inbox className="h-3 w-3 text-purple-500" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7" 
+                          onClick={() => handleDeleteDemanda(demanda.id)}
+                        >
+                          <Trash className="h-3 w-3 text-red-500" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+                {demandasConcluidas.length === 0 && (
+                  <p className="text-sm text-center py-4 text-muted-foreground">
+                    Nenhuma demanda concluída
+                  </p>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="lembretes">
-        <TabsList className="grid grid-cols-6 w-full max-w-4xl mb-6">
-          <TabsTrigger value="lembretes">Lembretes</TabsTrigger>
-          <TabsTrigger value="tarefas">Tarefas</TabsTrigger>
-          <TabsTrigger value="assessorias">Assessorias</TabsTrigger>
-          <TabsTrigger value="ofertas">Ofertas</TabsTrigger>
-          <TabsTrigger value="descontos">Descontos</TabsTrigger>
-          <TabsTrigger value="suporte">Suporte</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="lembretes" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="mr-2 h-5 w-5 text-blue-500" />
-                Lembretes e Próximos Eventos
-              </CardTitle>
-              <CardDescription>
-                Compromissos importantes para os próximos dias
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-blue-200">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-medium">Entrega de relatórios</h3>
-                      <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded">Amanhã</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Prazo final para envio dos relatórios mensais de desempenho.
-                    </p>
-                    <Button className="mt-4 w-full" variant="outline">Marcar como concluído</Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-purple-200">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-medium">Treinamento de sistemas</h3>
-                      <span className="text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded">Em 3 dias</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Treinamento obrigatório sobre as novas funcionalidades do sistema de gestão.
-                    </p>
-                    <Button className="mt-4 w-full" variant="outline">Ver detalhes</Button>
-                  </CardContent>
-                </Card>
+      {/* Diálogo de edição */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Demanda</DialogTitle>
+          </DialogHeader>
+          {demandaAtual && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-titulo">Título</Label>
+                <Input
+                  id="edit-titulo"
+                  value={demandaAtual.titulo}
+                  onChange={(e) => setDemandaAtual({...demandaAtual, titulo: e.target.value})}
+                />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="tarefas" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <CheckCircle2 className="mr-2 h-5 w-5 text-green-500" />
-                Dashboard de Progresso
-              </CardTitle>
-              <CardDescription>
-                Acompanhamento de tarefas concluídas e pendentes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white p-4 rounded-lg border shadow-sm">
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Progresso Geral</h3>
-                  <div className="flex items-baseline mb-2">
-                    <span className="text-2xl font-bold mr-2">{completionPercentage}%</span>
-                    <span className="text-sm text-gray-500">concluído</span>
-                  </div>
-                  <Progress value={completionPercentage} className="h-2 mb-2" />
-                  <p className="text-sm text-gray-500">{completedTasks} de {totalTasks} tarefas</p>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg border shadow-sm">
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Por Tipo</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Contratos</span>
-                        <span className="font-medium">{taskTypeCount.contrato}</span>
-                      </div>
-                      <Progress value={(taskTypeCount.contrato / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-blue-100" indicatorClassName="bg-blue-500" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Pagamentos</span>
-                        <span className="font-medium">{taskTypeCount.pagamento}</span>
-                      </div>
-                      <Progress value={(taskTypeCount.pagamento / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-green-100" indicatorClassName="bg-green-500" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Relatórios</span>
-                        <span className="font-medium">{taskTypeCount.relatório}</span>
-                      </div>
-                      <Progress value={(taskTypeCount.relatório / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-amber-100" indicatorClassName="bg-amber-500" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Administrativo</span>
-                        <span className="font-medium">{taskTypeCount.administrativo}</span>
-                      </div>
-                      <Progress value={(taskTypeCount.administrativo / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-purple-100" indicatorClassName="bg-purple-500" />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg border shadow-sm">
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Por Prioridade</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Alta</span>
-                        <span className="font-medium">{priorityCount.alta}</span>
-                      </div>
-                      <Progress value={(priorityCount.alta / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-red-100" indicatorClassName="bg-red-500" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Média</span>
-                        <span className="font-medium">{priorityCount.média}</span>
-                      </div>
-                      <Progress value={(priorityCount.média / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-orange-100" indicatorClassName="bg-orange-500" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Baixa</span>
-                        <span className="font-medium">{priorityCount.baixa}</span>
-                      </div>
-                      <Progress value={(priorityCount.baixa / Math.max(1, completedTasks)) * 100} className="h-1.5 bg-blue-100" indicatorClassName="bg-blue-500" />
-                    </div>
-                  </div>
-                </div>
+              <div>
+                <Label htmlFor="edit-descricao">Descrição</Label>
+                <Input
+                  id="edit-descricao"
+                  value={demandaAtual.descricao}
+                  onChange={(e) => setDemandaAtual({...demandaAtual, descricao: e.target.value})}
+                />
               </div>
-              
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[50px]">Status</TableHead>
-                    <TableHead>Tarefa</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Prioridade</TableHead>
-                    <TableHead>Vencimento</TableHead>
-                    <TableHead className="text-right">Ação</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tasks.map(task => (
-                    <TableRow key={task.id} className={task.completed ? "bg-gray-50" : ""}>
-                      <TableCell>
-                        <input 
-                          type="checkbox" 
-                          checked={task.completed} 
-                          onChange={() => toggleTaskCompletion(task.id)}
-                          className="h-4 w-4 rounded border-gray-300"
-                        />
-                      </TableCell>
-                      <TableCell className={task.completed ? "line-through text-gray-500" : ""}>
-                        {task.title}
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          task.type === "contrato" ? "bg-blue-100 text-blue-700" :
-                          task.type === "pagamento" ? "bg-green-100 text-green-700" :
-                          task.type === "relatório" ? "bg-amber-100 text-amber-700" :
-                          "bg-purple-100 text-purple-700"
-                        }`}>
-                          {task.type}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          task.priority === "alta" ? "bg-red-100 text-red-700" :
-                          task.priority === "média" ? "bg-orange-100 text-orange-700" :
-                          "bg-blue-100 text-blue-700"
-                        }`}>
-                          {task.priority}
-                        </span>
-                      </TableCell>
-                      <TableCell>{task.dueDate}</TableCell>
-                      <TableCell className="text-right">
-                        <Button size="sm" variant="ghost">Detalhes</Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              
-              <div className="mt-4 flex justify-end">
-                <Button size="sm">Adicionar tarefa</Button>
+              <div>
+                <Label htmlFor="edit-prioridade">Prioridade</Label>
+                <Select
+                  value={demandaAtual.prioridade}
+                  onValueChange={(value) => setDemandaAtual({...demandaAtual, prioridade: value as any})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a prioridade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="baixa">Baixa</SelectItem>
+                    <SelectItem value="media">Média</SelectItem>
+                    <SelectItem value="alta">Alta</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="assessorias" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <InfoIcon className="mr-2 h-5 w-5 text-blue-500" />
-                Serviços de Assessoria
-              </CardTitle>
-              <CardDescription>
-                Informações sobre assessorias disponíveis para atendimento a clientes
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardContent className="p-4">
-                    <h3 className="text-lg font-medium">Assessoria Jurídica</h3>
-                    <div className="flex items-center mt-2 text-sm text-green-600">
-                      <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-                      Disponível agora
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Para casos de contratos, revisões e reclamações legais.
-                    </p>
-                    <div className="mt-4 space-y-2">
-                      <p className="text-sm">
-                        <span className="font-semibold">Contato:</span> (11) 3333-4444
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-semibold">Plantão:</span> Dr. Marcos Silva
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-semibold">Email:</span> juridico@exemplo.com
-                      </p>
-                    </div>
-                    <Button className="mt-4 w-full" variant="outline">Solicitar atendimento</Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-4">
-                    <h3 className="text-lg font-medium">Assessoria Financeira</h3>
-                    <div className="flex items-center mt-2 text-sm text-yellow-600">
-                      <div className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></div>
-                      Disponível em 1 hora
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Para análise financeira, regularização e negociações.
-                    </p>
-                    <div className="mt-4 space-y-2">
-                      <p className="text-sm">
-                        <span className="font-semibold">Contato:</span> (11) 5555-6666
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-semibold">Plantão:</span> Ana Oliveira
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-semibold">Email:</span> financeiro@exemplo.com
-                      </p>
-                    </div>
-                    <Button className="mt-4 w-full" variant="outline">Solicitar atendimento</Button>
-                  </CardContent>
-                </Card>
+              <div>
+                <Label htmlFor="edit-status">Status</Label>
+                <Select
+                  value={demandaAtual.status}
+                  onValueChange={(value) => setDemandaAtual({...demandaAtual, status: value as any})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="em_andamento">Em andamento</SelectItem>
+                    <SelectItem value="concluida">Concluída</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-
-              <Card>
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-medium mb-3">Escala semanal de plantões</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2 px-2">Dia</th>
-                          <th className="text-left py-2 px-2">Jurídico</th>
-                          <th className="text-left py-2 px-2">Financeiro</th>
-                          <th className="text-left py-2 px-2">Contábil</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-b">
-                          <td className="py-2 px-2">Segunda</td>
-                          <td className="py-2 px-2">Dr. Marcos</td>
-                          <td className="py-2 px-2">Ana</td>
-                          <td className="py-2 px-2">Carlos</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-2">Terça</td>
-                          <td className="py-2 px-2">Dra. Luiza</td>
-                          <td className="py-2 px-2">Roberto</td>
-                          <td className="py-2 px-2">Fernanda</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-2">Quarta</td>
-                          <td className="py-2 px-2">Dr. Paulo</td>
-                          <td className="py-2 px-2">Ana</td>
-                          <td className="py-2 px-2">Carlos</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-2 px-2">Quinta</td>
-                          <td className="py-2 px-2">Dra. Luiza</td>
-                          <td className="py-2 px-2">Roberto</td>
-                          <td className="py-2 px-2">Fernanda</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 px-2">Sexta</td>
-                          <td className="py-2 px-2">Dr. Marcos</td>
-                          <td className="py-2 px-2">Ana</td>
-                          <td className="py-2 px-2">Carlos</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="ofertas" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Award className="mr-2 h-5 w-5 text-yellow-500" />
-                Ofertas Especiais Ativas
-              </CardTitle>
-              <CardDescription>
-                Ofertas exclusivas para apresentar aos clientes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-medium text-blue-700">Plano Premium</h3>
-                      <span className="bg-blue-200 text-xs font-semibold px-2 py-1 rounded text-blue-700">Novo</span>
-                    </div>
-                    <p className="text-sm text-blue-600 mt-2">
-                      Acesso ilimitado a todos os serviços com 20% de desconto para novos contratos.
-                    </p>
-                    <div className="mt-3 text-xs text-blue-600 space-y-1">
-                      <p><span className="font-semibold">Validade:</span> 30/06/2023</p>
-                      <p><span className="font-semibold">Código da promoção:</span> PREM22</p>
-                    </div>
-                    <div className="flex space-x-2 mt-4">
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700">Ver detalhes</Button>
-                      <Button className="w-full" variant="outline">Compartilhar</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-medium text-green-700">Consultoria Grátis</h3>
-                      <span className="bg-green-200 text-xs font-semibold px-2 py-1 rounded text-green-700">Popular</span>
-                    </div>
-                    <p className="text-sm text-green-600 mt-2">
-                      Primeira consultoria gratuita para clientes indicados.
-                    </p>
-                    <div className="mt-3 text-xs text-green-600 space-y-1">
-                      <p><span className="font-semibold">Validade:</span> 15/07/2023</p>
-                      <p><span className="font-semibold">Código da promoção:</span> INDIC1</p>
-                    </div>
-                    <div className="flex space-x-2 mt-4">
-                      <Button className="w-full bg-green-600 hover:bg-green-700">Ver detalhes</Button>
-                      <Button className="w-full" variant="outline">Compartilhar</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-medium text-purple-700">Pacote Empresarial</h3>
-                      <span className="bg-purple-200 text-xs font-semibold px-2 py-1 rounded text-purple-700">Limitado</span>
-                    </div>
-                    <p className="text-sm text-purple-600 mt-2">
-                      Soluções completas para empresas com condições especiais e desconto progressivo.
-                    </p>
-                    <div className="mt-3 text-xs text-purple-600 space-y-1">
-                      <p><span className="font-semibold">Validade:</span> 10/07/2023</p>
-                      <p><span className="font-semibold">Código da promoção:</span> CORP23</p>
-                    </div>
-                    <div className="flex space-x-2 mt-4">
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700">Ver detalhes</Button>
-                      <Button className="w-full" variant="outline">Compartilhar</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="descontos" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Percent className="mr-2 h-5 w-5 text-green-500" />
-                Descontos Autorizados
-              </CardTitle>
-              <CardDescription>
-                Descontos que podem ser aplicados nos contratos
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 rounded-lg border">
-                  <div>
-                    <h3 className="text-lg font-medium">Desconto Sazonal</h3>
-                    <p className="text-sm text-muted-foreground">15% para contratos fechados até 31/07</p>
-                    <div className="text-xs text-gray-500 mt-1">
-                      <span className="font-semibold">Aplicável a:</span> Todos os serviços
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      <span className="font-semibold">Aprovação:</span> Automática
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">15%</div>
-                    <Button variant="outline" size="sm" className="mt-2">Aplicar</Button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg border">
-                  <div>
-                    <h3 className="text-lg font-medium">Pacote Família</h3>
-                    <p className="text-sm text-muted-foreground">20% para mais de um contrato no mesmo CPF</p>
-                    <div className="text-xs text-gray-500 mt-1">
-                      <span className="font-semibold">Aplicável a:</span> Pessoa física
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      <span className="font-semibold">Aprovação:</span> Coordenador
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">20%</div>
-                    <Button variant="outline" size="sm" className="mt-2">Solicitar</Button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg border">
-                  <div>
-                    <h3 className="text-lg font-medium">Renovação Antecipada</h3>
-                    <p className="text-sm text-muted-foreground">10% para renovações com 30 dias de antecedência</p>
-                    <div className="text-xs text-gray-500 mt-1">
-                      <span className="font-semibold">Aplicável a:</span> Contratos existentes
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      <span className="font-semibold">Aprovação:</span> Automática
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">10%</div>
-                    <Button variant="outline" size="sm" className="mt-2">Aplicar</Button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 rounded-lg border">
-                  <div>
-                    <h3 className="text-lg font-medium">Desconto Especial</h3>
-                    <p className="text-sm text-muted-foreground">Até 30% para casos específicos autorizados pela gerência</p>
-                    <div className="text-xs text-gray-500 mt-1">
-                      <span className="font-semibold">Aplicável a:</span> Casos especiais
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      <span className="font-semibold">Aprovação:</span> Gerência
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">30%</div>
-                    <Button variant="outline" size="sm" className="mt-2">Solicitar</Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="suporte" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="mr-2 h-5 w-5 text-indigo-500" />
-                Suporte e Recursos
-              </CardTitle>
-              <CardDescription>
-                Canais de suporte e materiais de apoio para colaboradores
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Canais de Suporte</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3 p-3 rounded-lg border">
-                      <div className="bg-indigo-100 p-2 rounded-full">
-                        <InfoIcon className="h-5 w-5 text-indigo-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Suporte Técnico TI</h4>
-                        <p className="text-sm text-muted-foreground">Para problemas com sistemas e equipamentos</p>
-                        <p className="text-sm mt-1">
-                          <span className="font-semibold">Contato:</span> (11) 4444-5555 | suporte@exemplo.com
-                        </p>
-                        <p className="text-sm text-indigo-600">
-                          Horário: 8h às 18h (dias úteis)
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-3 rounded-lg border">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <HelpCircle className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Suporte Operacional</h4>
-                        <p className="text-sm text-muted-foreground">Para dúvidas sobre processos e procedimentos</p>
-                        <p className="text-sm mt-1">
-                          <span className="font-semibold">Contato:</span> (11) 4444-6666 | operacional@exemplo.com
-                        </p>
-                        <p className="text-sm text-blue-600">
-                          Horário: 9h às 17h (dias úteis)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Materiais de Apoio</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-gray-500" />
-                        <div>
-                          <p className="font-medium">Manual de Processos</p>
-                          <p className="text-sm text-muted-foreground">v2.3 - Atualizado em 15/05/2023</p>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost">Download</Button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-gray-500" />
-                        <div>
-                          <p className="font-medium">Tabela de Valores e Condições</p>
-                          <p className="text-sm text-muted-foreground">Vigência: Jun-Jul/2023</p>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost">Download</Button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-gray-500" />
-                        <div>
-                          <p className="font-medium">Perguntas Frequentes</p>
-                          <p className="text-sm text-muted-foreground">Guia de respostas para clientes</p>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost">Download</Button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-gray-500" />
-                        <div>
-                          <p className="font-medium">Modelos de Documentos</p>
-                          <p className="text-sm text-muted-foreground">Templates para uso diário</p>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost">Download</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleEditDemanda}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-};
-
-export default Painel;
+}

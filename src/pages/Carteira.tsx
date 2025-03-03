@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ValidationError } from "@/utils/csvUtils";
-import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 import {
   Dialog,
   DialogContent,
@@ -192,18 +191,8 @@ const Carteira = () => {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
-  const [selectedDemanda, setSelectedDemanda] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-
-  const demandas = [
-    "Contrato 12345 - Necessário envio de documentação adicional",
-    "Cliente João Silva - Pendência de assinatura em contrato",
-    "Processo 789/2023 - Prazo de 5 dias para recurso",
-    "Notificação extrajudicial - Cliente Maria Oliveira",
-    "Contrato 56789 - Necessário reconhecimento de firma",
-    "Ação judicial 2022/456 - Audiência marcada",
-  ];
 
   const form = useForm<Cliente>({
     defaultValues: {
@@ -518,36 +507,8 @@ const Carteira = () => {
     }
   ];
 
-  const handleDemandaSelect = (demanda: string) => {
-    setSelectedDemanda(demanda);
-    setHistorico(prev => [...prev, {
-      data: new Date().toISOString(),
-      acao: `Demanda selecionada: ${demanda}`
-    }]);
-    toast({
-      title: "Demanda Selecionada",
-      description: `A demanda "${demanda}" foi selecionada e precisa de atenção.`,
-      variant: "destructive",
-    });
-  };
-
-  const handleResolveDemanda = () => {
-    setSelectedDemanda(null);
-    setHistorico(prev => [...prev, {
-      data: new Date().toISOString(),
-      acao: "Demanda resolvida"
-    }]);
-  };
-
   return (
     <div className="space-y-4">
-      {selectedDemanda && (
-        <DemandaAlert 
-          demanda={selectedDemanda} 
-          onResolve={handleResolveDemanda} 
-        />
-      )}
-      
       <div className="sticky top-0 bg-background z-10 pb-2">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
@@ -638,28 +599,6 @@ const Carteira = () => {
           </div>
         </div>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Demandas Pendentes</CardTitle>
-          <CardDescription>Clique para selecionar uma demanda e criar um alerta</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {demandas.map((demanda, index) => (
-              <Button 
-                key={index}
-                variant="outline"
-                className="justify-start h-auto py-2 px-3"
-                onClick={() => handleDemandaSelect(demanda)}
-              >
-                <AlertTriangle className="h-4 w-4 mr-2 text-amber-500" />
-                {demanda}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {kpis.map((kpi, index) => (

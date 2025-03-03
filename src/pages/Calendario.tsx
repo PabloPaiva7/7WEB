@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -21,8 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bell, Check, Plus, Trash } from "lucide-react";
+import { Bell, Check, Plus, Trash, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
+import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 
 type Compromisso = {
   id: string;
@@ -44,6 +45,15 @@ export default function Calendario() {
     status: "pendente",
     alerta: true,
   });
+  const [demandas, setDemandas] = useState([
+    "Contrato 12345 - Necessário envio de documentação adicional",
+    "Cliente João Silva - Pendência de assinatura em contrato",
+    "Processo 789/2023 - Prazo de 5 dias para recurso",
+    "Notificação extrajudicial - Cliente Maria Oliveira",
+    "Contrato 56789 - Necessário reconhecimento de firma",
+    "Ação judicial 2022/456 - Audiência marcada",
+  ]);
+  const [selectedDemanda, setSelectedDemanda] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -96,12 +106,40 @@ export default function Calendario() {
     });
   };
 
+  const handleDemandaSelect = (demanda: string) => {
+    setSelectedDemanda(demanda);
+    toast({
+      title: "Demanda Selecionada",
+      description: `A demanda "${demanda}" foi selecionada e precisa de atenção.`,
+      variant: "destructive",
+    });
+  };
+
+  const handleResolveDemanda = () => {
+    if (selectedDemanda) {
+      const novasDemandas = demandas.filter(d => d !== selectedDemanda);
+      setDemandas(novasDemandas);
+      setSelectedDemanda(null);
+      toast({
+        title: "Demanda resolvida",
+        description: `A demanda foi marcada como resolvida.`,
+      });
+    }
+  };
+
   const compromissosDoDia = compromissos.filter(
     comp => selectedDate && comp.data.toDateString() === selectedDate.toDateString()
   );
 
   return (
     <div className="grid md:grid-cols-[1fr,300px] gap-6 animate-fadeIn">
+      {selectedDemanda && (
+        <DemandaAlert 
+          demanda={selectedDemanda} 
+          onResolve={handleResolveDemanda} 
+        />
+      )}
+      
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Calendário</CardTitle>
@@ -245,6 +283,33 @@ export default function Calendario() {
               {compromissosDoDia.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   Nenhum compromisso para esta data
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Demandas Pendentes</CardTitle>
+            <CardDescription>Clique para selecionar uma demanda e criar um alerta</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {demandas.map((demanda, index) => (
+                <Button 
+                  key={index}
+                  variant="outline"
+                  className="justify-start h-auto py-2 px-3 w-full text-left"
+                  onClick={() => handleDemandaSelect(demanda)}
+                >
+                  <AlertTriangle className="h-4 w-4 mr-2 text-amber-500 flex-shrink-0" />
+                  <span className="truncate">{demanda}</span>
+                </Button>
+              ))}
+              {demandas.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Não há demandas pendentes
                 </p>
               )}
             </div>
