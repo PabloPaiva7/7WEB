@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,13 +24,25 @@ interface Pasta {
   documentos: Documento[];
 }
 
+// Lista de pastas predefinidas que já foram criadas no Supabase
 const pastasPredefinidas = [
   "minutas",
-  "comprovantes",
-  "boletos",
   "procuracoes",
-  "notificacao_extrajudicial"
+  "prints",
+  "boletos",
+  "comprovantes",
+  "notificacoes_extrajudiciais"
 ];
+
+// Mapeamento de nomes para exibição
+const pastasDisplay: Record<string, string> = {
+  "minutas": "MINUTAS",
+  "procuracoes": "PROCURAÇÕES",
+  "prints": "PRINTS",
+  "boletos": "BOLETOS",
+  "comprovantes": "COMPROVANTES",
+  "notificacoes_extrajudiciais": "NOTIFICAÇÕES EXTRAJUDICIAIS"
+};
 
 const Documentos = () => {
   const [pastas, setPastas] = useState<Pasta[]>([]);
@@ -49,55 +62,24 @@ const Documentos = () => {
     try {
       setCarregando(true);
       
-      // Carregar todas as pastas existentes primeiro
+      // Carregar todas as pastas existentes
       const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
       
       if (bucketsError) {
         console.error("Erro ao listar buckets:", bucketsError);
-        // Verificar se é um erro de permissão
         if (bucketsError.message?.includes("violates row-level security policy")) {
           setPermissionError(true);
         }
         throw bucketsError;
       }
       
-      // Verificar quais pastas predefinidas existem
       const bucketsExistentes = (buckets || []).map(b => b.name);
       console.log("Buckets existentes:", bucketsExistentes);
       
-      // Não tentar criar pastas se encontramos um erro de permissão
-      if (!permissionError) {
-        // Tentar criar apenas as pastas predefinidas que não existem
-        for (const pasta of pastasPredefinidas) {
-          if (!bucketsExistentes.includes(pasta)) {
-            try {
-              await criarPasta(pasta);
-            } catch (error: any) {
-              console.error(`Não foi possível criar a pasta ${pasta}:`, error);
-              // Verificar se é um erro de permissão
-              if (error?.message?.includes("violates row-level security policy")) {
-                setPermissionError(true);
-                break; // Parar de tentar criar mais pastas
-              }
-            }
-          }
-        }
-      }
-      
-      // Carregar novamente os buckets para incluir os que foram criados com sucesso
-      const { data: bucketsAtualizados, error: bucketUpdateError } = await supabase.storage.listBuckets();
-      
-      if (bucketUpdateError) {
-        if (bucketUpdateError.message?.includes("violates row-level security policy")) {
-          setPermissionError(true);
-        }
-        throw bucketUpdateError;
-      }
-
       const pastasCarregadas: Pasta[] = [];
 
-      // Adicionar todas as pastas que existem (tanto predefinidas quanto outras)
-      for (const bucket of bucketsAtualizados || []) {
+      // Processar cada bucket para obter seus arquivos
+      for (const bucket of buckets || []) {
         try {
           const { data: files, error: filesError } = await supabase.storage
             .from(bucket.name)
@@ -113,14 +95,20 @@ const Documentos = () => {
             });
           } else {
             const documentos: Documento[] = files
-              ?.filter(file => !file.metadata?.isFolder)
-              .map(file => ({
-                id: Date.now() + Math.random(),
-                nome: file.name,
-                data: new Date(file.created_at || '').toISOString(),
-                tipo: file.metadata?.mimetype || 'unknown',
-                url: `${supabase.storage.from(bucket.name).getPublicUrl(file.name).data.publicUrl}`
-              })) || [];
+              ?.filter(file => !file.name.endsWith('/') && file.name !== '.emptyFolderPlaceholder')
+              .map(file => {
+                const { data: urlData } = supabase.storage
+                  .from(bucket.name)
+                  .getPublicUrl(file.name);
+                
+                return {
+                  id: Date.now() + Math.random(),
+                  nome: file.name,
+                  data: new Date(file.created_at || '').toISOString(),
+                  tipo: file.metadata?.mimetype || 'unknown',
+                  url: urlData.publicUrl
+                };
+              }) || [];
 
             pastasCarregadas.push({
               id: Date.now() + Math.random(),
@@ -178,7 +166,6 @@ const Documentos = () => {
 
       if (error) {
         console.error('Erro ao criar pasta:', error);
-        // Se o erro for relacionado a RLS, marcamos como erro de permissão
         if (error.message?.includes("violates row-level security policy")) {
           setPermissionError(true);
           return false;
@@ -199,7 +186,6 @@ const Documentos = () => {
   const handleNovaPasta = async () => {
     if (novaPasta.trim()) {
       try {
-        // Criar novo bucket no Storage com configurações atualizadas
         const success = await criarPasta(novaPasta.toLowerCase());
 
         if (!success) {
@@ -275,6 +261,7 @@ const Documentos = () => {
       }
     }
 
+    // Atualizar estado das pastas após uploads
     setPastas(pastas.map(pasta => {
       if (pasta.id === pastaId) {
         return {
@@ -335,6 +322,11 @@ const Documentos = () => {
       pasta.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pasta.documentos.length > 0
     );
+  };
+
+  // Obter o nome de exibição para uma pasta
+  const getNomePastaDisplay = (nome: string) => {
+    return pastasDisplay[nome] || nome.toUpperCase();
   };
 
   return (
@@ -403,12 +395,7 @@ const Documentos = () => {
               <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
             </Button>
             <h1 className="text-2xl font-semibold text-foreground">
-              {pastaAberta.nome === "minutas" ? "MINUTAS" :
-               pastaAberta.nome === "comprovantes" ? "COMPROVANTES" :
-               pastaAberta.nome === "boletos" ? "BOLETOS" :
-               pastaAberta.nome === "procuracoes" ? "PROCURAÇÕES" :
-               pastaAberta.nome === "notificacao_extrajudicial" ? "NOTIFICAÇÃO EXTRAJUDICIAL" :
-               pastaAberta.nome}
+              {getNomePastaDisplay(pastaAberta.nome)}
             </h1>
           </div>
 
@@ -498,12 +485,7 @@ const Documentos = () => {
                   <div className="flex items-center gap-2">
                     <Folder className="h-5 w-5 text-primary" />
                     <h3 className="font-medium">
-                      {pasta.nome === "minutas" ? "MINUTAS" :
-                       pasta.nome === "comprovantes" ? "COMPROVANTES" :
-                       pasta.nome === "boletos" ? "BOLETOS" :
-                       pasta.nome === "procuracoes" ? "PROCURAÇÕES" :
-                       pasta.nome === "notificacao_extrajudicial" ? "NOTIFICAÇÃO EXTRAJUDICIAL" :
-                       pasta.nome}
+                      {getNomePastaDisplay(pasta.nome)}
                     </h3>
                   </div>
                   <span className="text-sm text-muted-foreground">
