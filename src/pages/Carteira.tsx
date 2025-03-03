@@ -196,6 +196,15 @@ const Carteira = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
+  const demandas = [
+    "Contrato 12345 - Necessário envio de documentação adicional",
+    "Cliente João Silva - Pendência de assinatura em contrato",
+    "Processo 789/2023 - Prazo de 5 dias para recurso",
+    "Notificação extrajudicial - Cliente Maria Oliveira",
+    "Contrato 56789 - Necessário reconhecimento de firma",
+    "Ação judicial 2022/456 - Audiência marcada",
+  ];
+
   const form = useForm<Cliente>({
     defaultValues: {
       id: 0,
