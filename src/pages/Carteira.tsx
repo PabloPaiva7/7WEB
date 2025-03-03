@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ValidationError } from "@/utils/csvUtils";
+import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 import {
   Dialog,
   DialogContent,
@@ -191,6 +192,7 @@ const Carteira = () => {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [selectedDemanda, setSelectedDemanda] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -507,8 +509,36 @@ const Carteira = () => {
     }
   ];
 
+  const handleDemandaSelect = (demanda: string) => {
+    setSelectedDemanda(demanda);
+    setHistorico(prev => [...prev, {
+      data: new Date().toISOString(),
+      acao: `Demanda selecionada: ${demanda}`
+    }]);
+    toast({
+      title: "Demanda Selecionada",
+      description: `A demanda "${demanda}" foi selecionada e precisa de atenção.`,
+      variant: "destructive",
+    });
+  };
+
+  const handleResolveDemanda = () => {
+    setSelectedDemanda(null);
+    setHistorico(prev => [...prev, {
+      data: new Date().toISOString(),
+      acao: "Demanda resolvida"
+    }]);
+  };
+
   return (
     <div className="space-y-4">
+      {selectedDemanda && (
+        <DemandaAlert 
+          demanda={selectedDemanda} 
+          onResolve={handleResolveDemanda} 
+        />
+      )}
+      
       <div className="sticky top-0 bg-background z-10 pb-2">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
@@ -600,57 +630,26 @@ const Carteira = () => {
         </div>
       </div>
 
-      <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <Select onValueChange={(value) => handleFilterChange('banco', value)}>
-              <SelectTrigger>
-                <div className="flex items-center">
-                  <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <SelectValue placeholder="Filtrar por banco" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os bancos</SelectItem>
-                {bancos.map((banco) => (
-                  <SelectItem key={banco} value={banco}>{banco}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Demandas Pendentes</CardTitle>
+          <CardDescription>Clique para selecionar uma demanda e criar um alerta</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {demandas.map((demanda, index) => (
+              <Button 
+                key={index}
+                variant="outline"
+                className="justify-start h-auto py-2 px-3"
+                onClick={() => handleDemandaSelect(demanda)}
+              >
+                <AlertTriangle className="h-4 w-4 mr-2 text-amber-500" />
+                {demanda}
+              </Button>
+            ))}
           </div>
-          <div>
-            <Select onValueChange={(value) => handleFilterChange('escritorio', value)}>
-              <SelectTrigger>
-                <div className="flex items-center">
-                  <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <SelectValue placeholder="Filtrar por escritório" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os escritórios</SelectItem>
-                {escritorios.map((escritorio) => (
-                  <SelectItem key={escritorio} value={escritorio}>{escritorio}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Select onValueChange={(value) => handleFilterChange('prazo', value)}>
-              <SelectTrigger>
-                <div className="flex items-center">
-                  <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <SelectValue placeholder="Filtrar por prazo" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os prazos</SelectItem>
-                {prazos.map((prazo) => (
-                  <SelectItem key={prazo} value={prazo}>{prazo}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
