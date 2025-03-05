@@ -39,6 +39,7 @@ export function Calculadora() {
 
     if (!isNaN(saldo) && !isNaN(desc)) {
       const result = saldo - desc;
+      // Fórmula corrigida: VALOR DO DESCONTO / SALDO DEVEDOR * 100
       const percent = (desc / saldo) * 100;
       setResultado(result);
       setPorcentagem(percent);
@@ -58,6 +59,7 @@ export function Calculadora() {
   const calcularPorPorcentagem = (percent: number) => {
     const saldo = parseFloat(saldoDevedor.replace(/[^\d.-]/g, ''));
     if (!isNaN(saldo) && !isNaN(percent)) {
+      // Fórmula corrigida: calcular o desconto baseado na porcentagem
       const desc = (saldo * percent) / 100;
       setDesconto(formatarMoeda(desc.toString()));
       const result = saldo - desc;
