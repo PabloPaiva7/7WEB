@@ -53,7 +53,7 @@ export const ClienteDialog = ({
                 <FormField
                   key={key}
                   control={form.control}
-                  name={key as keyof Cliente}
+                  name={key as any}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{config.label}</FormLabel>

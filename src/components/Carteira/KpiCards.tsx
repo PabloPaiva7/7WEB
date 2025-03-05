@@ -16,7 +16,7 @@ export const KpiCards = ({
   const kpis = [
     { 
       title: 'Clientes Ativos',
-      value: totalClientes,
+      value: totalClientes.toString(),
       icon: Users,
       bgColor: 'bg-indigo-50',
       borderColor: 'border-indigo-200',
@@ -56,8 +56,8 @@ export const KpiCards = ({
       {kpis.map((kpi, index) => (
         <StatisticCard
           key={index}
-          title={typeof kpi.value === 'string' ? kpi.title : kpi.value}
-          value={typeof kpi.value === 'string' ? kpi.value : kpi.title}
+          title={kpi.title}
+          value={kpi.value}
           icon={kpi.icon}
           bgColor={kpi.bgColor}
           borderColor={kpi.borderColor}
