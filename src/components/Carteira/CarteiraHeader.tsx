@@ -10,6 +10,7 @@ interface CarteiraHeaderProps {
   onFilterChange: (type: string, value: string) => void;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
+  onFileUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const CarteiraHeader = ({
@@ -17,7 +18,8 @@ export const CarteiraHeader = ({
   onSearchChange,
   onFilterChange,
   isDialogOpen,
-  setIsDialogOpen
+  setIsDialogOpen,
+  onFileUpload
 }: CarteiraHeaderProps) => {
   return (
     <div className="sticky top-0 bg-background z-10 pb-2">
@@ -51,6 +53,7 @@ export const CarteiraHeader = ({
                   type="file"
                   accept=".csv"
                   className="hidden"
+                  onChange={onFileUpload}
                 />
               </label>
             </Button>

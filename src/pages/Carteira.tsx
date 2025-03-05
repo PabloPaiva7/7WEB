@@ -286,6 +286,7 @@ const Carteira = () => {
           onFilterChange={handleFilterChange}
           isDialogOpen={isDialogOpen}
           setIsDialogOpen={setIsDialogOpen}
+          onFileUpload={handleFileUpload}
         />
         <ClienteDialog 
           editingCliente={editingCliente}

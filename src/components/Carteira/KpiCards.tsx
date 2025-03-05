@@ -42,8 +42,8 @@ export const KpiCards = ({
       iconColor: 'text-amber-500'
     },
     { 
-      title: `${Math.round(mediaPrazo)} dias`,
-      value: 'Prazo Médio',
+      title: 'Prazo Médio',
+      value: `${Math.round(mediaPrazo)} dias`,
       icon: CreditCard,
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
