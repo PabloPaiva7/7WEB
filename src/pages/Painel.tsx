@@ -1,4 +1,3 @@
-
 import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 import { useState } from "react";
 import { Demanda } from "@/types/demanda";
@@ -92,7 +91,9 @@ export default function Painel() {
       )}
       
       <StatisticsSection demandas={demandas} />
+      
       <ChartSection />
+      
       <DemandasBoard 
         demandas={demandas} 
         setDemandas={setDemandas}
