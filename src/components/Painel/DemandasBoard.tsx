@@ -16,7 +16,7 @@ export function DemandasBoard({ demandas, setDemandas, onSelectDemanda }: Demand
   const concluidas = demandas.filter((demanda) => demanda.status === "concluida");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <DemandasColumn 
         title="Pendentes" 
         color="bg-amber-500" 

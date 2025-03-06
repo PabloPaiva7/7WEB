@@ -24,7 +24,7 @@ export const DemandaCard = ({
   showCompleteIcon = false
 }: DemandaCardProps) => {
   return (
-    <Card className="p-3 bg-white">
+    <Card className="p-3 bg-white shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-2">
           {demanda.prioridade === 'alta' && (

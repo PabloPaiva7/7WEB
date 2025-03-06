@@ -110,7 +110,7 @@ export default function Painel() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 pb-8">
       {selectedDemanda && (
         <DemandaAlert 
           demanda={selectedDemanda} 
@@ -122,7 +122,7 @@ export default function Painel() {
       
       <ChartSection />
       
-      <div className="mb-8">
+      <div>
         <h2 className="text-xl font-semibold mb-4">Demandas</h2>
         <DemandasBoard 
           demandas={demandas} 
