@@ -48,12 +48,12 @@ export const columnConfig: ColumnConfig = {
     label: "Valor do Cliente",
     type: "currency",
     format: (value: string) => {
-      // Preservar o valor original para exibição se já estiver formatado
-      if (value.includes('R$')) {
+      // Se o valor já contém R$, retorna como está para evitar formatação duplicada
+      if (value && typeof value === 'string' && value.includes('R$')) {
         return value;
       }
       
-      // Usa a função aprimorada para processar os valores monetários
+      // Usa a função para processar os valores monetários
       const numberValue = formatCurrencyValue(value);
       return new Intl.NumberFormat('pt-BR', {
         style: 'currency',

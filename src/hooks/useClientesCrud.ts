@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Cliente } from "@/components/Carteira/ClientesTable";
 import { HistoricoItem } from "@/types/carteira.types";
-import { processCSV } from "@/utils/carteiraUtils";
+import { processCSV, formatCurrencyValue } from "@/utils/carteiraUtils";
 import { columnConfig } from "@/config/columnConfig";
 
 // Dados iniciais para teste
@@ -34,6 +34,11 @@ export const useClientesCrud = () => {
   const { toast } = useToast();
 
   const handleSubmit = (data: Cliente) => {
+    // Garantir que o valor do cliente esteja formatado corretamente
+    if (data.valorCliente && !data.valorCliente.includes('R$')) {
+      data.valorCliente = columnConfig.valorCliente.format(data.valorCliente);
+    }
+    
     if (editingCliente) {
       const updatedClientes = clientes.map(c => 
         c.id === editingCliente.id ? { ...data, id: editingCliente.id } : c
@@ -100,11 +105,32 @@ export const useClientesCrud = () => {
           }
           
           if (data.length > 0) {
-            setClientes(prev => [...prev, ...data]);
+            // Calculamos o próximo ID disponível
+            const nextId = Math.max(...clientes.map(c => c.id), 0) + 1;
+            
+            // Garantimos que cada cliente importado tenha um ID único
+            const clientesComId = data.map((cliente, index) => ({
+              ...cliente,
+              id: nextId + index,
+              // Formatamos o valor do cliente adequadamente se ainda não estiver formatado
+              valorCliente: cliente.valorCliente && !cliente.valorCliente.includes('R$') 
+                ? columnConfig.valorCliente.format(cliente.valorCliente)
+                : cliente.valorCliente
+            }));
+            
+            setClientes(prev => [...prev, ...clientesComId]);
+            
+            // Somamos o valor total importado para o registro
+            const valorTotalImportado = clientesComId.reduce((acc, cliente) => {
+              return acc + formatCurrencyValue(cliente.valorCliente);
+            }, 0);
             
             setHistorico(prev => [...prev, {
               data: new Date().toISOString(),
-              acao: `Importação de ${data.length} registros via CSV`
+              acao: `Importação de ${data.length} registros via CSV com valor total de ${new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+              }).format(valorTotalImportado)}`
             }]);
             
             toast({

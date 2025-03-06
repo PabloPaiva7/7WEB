@@ -60,10 +60,9 @@ export const processCSV = (text: string, columnConfig: Record<string, any>): { d
           
           // Tratamento especial para o campo valorCliente
           if (key === 'valorCliente') {
-            // Mantém o valor original para exibição
-            const originalValue = value;
-            // Armazena o valor numérico para cálculos internos
-            (cliente[key as keyof Cliente] as any) = originalValue;
+            // Mantém o valor original formatado para exibição
+            const formattedValue = config.format ? config.format(value) : value;
+            (cliente[key as keyof Cliente] as any) = formattedValue;
           } else if (config.format) {
             value = config.format(value);
           }
@@ -129,11 +128,13 @@ export const calcularEstatisticas = (clientes: Cliente[]) => {
   return {
     totalClientes: clientes.length,
     porSituacao: clientes.reduce((acc, cliente) => {
-      acc[cliente.situacao] = (acc[cliente.situacao] || 0) + 1;
+      const situacao = cliente.situacao || 'Não definido';
+      acc[situacao] = (acc[situacao] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
     porBanco: clientes.reduce((acc, cliente) => {
-      acc[cliente.banco] = (acc[cliente.banco] || 0) + 1;
+      const banco = cliente.banco || 'Não definido';
+      acc[banco] = (acc[banco] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
     valorTotal: clientes.reduce((acc, cliente) => {
@@ -141,8 +142,10 @@ export const calcularEstatisticas = (clientes: Cliente[]) => {
       return acc + valor;
     }, 0),
     mediaPrazo: clientes.reduce((acc, cliente) => {
-      const dias = parseInt(cliente.prazo as string) || 0;
-      return acc + dias;
+      // Tenta extrair o número do prazo (remove 'dias' ou outros textos)
+      const prazoStr = cliente.prazo || '0';
+      const prazoNum = parseInt(prazoStr.replace(/\D/g, ''));
+      return acc + (isNaN(prazoNum) ? 0 : prazoNum);
     }, 0) / (clientes.length || 1),
   };
 };
