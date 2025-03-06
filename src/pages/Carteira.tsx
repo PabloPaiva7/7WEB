@@ -7,7 +7,8 @@ import { ChartAnalysis } from "@/components/Carteira/ChartAnalysis";
 import { ClientesTable } from "@/components/Carteira/ClientesTable";
 import { HistoricoCard } from "@/components/Carteira/HistoricoCard";
 import { ClienteDialog } from "@/components/Carteira/ClienteDialog";
-import { useClientesCarteira, columnConfig } from "@/hooks/useClientesCarteira";
+import { useClientesCarteira } from "@/hooks/useClientesCarteira";
+import { columnConfig } from "@/config/columnConfig";
 
 const Carteira = () => {
   const {
