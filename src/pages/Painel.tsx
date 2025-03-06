@@ -1,3 +1,4 @@
+
 import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 import { useState } from "react";
 import { Demanda } from "@/types/demanda";
@@ -109,7 +110,7 @@ export default function Painel() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {selectedDemanda && (
         <DemandaAlert 
           demanda={selectedDemanda} 
@@ -121,11 +122,14 @@ export default function Painel() {
       
       <ChartSection />
       
-      <DemandasBoard 
-        demandas={demandas} 
-        setDemandas={setDemandas}
-        onSelectDemanda={handleDemandaSelect}
-      />
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Demandas</h2>
+        <DemandasBoard 
+          demandas={demandas} 
+          setDemandas={setDemandas}
+          onSelectDemanda={handleDemandaSelect}
+        />
+      </div>
     </div>
   );
 }

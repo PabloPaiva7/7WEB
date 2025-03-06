@@ -1,9 +1,8 @@
 
-// src/components/Painel/DemandasColumn.tsx
 import { DemandaCard } from "./DemandaCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useIsMobile } from "@/hooks/use-mobile"; // Correct import path
-import { Demanda } from "@/types/demanda"; // Import the correct Demanda type
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Demanda } from "@/types/demanda";
 
 interface DemandasColumnProps {
   title: string;
@@ -21,7 +20,7 @@ export const DemandasColumn = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-w-[280px] max-w-full flex flex-col">
+    <div className="min-w-[280px] max-w-full flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-medium text-sm flex items-center">
           <div className={`w-3 h-3 rounded-full mr-2 ${color}`}></div>
@@ -32,8 +31,8 @@ export const DemandasColumn = ({
         </h3>
       </div>
 
-      <ScrollArea className={`${isMobile ? 'h-[350px]' : 'h-[400px]'} overflow-y-auto`}>
-        <div className="pr-4 space-y-2">
+      <ScrollArea className="h-[300px] overflow-y-auto flex-grow">
+        <div className="pr-4 space-y-2 pb-2">
           {demandas.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center p-4">Nenhuma demanda</p>
           ) : (
@@ -42,9 +41,9 @@ export const DemandasColumn = ({
                 key={demanda.id} 
                 demanda={demanda} 
                 onSelect={() => onSelectDemanda && onSelectDemanda(demanda.id)}
-                onChangeStatus={(id, status) => {}} // Add empty handler to match DemandaCard props
-                onEdit={() => {}} // Add empty handler to match DemandaCard props
-                onDelete={() => {}} // Add empty handler to match DemandaCard props
+                onChangeStatus={(id, status) => {}} 
+                onEdit={() => {}} 
+                onDelete={() => {}} 
               />
             ))
           )}
