@@ -1,22 +1,25 @@
 
 import { DemandasColumn } from "./DemandasColumn";
 import { Demanda } from "@/types/demanda";
+import { Dispatch, SetStateAction } from "react";
 
-interface DemandasBoardProps {
+export interface DemandasBoardProps {
   demandas: Demanda[];
+  setDemandas?: Dispatch<SetStateAction<Demanda[]>>;
+  onSelectDemanda?: (demandaId: string) => void;
 }
 
-export function DemandasBoard({ demandas }: DemandasBoardProps) {
+export function DemandasBoard({ demandas, setDemandas, onSelectDemanda }: DemandasBoardProps) {
   // Filter demandas by status
-  const backlog = demandas.filter((demanda) => demanda.status === "backlog");
-  const emProgresso = demandas.filter((demanda) => demanda.status === "em_progresso");
-  const concluido = demandas.filter((demanda) => demanda.status === "concluido");
+  const pendentes = demandas.filter((demanda) => demanda.status === "pendente");
+  const emAndamento = demandas.filter((demanda) => demanda.status === "em_andamento");
+  const concluidas = demandas.filter((demanda) => demanda.status === "concluida");
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-      <DemandasColumn title="Backlog" demandas={backlog} status="backlog" />
-      <DemandasColumn title="Em Progresso" demandas={emProgresso} status="em_progresso" />
-      <DemandasColumn title="Concluído" demandas={concluido} status="concluido" />
+      <DemandasColumn title="Pendentes" demandas={pendentes} onSelectDemanda={onSelectDemanda} />
+      <DemandasColumn title="Em Andamento" demandas={emAndamento} onSelectDemanda={onSelectDemanda} />
+      <DemandasColumn title="Concluídas" demandas={concluidas} onSelectDemanda={onSelectDemanda} />
     </div>
   );
 }

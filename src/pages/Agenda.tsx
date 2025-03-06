@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Calendar, 
@@ -30,6 +29,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 // Interface para cliente
 interface Cliente {
@@ -396,6 +396,7 @@ const paginasJuridicasExemplo: PaginaJuridica[] = [
 
 const Agenda = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [regiaoFilter, setRegiaoFilter] = useState("todas");
   const [escritorioFilter, setEscritorioFilter] = useState("todos");
@@ -403,11 +404,8 @@ const Agenda = () => {
   const [tipoContratoFilter, setTipoContratoFilter] = useState("todos");
   const [visualizacao, setVisualizacao] = useState("lista");
   const [secaoAtual, setSecaoAtual] = useState("clientes");
-
-  // Obter valores únicos para os filtros
-  const regioes = Array.from(new Set(clientesExemplo.map(cliente => cliente.regiao)));
-  const escritorios = Array.from(new Set(clientesExemplo.map(cliente => cliente.escritorio)));
-  const tiposContrato = Array.from(new Set(clientesExemplo.map(cliente => cliente.tipoContrato)));
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Filtro para ramais
   const [ramalSearchTerm, setRamalSearchTerm] = useState("");
@@ -415,6 +413,38 @@ const Agenda = () => {
   
   // Filtros para todas as seções
   const [generalSearchTerm, setGeneralSearchTerm] = useState("");
+
+  // Obter valores únicos para os filtros
+  const regioes = Array.from(new Set(clientesExemplo.map(cliente => cliente.regiao)));
+  const escritorios = Array.from(new Set(clientesExemplo.map(cliente => cliente.escritorio)));
+  const tiposContrato = Array.from(new Set(clientesExemplo.map(cliente => cliente.tipoContrato)));
+
+  // Efeito para simular carregamento e detectar erros
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    
+    // Simula o tempo de carregamento e verifica se há erro
+    const timer = setTimeout(() => {
+      try {
+        // Verificação simbólica para garantir que os dados foram carregados
+        if (!clientesExemplo || !ramaisExemplo) {
+          throw new Error("Erro ao carregar dados da agenda");
+        }
+        setIsLoading(false);
+      } catch (err) {
+        setError("Houve um erro ao carregar os dados. Por favor, tente novamente.");
+        setIsLoading(false);
+        toast({
+          title: "Erro ao carregar",
+          description: "Houve um problema ao carregar a página. Tente novamente.",
+          variant: "destructive",
+        });
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   // Filtrar clientes com base nos critérios
   const clientesFiltrados = clientesExemplo.filter(cliente => {
@@ -487,6 +517,32 @@ const Agenda = () => {
   const handleClienteClick = (id: string) => {
     navigate(`/cliente/${id}`);
   };
+
+  // Se estiver carregando, mostre um indicador de carregamento
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="space-y-4 text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Carregando dados da agenda...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Se houver um erro, mostre uma mensagem de erro
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="space-y-4 text-center">
+          <div className="text-destructive text-3xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold">Erro ao carregar a agenda</h2>
+          <p className="text-muted-foreground">{error}</p>
+          <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fadeIn">
