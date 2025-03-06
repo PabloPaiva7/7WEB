@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BancoPieChart } from "../Charts/BancoPieChart";
+import { BancoBarChart } from "../Charts/BancoBarChart";
 
 interface DistribuicaoBancoCardProps {
   dadosPizza: { name: string; value: number }[];
@@ -14,7 +14,7 @@ export const DistribuicaoBancoCard = ({ dadosPizza }: DistribuicaoBancoCardProps
         <CardDescription>Análise do volume por instituição financeira</CardDescription>
       </CardHeader>
       <CardContent>
-        <BancoPieChart dados={dadosPizza} />
+        <BancoBarChart dados={dadosPizza} />
       </CardContent>
     </Card>
   );

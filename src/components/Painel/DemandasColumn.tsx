@@ -28,7 +28,7 @@ export function DemandasColumn({ title, demandas, onSelectDemanda }: DemandasCol
               <DemandaCard 
                 key={demanda.id} 
                 demanda={demanda} 
-                onClick={() => onSelectDemanda && onSelectDemanda(demanda.id)}
+                onSelectDemanda={() => onSelectDemanda && onSelectDemanda(demanda.id)}
               />
             ))
           )}
