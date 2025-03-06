@@ -17,9 +17,24 @@ export function DemandasBoard({ demandas, setDemandas, onSelectDemanda }: Demand
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-      <DemandasColumn title="Pendentes" demandas={pendentes} onSelectDemanda={onSelectDemanda} />
-      <DemandasColumn title="Em Andamento" demandas={emAndamento} onSelectDemanda={onSelectDemanda} />
-      <DemandasColumn title="Concluídas" demandas={concluidas} onSelectDemanda={onSelectDemanda} />
+      <DemandasColumn 
+        title="Pendentes" 
+        color="bg-amber-500" 
+        demandas={pendentes} 
+        onSelectDemanda={onSelectDemanda} 
+      />
+      <DemandasColumn 
+        title="Em Andamento" 
+        color="bg-purple-500" 
+        demandas={emAndamento} 
+        onSelectDemanda={onSelectDemanda} 
+      />
+      <DemandasColumn 
+        title="Concluídas" 
+        color="bg-green-500" 
+        demandas={concluidas} 
+        onSelectDemanda={onSelectDemanda} 
+      />
     </div>
   );
 }

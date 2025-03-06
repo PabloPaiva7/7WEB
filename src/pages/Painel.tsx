@@ -1,3 +1,4 @@
+
 import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 import { useState } from "react";
 import { Demanda } from "@/types/demanda";
@@ -78,6 +79,34 @@ export default function Painel() {
     toast({
       title: "Demanda resolvida",
       description: `A demanda foi marcada como resolvida.`,
+    });
+  };
+
+  const handleChangeDemandaStatus = (id: string, status: 'pendente' | 'em_andamento' | 'concluida') => {
+    setDemandas(prevDemandas => 
+      prevDemandas.map(d => 
+        d.id === id ? { ...d, status } : d
+      )
+    );
+    toast({
+      title: "Status atualizado",
+      description: `O status da demanda foi atualizado.`,
+    });
+  };
+
+  const handleEditDemanda = (demanda: Demanda) => {
+    // Implementation for editing a demanda
+    toast({
+      title: "Editar demanda",
+      description: `A demanda "${demanda.titulo}" será editada.`,
+    });
+  };
+
+  const handleDeleteDemanda = (id: string) => {
+    setDemandas(prevDemandas => prevDemandas.filter(d => d.id !== id));
+    toast({
+      title: "Demanda removida",
+      description: `A demanda foi removida com sucesso.`,
     });
   };
 
