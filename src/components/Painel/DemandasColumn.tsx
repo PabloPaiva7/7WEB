@@ -41,7 +41,7 @@ export const DemandasColumn = ({
               <DemandaCard 
                 key={demanda.id} 
                 demanda={demanda} 
-                onClick={() => onSelectDemanda && onSelectDemanda(demanda.id)}
+                onSelect={() => onSelectDemanda && onSelectDemanda(demanda.id)}
                 onChangeStatus={(id, status) => {}} // Add empty handler to match DemandaCard props
                 onEdit={() => {}} // Add empty handler to match DemandaCard props
                 onDelete={() => {}} // Add empty handler to match DemandaCard props
