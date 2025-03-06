@@ -26,7 +26,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export const ChartSection = () => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <ChartCard
         title="Evolução de Demandas"
         description="Número de demandas nos últimos 6 meses"

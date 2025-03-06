@@ -10,13 +10,13 @@ interface ChartCardProps {
 
 export const ChartCard = ({ title, description, children }: ChartCardProps) => {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-2">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[250px]">
           {children}
         </div>
       </CardContent>

@@ -6,7 +6,7 @@ export const StatisticsSection = () => {
   const statistics = [
     {
       title: "Clientes Ativos",
-      value: "253", // Convertido para string
+      value: "253", 
       icon: Users,
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
@@ -14,7 +14,7 @@ export const StatisticsSection = () => {
     },
     {
       title: "Pendências",
-      value: "45", // Convertido para string
+      value: "45", 
       icon: Clock,
       bgColor: "bg-amber-50",
       borderColor: "border-amber-200",
@@ -22,7 +22,7 @@ export const StatisticsSection = () => {
     },
     {
       title: "Concluídos",
-      value: "128", // Convertido para string
+      value: "128", 
       icon: CheckCircle,
       bgColor: "bg-emerald-50",
       borderColor: "border-emerald-200",
@@ -30,7 +30,7 @@ export const StatisticsSection = () => {
     },
     {
       title: "Notificações",
-      value: "9", // Convertido para string
+      value: "9", 
       icon: BellRing,
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200",
@@ -39,7 +39,7 @@ export const StatisticsSection = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {statistics.map((stat, index) => (
         <StatisticCard
           key={index}
