@@ -1,39 +1,57 @@
-
-import { Demanda } from "@/types/demanda";
+// src/components/Painel/DemandasColumn.tsx
 import { DemandaCard } from "./DemandaCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMobile } from "@/hooks/useMobile";
 
-interface DemandasColumnProps {
+interface Demanda {
+  id: number;
   title: string;
-  demandas: Demanda[];
-  onSelectDemanda?: (demandaId: string) => void;
+  description: string;
+  status: string;
 }
 
-export function DemandasColumn({ title, demandas, onSelectDemanda }: DemandasColumnProps) {
+interface DemandasColumnProps {
+  titulo: string;
+  cor: string;
+  demandas: Demanda[];
+  onSelectDemanda?: (id: number) => void;
+}
+
+export const DemandasColumn = ({ 
+  titulo, 
+  cor, 
+  demandas, 
+  onSelectDemanda 
+}: DemandasColumnProps) => {
+  const { isMobile } = useMobile();
+
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">
-          {title} ({demandas.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+    <div className="min-w-[280px] max-w-full">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-medium text-sm flex items-center">
+          <div className={`w-3 h-3 rounded-full mr-2 ${cor}`}></div>
+          {titulo}
+          <span className="ml-2 text-xs text-muted-foreground">
+            ({demandas.length})
+          </span>
+        </h3>
+      </div>
+
+      <ScrollArea className={`${isMobile ? 'h-[calc(100vh-220px)]' : 'h-[calc(100vh-180px)]'}`}>
+        <div className="pr-4 space-y-2">
           {demandas.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground">
-              Sem demandas nesta coluna
-            </div>
+            <p className="text-sm text-muted-foreground text-center p-4">Nenhuma demanda</p>
           ) : (
             demandas.map((demanda) => (
               <DemandaCard 
                 key={demanda.id} 
                 demanda={demanda} 
-                onSelectDemanda={() => onSelectDemanda && onSelectDemanda(demanda.id)}
+                onClick={() => onSelectDemanda && onSelectDemanda(demanda.id)}
               />
             ))
           )}
         </div>
-      </CardContent>
-    </Card>
+      </ScrollArea>
+    </div>
   );
-}
+};

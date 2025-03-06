@@ -58,7 +58,16 @@ export const processCSV = (text: string, columnConfig: Record<string, any>): { d
             value = config.validate(value);
           }
           
-          if (config.format) {
+          // Tratamento especial para o campo valorCliente
+          if (key === 'valorCliente') {
+            // Remove qualquer formatação existente e converte para um número
+            const numericValue = formatCurrencyValue(value);
+            // Formata o valor para exibição
+            value = new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            }).format(numericValue);
+          } else if (config.format) {
             value = config.format(value);
           }
           
@@ -79,6 +88,28 @@ export const processCSV = (text: string, columnConfig: Record<string, any>): { d
   return { data, errors };
 };
 
+// Função para lidar com diferentes formatos de valores monetários
+export const formatCurrencyValue = (value: string): number => {
+  if (!value) return 0;
+  
+  // Remove todos os caracteres não numéricos, exceto ponto e vírgula
+  let cleanValue = value.replace(/[^\d,.-]/g, '');
+  
+  // Verifica se o valor está no formato brasileiro (ex: 1.000,00)
+  if (cleanValue.indexOf(',') > -1 && cleanValue.indexOf('.') > -1 && 
+      cleanValue.lastIndexOf('.') < cleanValue.lastIndexOf(',')) {
+    // Remove os pontos de milhar
+    cleanValue = cleanValue.replace(/\./g, '').replace(',', '.');
+  } else if (cleanValue.indexOf(',') > -1) {
+    // Troca a vírgula por ponto para decimal
+    cleanValue = cleanValue.replace(',', '.');
+  }
+  
+  // Converte para número com precisão de 2 casas decimais
+  const numValue = parseFloat(cleanValue);
+  return isNaN(numValue) ? 0 : numValue;
+};
+
 // Função para calcular estatísticas
 export const calcularEstatisticas = (clientes: Cliente[]) => {
   return {
@@ -92,7 +123,7 @@ export const calcularEstatisticas = (clientes: Cliente[]) => {
       return acc;
     }, {} as Record<string, number>),
     valorTotal: clientes.reduce((acc, cliente) => {
-      const valor = Number(cliente.valorCliente.replace(/[^0-9.-]+/g, "")) || 0;
+      const valor = formatCurrencyValue(cliente.valorCliente);
       return acc + valor;
     }, 0),
     mediaPrazo: clientes.reduce((acc, cliente) => {

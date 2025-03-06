@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Cliente } from "@/components/Carteira/ClientesTable";
-import { processCSV, calcularEstatisticas } from "@/utils/carteiraUtils";
+import { processCSV, calcularEstatisticas, formatCurrencyValue } from "@/utils/carteiraUtils";
 
 // Dados iniciais para teste
 const clientesCarteira: Cliente[] = [
@@ -247,7 +246,8 @@ export const columnConfig = {
     label: "Valor do Cliente",
     type: "currency",
     format: (value: string) => {
-      const numberValue = Number(value.replace(/[^0-9.-]+/g, ""));
+      // Usa a nova função para processar os valores monetários
+      const numberValue = formatCurrencyValue(value);
       return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
