@@ -1,4 +1,3 @@
-
 import { Cliente } from "@/components/Carteira/ClientesTable";
 
 export type ValidationError = {
@@ -84,38 +83,23 @@ export const processCSV = (text: string, columnConfig: Record<string, any>): { d
   return { data, errors };
 };
 
-// Função melhorada para lidar com diferentes formatos de valores monetários
+// Função aprimorada para lidar com diferentes formatos de valores monetários brasileiros
 export const formatCurrencyValue = (value: string): number => {
   if (!value) return 0;
   
   // Remove R$, espaços e outros caracteres não relevantes
   let cleanValue = value.replace(/[^\d,.]/g, '');
   
-  // Verifica se está no formato brasileiro (R$ 1.234,56)
-  if (cleanValue.indexOf('.') !== -1 && cleanValue.indexOf(',') !== -1) {
-    // Se tem pontos como separadores de milhar e vírgula como decimal
-    if (cleanValue.lastIndexOf('.') < cleanValue.lastIndexOf(',')) {
-      // Remove todos os pontos (separadores de milhar)
-      cleanValue = cleanValue.replace(/\./g, '');
-      // Substitui a vírgula por ponto
-      cleanValue = cleanValue.replace(',', '.');
-    }
-    // Se tem vírgulas como separadores de milhar e ponto como decimal
-    else if (cleanValue.lastIndexOf(',') < cleanValue.lastIndexOf('.')) {
-      // Remove todas as vírgulas (separadores de milhar)
-      cleanValue = cleanValue.replace(/,/g, '');
-    }
-  } 
-  // Se tem apenas vírgula, assume que é separador decimal
-  else if (cleanValue.indexOf(',') !== -1) {
+  // Trata o formato brasileiro específico (R$ 1.234,56 ou 1.234,56)
+  if (cleanValue.includes('.') && cleanValue.includes(',')) {
+    // Formato brasileiro típico com ponto como separador de milhar e vírgula como decimal
+    // Remove todos os pontos (separadores de milhar)
+    cleanValue = cleanValue.replace(/\./g, '');
+    // Substitui a vírgula por ponto para converter para número
     cleanValue = cleanValue.replace(',', '.');
-  }
-  
-  // Certifica-se de que há apenas um ponto decimal
-  const parts = cleanValue.split('.');
-  if (parts.length > 2) {
-    // Se houver múltiplos pontos, assume que os primeiros são separadores de milhar
-    cleanValue = parts.slice(0, -1).join('') + '.' + parts.slice(-1);
+  } else if (cleanValue.includes(',')) {
+    // Se tem apenas vírgula, assume que é separador decimal
+    cleanValue = cleanValue.replace(',', '.');
   }
   
   // Converte para número

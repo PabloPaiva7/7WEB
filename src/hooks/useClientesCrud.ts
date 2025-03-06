@@ -108,19 +108,26 @@ export const useClientesCrud = () => {
             // Calculamos o próximo ID disponível
             const nextId = Math.max(...clientes.map(c => c.id), 0) + 1;
             
-            // Garantimos que cada cliente importado tenha um ID único
-            const clientesComId = data.map((cliente, index) => ({
-              ...cliente,
-              id: nextId + index,
-              // Formatamos o valor do cliente adequadamente se ainda não estiver formatado
-              valorCliente: cliente.valorCliente && !cliente.valorCliente.includes('R$') 
-                ? columnConfig.valorCliente.format(cliente.valorCliente)
-                : cliente.valorCliente
-            }));
+            // Garantimos que cada cliente importado tenha um ID único e valores formatados corretamente
+            const clientesComId = data.map((cliente, index) => {
+              // Certifique-se de que o valor do cliente está formatado corretamente
+              let valorClienteFormatado = cliente.valorCliente;
+              
+              // Se o valor não estiver vazio e não contiver R$, formate-o
+              if (valorClienteFormatado && !valorClienteFormatado.includes('R$')) {
+                valorClienteFormatado = columnConfig.valorCliente.format(valorClienteFormatado);
+              }
+              
+              return {
+                ...cliente,
+                id: nextId + index,
+                valorCliente: valorClienteFormatado
+              };
+            });
             
             setClientes(prev => [...prev, ...clientesComId]);
             
-            // Somamos o valor total importado para o registro
+            // Somamos o valor total importado para o registro, usando a função aprimorada
             const valorTotalImportado = clientesComId.reduce((acc, cliente) => {
               return acc + formatCurrencyValue(cliente.valorCliente);
             }, 0);

@@ -1,4 +1,3 @@
-
 import { ColumnConfig } from "@/types/carteira.types";
 import { formatCurrencyValue } from "@/utils/carteiraUtils";
 
