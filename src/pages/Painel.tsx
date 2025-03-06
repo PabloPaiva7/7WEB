@@ -121,7 +121,6 @@ export default function Painel() {
       
       <StatisticsSection demandas={demandas} />
       
-      {/* Fix the ChartSection component by removing the demandas prop */}
       <ChartSection />
       
       <DemandasBoard 

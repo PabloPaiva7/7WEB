@@ -60,13 +60,10 @@ export const processCSV = (text: string, columnConfig: Record<string, any>): { d
           
           // Tratamento especial para o campo valorCliente
           if (key === 'valorCliente') {
-            // Remove qualquer formatação existente e converte para um número
-            const numericValue = formatCurrencyValue(value);
-            // Formata o valor para exibição
-            value = new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL'
-            }).format(numericValue);
+            // Mantém o valor original para exibição
+            const originalValue = value;
+            // Armazena o valor numérico para cálculos internos
+            (cliente[key as keyof Cliente] as any) = originalValue;
           } else if (config.format) {
             value = config.format(value);
           }
@@ -88,24 +85,41 @@ export const processCSV = (text: string, columnConfig: Record<string, any>): { d
   return { data, errors };
 };
 
-// Função para lidar com diferentes formatos de valores monetários
+// Função melhorada para lidar com diferentes formatos de valores monetários
 export const formatCurrencyValue = (value: string): number => {
   if (!value) return 0;
   
-  // Remove todos os caracteres não numéricos, exceto ponto e vírgula
-  let cleanValue = value.replace(/[^\d,.-]/g, '');
+  // Remove R$, espaços e outros caracteres não relevantes
+  let cleanValue = value.replace(/[^\d,.]/g, '');
   
-  // Verifica se o valor está no formato brasileiro (ex: 1.000,00)
-  if (cleanValue.indexOf(',') > -1 && cleanValue.indexOf('.') > -1 && 
-      cleanValue.lastIndexOf('.') < cleanValue.lastIndexOf(',')) {
-    // Remove os pontos de milhar
-    cleanValue = cleanValue.replace(/\./g, '').replace(',', '.');
-  } else if (cleanValue.indexOf(',') > -1) {
-    // Troca a vírgula por ponto para decimal
+  // Verifica se está no formato brasileiro (R$ 1.234,56)
+  if (cleanValue.indexOf('.') !== -1 && cleanValue.indexOf(',') !== -1) {
+    // Se tem pontos como separadores de milhar e vírgula como decimal
+    if (cleanValue.lastIndexOf('.') < cleanValue.lastIndexOf(',')) {
+      // Remove todos os pontos (separadores de milhar)
+      cleanValue = cleanValue.replace(/\./g, '');
+      // Substitui a vírgula por ponto
+      cleanValue = cleanValue.replace(',', '.');
+    }
+    // Se tem vírgulas como separadores de milhar e ponto como decimal
+    else if (cleanValue.lastIndexOf(',') < cleanValue.lastIndexOf('.')) {
+      // Remove todas as vírgulas (separadores de milhar)
+      cleanValue = cleanValue.replace(/,/g, '');
+    }
+  } 
+  // Se tem apenas vírgula, assume que é separador decimal
+  else if (cleanValue.indexOf(',') !== -1) {
     cleanValue = cleanValue.replace(',', '.');
   }
   
-  // Converte para número com precisão de 2 casas decimais
+  // Certifica-se de que há apenas um ponto decimal
+  const parts = cleanValue.split('.');
+  if (parts.length > 2) {
+    // Se houver múltiplos pontos, assume que os primeiros são separadores de milhar
+    cleanValue = parts.slice(0, -1).join('') + '.' + parts.slice(-1);
+  }
+  
+  // Converte para número
   const numValue = parseFloat(cleanValue);
   return isNaN(numValue) ? 0 : numValue;
 };
