@@ -14,9 +14,12 @@ import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
 
+// Get the basename from the public URL or default to "/"
+const basename = import.meta.env.BASE_URL || "/";
+
 function App() {
   return (
-    <Router>
+    <Router basename={basename}>
       <Layout>
         <Routes>
           <Route path="/" element={<Index />} />
