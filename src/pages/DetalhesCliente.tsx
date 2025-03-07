@@ -1,16 +1,17 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, Download, DollarSign, FileText, Mail, Phone, User, Upload, X } from "lucide-react";
+import { ArrowLeft, Calendar, Download, DollarSign, FileText, Mail, Phone, User, Upload, X, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { InteracaoCard } from "@/components/Carteira/InteracaoCard";
+import { NovaInteracaoForm } from "@/components/Carteira/NovaInteracaoForm";
 
 interface Cliente {
   id: string;
@@ -39,6 +40,14 @@ interface Documento {
   url: string;
 }
 
+interface Interacao {
+  id: string;
+  data: string;
+  tipo: "pagamento" | "negociacao" | "contato";
+  conteudo: string;
+  atendente: string;
+}
+
 const DetalhesCliente = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -47,8 +56,8 @@ const DetalhesCliente = () => {
   const [loading, setLoading] = useState(true);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [interacoes, setInteracoes] = useState<Interacao[]>([]);
 
-  // Buscar dados do cliente
   useEffect(() => {
     const fetchCliente = async () => {
       if (!id) return;
@@ -82,28 +91,23 @@ const DetalhesCliente = () => {
     fetchCliente();
   }, [id, navigate, toast]);
 
-  // Buscar documentos do cliente
   useEffect(() => {
     const fetchDocumentos = async () => {
       if (!id) return;
       
       try {
-        // Verificar se existe um bucket para este cliente
         const bucketName = `cliente-${id}`;
         
-        // Listar arquivos do cliente
         const { data, error } = await supabase.storage
           .from(bucketName)
           .list();
 
         if (error) {
-          // Bucket pode não existir ainda
           console.log("Nenhum documento encontrado ou bucket não existe:", error);
           return;
         }
 
         if (data) {
-          // Converter para o formato de documentos
           const docs = data.map(file => ({
             id: file.id || String(Date.now() + Math.random()),
             nome: file.name,
@@ -122,22 +126,36 @@ const DetalhesCliente = () => {
     fetchDocumentos();
   }, [id]);
 
-  // Upload de documentos
+  useEffect(() => {
+    if (!id) return;
+    
+    const fetchInteracoes = async () => {
+      try {
+        const storedInteracoes = localStorage.getItem(`interacoes-cliente-${id}`);
+        if (storedInteracoes) {
+          setInteracoes(JSON.parse(storedInteracoes));
+        }
+      } catch (error) {
+        console.error("Erro ao buscar interações:", error);
+      }
+    };
+
+    fetchInteracoes();
+  }, [id]);
+
   const handleUploadDocumento = async (files: FileList | null) => {
     if (!id || !files || files.length === 0) return;
     
-    // Criar bucket para o cliente se não existir
     const bucketName = `cliente-${id}`;
     
     try {
-      // Verificar se o bucket existe e criar se não existir
       const { data: buckets } = await supabase.storage.listBuckets();
       const bucketExists = buckets?.some(b => b.name === bucketName);
       
       if (!bucketExists) {
         await supabase.storage.createBucket(bucketName, {
           public: true,
-          fileSizeLimit: 52428800, // 50MB
+          fileSizeLimit: 52428800,
           allowedMimeTypes: [
             'image/jpeg',
             'image/png',
@@ -153,7 +171,6 @@ const DetalhesCliente = () => {
         });
       }
       
-      // Upload dos arquivos
       const uploadedDocs: Documento[] = [];
       
       for (const file of Array.from(files)) {
@@ -189,7 +206,6 @@ const DetalhesCliente = () => {
         }
       }
       
-      // Atualizar lista de documentos
       setDocumentos([...documentos, ...uploadedDocs]);
       setUploadDialogOpen(false);
     } catch (error: any) {
@@ -202,7 +218,6 @@ const DetalhesCliente = () => {
     }
   };
 
-  // Remover documento
   const handleRemoveDocumento = async (docNome: string) => {
     if (!id) return;
     
@@ -215,7 +230,6 @@ const DetalhesCliente = () => {
         
       if (error) throw error;
       
-      // Atualizar lista de documentos
       setDocumentos(documentos.filter(doc => doc.nome !== docNome));
       
       toast({
@@ -228,6 +242,76 @@ const DetalhesCliente = () => {
         variant: "destructive",
         title: "Erro ao remover",
         description: "Não foi possível remover o documento."
+      });
+    }
+  };
+
+  const handleAddInteracao = (interacao: {
+    tipo: "pagamento" | "negociacao" | "contato";
+    conteudo: string;
+    atendente: string;
+  }) => {
+    if (!id) return;
+    
+    const novaInteracao: Interacao = {
+      id: String(Date.now()),
+      data: new Date().toISOString(),
+      ...interacao
+    };
+    
+    const novasInteracoes = [novaInteracao, ...interacoes];
+    setInteracoes(novasInteracoes);
+    
+    localStorage.setItem(`interacoes-cliente-${id}`, JSON.stringify(novasInteracoes));
+    
+    toast({
+      title: "Interação adicionada",
+      description: "A interação foi registrada com sucesso."
+    });
+
+    if (interacao.tipo === "pagamento") {
+      updateClienteFields({ ultimo_pagamento: new Date().toISOString() });
+    } else if (interacao.tipo === "negociacao") {
+      updateClienteFields({ negociacao: new Date().toISOString() });
+    } else if (interacao.tipo === "contato" && interacao.conteudo.includes("Código:")) {
+      updateClienteFields({ codigo: interacao.conteudo.split("Código:")[1].trim() });
+    }
+  };
+
+  const handleRemoveInteracao = (interacaoId: string) => {
+    if (!id) return;
+    
+    const novasInteracoes = interacoes.filter(i => i.id !== interacaoId);
+    setInteracoes(novasInteracoes);
+    
+    localStorage.setItem(`interacoes-cliente-${id}`, JSON.stringify(novasInteracoes));
+    
+    toast({
+      title: "Interação removida",
+      description: "A interação foi removida com sucesso."
+    });
+  };
+
+  const updateClienteFields = async (fields: Partial<Cliente>) => {
+    if (!id) return;
+    
+    try {
+      const { error } = await supabase
+        .from("carteira_clientes")
+        .update(fields)
+        .eq("id", id);
+        
+      if (error) throw error;
+      
+      if (cliente) {
+        setCliente({ ...cliente, ...fields });
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar cliente:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível atualizar os dados do cliente."
       });
     }
   };
@@ -316,8 +400,9 @@ const DetalhesCliente = () => {
       </Card>
 
       <Tabs defaultValue="informacoes">
-        <TabsList className="grid grid-cols-3 w-full lg:w-[400px]">
+        <TabsList className="grid grid-cols-4 w-full lg:w-[500px]">
           <TabsTrigger value="informacoes">Informações</TabsTrigger>
+          <TabsTrigger value="interacoes">Interações</TabsTrigger>
           <TabsTrigger value="pagamentos">Pagamentos</TabsTrigger>
           <TabsTrigger value="documentos">Documentos</TabsTrigger>
         </TabsList>
@@ -368,6 +453,49 @@ const DetalhesCliente = () => {
                   </p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="interacoes" className="space-y-4 mt-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Interações com o Cliente
+                </h3>
+              </div>
+              
+              <div className="mb-6">
+                <NovaInteracaoForm onAdd={handleAddInteracao} />
+              </div>
+              
+              <Separator className="my-4" />
+              
+              {interacoes.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                  {interacoes.map((interacao) => (
+                    <InteracaoCard
+                      key={interacao.id}
+                      id={interacao.id}
+                      data={interacao.data}
+                      tipo={interacao.tipo}
+                      conteudo={interacao.conteudo}
+                      atendente={interacao.atendente}
+                      onDelete={handleRemoveInteracao}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">Nenhuma interação registrada</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Adicione interações preenchendo o formulário acima
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
