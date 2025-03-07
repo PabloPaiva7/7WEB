@@ -101,20 +101,20 @@ export function Calculadora() {
         />
 
         <InputField
+          id="desconto"
+          label="Valor do Desconto"
+          value={desconto}
+          onChange={handleDescontoChange}
+          placeholder="R$ 0,00"
+        />
+
+        <InputField
           id="porcentagem"
           label="Porcentagem de Desconto"
           value={porcentagemInput}
           onChange={handlePorcentagemChange}
           placeholder="0.00"
           icon={<Percent className="h-4 w-4" />}
-        />
-
-        <InputField
-          id="desconto"
-          label="Valor do Desconto"
-          value={desconto}
-          onChange={handleDescontoChange}
-          placeholder="R$ 0,00"
         />
 
         <ResultDisplay resultado={resultado} porcentagem={porcentagem} />

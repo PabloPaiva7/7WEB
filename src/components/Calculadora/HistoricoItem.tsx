@@ -27,7 +27,7 @@ export function HistoricoItem({ id, saldoDevedor, desconto, resultado, porcentag
           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(desconto)}
         </p>
         <p>
-          <span className="font-medium">Valor Final:</span>{" "}
+          <span className="font-medium">Economia:</span>{" "}
           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado)}
         </p>
         <p>

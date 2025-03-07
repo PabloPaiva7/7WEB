@@ -33,13 +33,13 @@ export function ResultDisplay({ resultado, porcentagem }: ResultDisplayProps) {
     <div className="pt-2">
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className="font-medium">Valor Final</span>
+          <span className="font-medium">Economia</span>
           <div className="flex items-center gap-2">
             <span>{valorFormatado}</span>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copiarValor(valorFormatado, "Valor Final")}
+              onClick={() => copiarValor(valorFormatado, "Economia")}
               className="h-6"
             >
               <Copy className="h-3 w-3 mr-1" />
