@@ -1,17 +1,16 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, Download, DollarSign, FileText, Mail, Phone, User, Upload, X, MessageSquare } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { InteracaoCard } from "@/components/Carteira/InteracaoCard";
-import { NovaInteracaoForm } from "@/components/Carteira/NovaInteracaoForm";
+import { ClienteHeader } from "@/components/Carteira/ClienteHeader";
+import { InformacoesTab } from "@/components/Carteira/InformacoesTab";
+import { InteracoesTab } from "@/components/Carteira/InteracoesTab";
+import { PagamentosTab } from "@/components/Carteira/PagamentosTab";
+import { DocumentosTab } from "@/components/Carteira/DocumentosTab";
 
 interface Cliente {
   id: string;
@@ -55,7 +54,6 @@ const DetalhesCliente = () => {
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [interacoes, setInteracoes] = useState<Interacao[]>([]);
 
   useEffect(() => {
@@ -207,7 +205,6 @@ const DetalhesCliente = () => {
       }
       
       setDocumentos([...documentos, ...uploadedDocs]);
-      setUploadDialogOpen(false);
     } catch (error: any) {
       console.error("Erro ao processar upload:", error);
       toast({
@@ -343,61 +340,7 @@ const DetalhesCliente = () => {
         <h1 className="text-2xl font-semibold text-foreground">Detalhes do Cliente</h1>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row justify-between gap-6">
-            <div className="space-y-4 flex-1">
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-semibold">{cliente.contrato}</h2>
-              </div>
-              
-              <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                cliente.situacao === "Em andamento" 
-                  ? "bg-blue-100 text-blue-800" 
-                  : "bg-yellow-100 text-yellow-800"
-              }`}>
-                {cliente.situacao || 'Pendente'}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Banco</p>
-                  <p className="font-medium">{cliente.banco || "Não informado"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Escritório</p>
-                  <p className="font-medium">{cliente.escritorio || "Não informado"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Código</p>
-                  <p className="font-medium">{cliente.codigo || "Não informado"}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Data de Entrada</p>
-                  <p className="font-medium">
-                    {cliente.data ? new Date(cliente.data).toLocaleDateString('pt-BR') : "Não informado"}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-lg space-y-3">
-              <DollarSign className="h-8 w-8 text-primary mb-2" />
-              <p className="text-sm text-muted-foreground">Valor</p>
-              <p className="text-3xl font-bold text-primary">
-                {cliente.valor_cliente 
-                  ? new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(cliente.valor_cliente)
-                  : 'R$ 0,00'
-                }
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <ClienteHeader cliente={cliente} />
 
       <Tabs defaultValue="informacoes">
         <TabsList className="grid grid-cols-4 w-full lg:w-[500px]">
@@ -408,215 +351,27 @@ const DetalhesCliente = () => {
         </TabsList>
         
         <TabsContent value="informacoes" className="space-y-4 mt-6">
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <h3 className="text-lg font-semibold flex items-center">
-                <Phone className="mr-2 h-4 w-4" />
-                Informações de Contato
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Contato</p>
-                  <p className="font-medium">{cliente.contato || "Não informado"}</p>
-                </div>
-              </div>
-              
-              <Separator className="my-4" />
-              
-              <h3 className="text-lg font-semibold flex items-center">
-                <Calendar className="mr-2 h-4 w-4" />
-                Datas Importantes
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Data de Entrada</p>
-                  <p className="font-medium">
-                    {cliente.entrada ? new Date(cliente.entrada).toLocaleDateString('pt-BR') : "Não informado"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Prazo</p>
-                  <p className="font-medium">
-                    {cliente.prazo ? new Date(cliente.prazo).toLocaleDateString('pt-BR') : "Não informado"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Negociação</p>
-                  <p className="font-medium">
-                    {cliente.negociacao ? new Date(cliente.negociacao).toLocaleDateString('pt-BR') : "Não informado"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Resolução</p>
-                  <p className="font-medium">
-                    {cliente.resolucao ? new Date(cliente.resolucao).toLocaleDateString('pt-BR') : "Não informado"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <InformacoesTab cliente={cliente} />
         </TabsContent>
 
         <TabsContent value="interacoes" className="space-y-4 mt-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold flex items-center">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Interações com o Cliente
-                </h3>
-              </div>
-              
-              <div className="mb-6">
-                <NovaInteracaoForm onAdd={handleAddInteracao} />
-              </div>
-              
-              <Separator className="my-4" />
-              
-              {interacoes.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                  {interacoes.map((interacao) => (
-                    <InteracaoCard
-                      key={interacao.id}
-                      id={interacao.id}
-                      data={interacao.data}
-                      tipo={interacao.tipo}
-                      conteudo={interacao.conteudo}
-                      atendente={interacao.atendente}
-                      onDelete={handleRemoveInteracao}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Nenhuma interação registrada</p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Adicione interações preenchendo o formulário acima
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <InteracoesTab 
+            interacoes={interacoes}
+            onAddInteracao={handleAddInteracao}
+            onRemoveInteracao={handleRemoveInteracao}
+          />
         </TabsContent>
         
         <TabsContent value="pagamentos" className="space-y-4 mt-6">
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold flex items-center">
-                <DollarSign className="mr-2 h-4 w-4" />
-                Histórico de Pagamentos
-              </h3>
-              
-              {cliente.ultimo_pagamento ? (
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground">Último Pagamento</p>
-                  <p className="font-medium">
-                    {new Date(cliente.ultimo_pagamento).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Nenhum pagamento registrado</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <PagamentosTab ultimoPagamento={cliente.ultimo_pagamento} />
         </TabsContent>
         
         <TabsContent value="documentos" className="space-y-4 mt-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold flex items-center">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Documentos do Cliente
-                </h3>
-                
-                <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Adicionar Documento
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Upload de Documento</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 pt-4">
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="documento-upload">Selecione os arquivos</Label>
-                        <Input 
-                          id="documento-upload" 
-                          type="file" 
-                          multiple
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png,.zip,.txt"
-                          onChange={(e) => handleUploadDocumento(e.target.files)}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Formatos aceitos: PDF, Word, Excel, CSV, imagens, ZIP, TXT (máx. 50MB)
-                        </p>
-                      </div>
-                      <Button 
-                        className="w-full" 
-                        onClick={() => {
-                          const fileInput = document.getElementById('documento-upload') as HTMLInputElement;
-                          handleUploadDocumento(fileInput?.files || null);
-                        }}
-                      >
-                        Enviar
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              
-              {documentos.length > 0 ? (
-                <div className="space-y-3">
-                  {documentos.map((doc) => (
-                    <div 
-                      key={doc.id}
-                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <a 
-                            href={doc.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="font-medium hover:underline"
-                          >
-                            {doc.nome}
-                          </a>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(doc.data).toLocaleDateString('pt-BR')}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveDocumento(doc.nome)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Nenhum documento disponível</p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Adicione documentos clicando no botão acima
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <DocumentosTab 
+            documentos={documentos}
+            onUploadDocumento={handleUploadDocumento}
+            onRemoveDocumento={handleRemoveDocumento}
+          />
         </TabsContent>
       </Tabs>
     </div>
