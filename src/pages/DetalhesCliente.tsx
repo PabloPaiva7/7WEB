@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -289,6 +288,16 @@ const DetalhesCliente = () => {
     });
   };
 
+  const handleUpdateClienteInfo = async (fields: Partial<{
+    contato: string | null;
+    entrada: string | null;
+    prazo: string | null;
+    negociacao: string | null;
+    resolucao: string | null;
+  }>) => {
+    updateClienteFields(fields);
+  };
+
   const updateClienteFields = async (fields: Partial<Cliente>) => {
     if (!id) return;
     
@@ -351,7 +360,10 @@ const DetalhesCliente = () => {
         </TabsList>
         
         <TabsContent value="informacoes" className="space-y-4 mt-6">
-          <InformacoesTab cliente={cliente} />
+          <InformacoesTab
+            cliente={cliente}
+            onUpdateCliente={handleUpdateClienteInfo}
+          />
         </TabsContent>
 
         <TabsContent value="interacoes" className="space-y-4 mt-6">
