@@ -43,7 +43,7 @@ interface Documento {
 interface Interacao {
   id: string;
   data: string;
-  tipo: "pagamento" | "negociacao" | "contato";
+  tipo: "pagamento" | "negociacao" | "contato" | "assessoria";
   conteudo: string;
   atendente: string;
 }
@@ -247,7 +247,7 @@ const DetalhesCliente = () => {
   };
 
   const handleAddInteracao = (interacao: {
-    tipo: "pagamento" | "negociacao" | "contato";
+    tipo: "pagamento" | "negociacao" | "contato" | "assessoria";
     conteudo: string;
     atendente: string;
   }) => {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 interface InteracaoCardProps {
   id: string;
   data: string;
-  tipo: "pagamento" | "negociacao" | "contato";
+  tipo: "pagamento" | "negociacao" | "contato" | "assessoria";
   conteudo: string;
   atendente: string;
   onDelete: (id: string) => void;
@@ -25,6 +25,7 @@ export const InteracaoCard = ({
       case "pagamento": return "bg-green-50 border-green-200";
       case "negociacao": return "bg-blue-50 border-blue-200";
       case "contato": return "bg-yellow-50 border-yellow-200";
+      case "assessoria": return "bg-purple-50 border-purple-200";
       default: return "bg-gray-50 border-gray-200";
     }
   };
@@ -34,6 +35,7 @@ export const InteracaoCard = ({
       case "pagamento": return "Pagamento";
       case "negociacao": return "Negociação";
       case "contato": return "Contato";
+      case "assessoria": return "Assessoria";
       default: return "Interação";
     }
   };

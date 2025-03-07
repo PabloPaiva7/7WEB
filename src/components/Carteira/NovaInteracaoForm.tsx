@@ -11,18 +11,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 interface NovaInteracaoFormProps {
   onAdd: (interacao: {
-    tipo: "pagamento" | "negociacao" | "contato";
+    tipo: "pagamento" | "negociacao" | "contato" | "assessoria";
     conteudo: string;
     atendente: string;
   }) => void;
 }
 
 const formSchema = z.object({
-  tipo: z.enum(["pagamento", "negociacao", "contato"], {
+  tipo: z.enum(["pagamento", "negociacao", "contato", "assessoria"], {
     required_error: "Selecione o tipo de interação"
-  }),
-  conteudo: z.string().min(3, "Insira pelo menos 3 caracteres"),
-  atendente: z.string().min(2, "Informe o nome do atendente")
+  }).optional().default("contato"),
+  conteudo: z.string().optional().default(""),
+  atendente: z.string().optional().default("")
 });
 
 export const NovaInteracaoForm = ({ onAdd }: NovaInteracaoFormProps) => {
@@ -36,7 +36,14 @@ export const NovaInteracaoForm = ({ onAdd }: NovaInteracaoFormProps) => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    onAdd(values);
+    // Ensure all fields have at least default values
+    const interacao = {
+      tipo: values.tipo || "contato",
+      conteudo: values.conteudo || "",
+      atendente: values.atendente || ""
+    } as const;
+    
+    onAdd(interacao);
     form.reset();
   };
 
@@ -62,6 +69,7 @@ export const NovaInteracaoForm = ({ onAdd }: NovaInteracaoFormProps) => {
                   <SelectItem value="pagamento">Pagamento</SelectItem>
                   <SelectItem value="negociacao">Negociação</SelectItem>
                   <SelectItem value="contato">Contato/Código</SelectItem>
+                  <SelectItem value="assessoria">Assessoria</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
