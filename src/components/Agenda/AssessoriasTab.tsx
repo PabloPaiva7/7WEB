@@ -7,7 +7,7 @@ import {
   Mail, 
   MapPin, 
   Clock,
-  CheckCircle2,
+  CheckCircle,
   XCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -82,11 +82,16 @@ const AssessoriasTab = ({ searchTerm, setSearchTerm }: AssessoriasTabProps) => {
           ) : (
             assessoriasFiltradas.map((assessoria) => (
               <Card key={assessoria.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{assessoria.nome}</CardTitle>
+                <CardHeader className="pb-2 relative">
+                  {/* Ícone de disponibilidade no canto superior esquerdo */}
+                  <div className="absolute top-3 left-3">
+                    <StatusIcon disponivel={disponibilidadeAssessorias[assessoria.id] || false} />
+                  </div>
+                  
+                  <div className="flex justify-end">
                     <StatusIndicator disponivel={disponibilidadeAssessorias[assessoria.id] || false} />
                   </div>
+                  <CardTitle className="text-lg mt-2">{assessoria.nome}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -125,6 +130,15 @@ const AssessoriasTab = ({ searchTerm, setSearchTerm }: AssessoriasTabProps) => {
   );
 };
 
+// Componente para ícone de status no canto superior esquerdo
+const StatusIcon = ({ disponivel }: { disponivel: boolean }) => {
+  return disponivel ? (
+    <CheckCircle className="w-5 h-5 text-green-600" />
+  ) : (
+    <XCircle className="w-5 h-5 text-red-600" />
+  );
+};
+
 // Componente para indicador de status de disponibilidade
 const StatusIndicator = ({ disponivel }: { disponivel: boolean }) => {
   return (
@@ -133,7 +147,7 @@ const StatusIndicator = ({ disponivel }: { disponivel: boolean }) => {
     }`}>
       {disponivel ? (
         <>
-          <CheckCircle2 className="w-3 h-3" />
+          <CheckCircle className="w-3 h-3" />
           <span>Disponível</span>
         </>
       ) : (
