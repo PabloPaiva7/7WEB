@@ -11,6 +11,7 @@ import Painel from "./pages/Painel";
 import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
 import Tickets from "./pages/Tickets";
+import BatePapo from "./pages/BatePapo";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
@@ -32,6 +33,7 @@ function App() {
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/cliente/:id" element={<DetalhesCliente />} />
           <Route path="/tickets" element={<Tickets />} />
+          <Route path="/bate-papo" element={<BatePapo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
