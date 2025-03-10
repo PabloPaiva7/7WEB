@@ -13,7 +13,10 @@ import {
   Link as LinkIcon,
   Landmark,
   GanttChart,
-  Scale
+  Scale,
+  Clock,
+  CheckCircle2,
+  XCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,6 +33,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 // Interface para cliente
 interface Cliente {
@@ -63,6 +68,11 @@ interface Assessoria {
   telefone: string;
   email: string;
   endereco: string;
+  horarioFuncionamento: {
+    inicio: string; // formato HH:MM
+    fim: string; // formato HH:MM
+    diasFuncionamento: number[]; // 0 = domingo, 1 = segunda, ..., 6 = sábado
+  };
 }
 
 // Interface para bancos
@@ -266,7 +276,7 @@ const ramaisExemplo: Ramal[] = [
   }
 ];
 
-// Dados de exemplo para assessorias
+// Dados de exemplo para assessorias com horário de funcionamento
 const assessoriasExemplo: Assessoria[] = [
   {
     id: "1",
@@ -274,7 +284,12 @@ const assessoriasExemplo: Assessoria[] = [
     contato: "Roberto Gomes",
     telefone: "(11) 3456-7890",
     email: "contato@assessoriafin.com",
-    endereco: "Av. Paulista, 1000, São Paulo - SP"
+    endereco: "Av. Paulista, 1000, São Paulo - SP",
+    horarioFuncionamento: {
+      inicio: "09:00",
+      fim: "18:00",
+      diasFuncionamento: [1, 2, 3, 4, 5] // segunda a sexta
+    }
   },
   {
     id: "2",
@@ -282,7 +297,12 @@ const assessoriasExemplo: Assessoria[] = [
     contato: "Juliana Alves",
     telefone: "(21) 2345-6789",
     email: "contato@consultorialegal.com",
-    endereco: "Rua do Ouvidor, 50, Rio de Janeiro - RJ"
+    endereco: "Rua do Ouvidor, 50, Rio de Janeiro - RJ",
+    horarioFuncionamento: {
+      inicio: "08:30",
+      fim: "17:30",
+      diasFuncionamento: [1, 2, 3, 4, 5] // segunda a sexta
+    }
   },
   {
     id: "3",
@@ -290,7 +310,12 @@ const assessoriasExemplo: Assessoria[] = [
     contato: "Fernando Costa",
     telefone: "(31) 3456-7891",
     email: "contato@ajn.com",
-    endereco: "Av. Afonso Pena, 1500, Belo Horizonte - MG"
+    endereco: "Av. Afonso Pena, 1500, Belo Horizonte - MG",
+    horarioFuncionamento: {
+      inicio: "10:00",
+      fim: "19:00",
+      diasFuncionamento: [1, 2, 3, 4, 5, 6] // segunda a sábado
+    }
   }
 ];
 
@@ -394,6 +419,35 @@ const paginasJuridicasExemplo: PaginaJuridica[] = [
   }
 ];
 
+// Função para verificar se a assessoria está disponível no momento
+const verificarDisponibilidade = (horarioFuncionamento: Assessoria['horarioFuncionamento']): boolean => {
+  const agora = new Date();
+  const diaSemana = agora.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
+  
+  // Verifica se hoje é um dia de funcionamento
+  if (!horarioFuncionamento.diasFuncionamento.includes(diaSemana)) {
+    return false;
+  }
+  
+  // Obtém a hora e minuto atual
+  const horaAtual = agora.getHours();
+  const minutoAtual = agora.getMinutes();
+  
+  // Converte a hora atual para minutos desde meia-noite
+  const minutosAtuais = horaAtual * 60 + minutoAtual;
+  
+  // Converte a hora de início para minutos desde meia-noite
+  const [horaInicio, minutoInicio] = horarioFuncionamento.inicio.split(':').map(Number);
+  const minutosInicio = horaInicio * 60 + minutoInicio;
+  
+  // Converte a hora de fim para minutos desde meia-noite
+  const [horaFim, minutoFim] = horarioFuncionamento.fim.split(':').map(Number);
+  const minutosFim = horaFim * 60 + minutoFim;
+  
+  // Verifica se o horário atual está dentro do horário de funcionamento
+  return minutosAtuais >= minutosInicio && minutosAtuais <= minutosFim;
+};
+
 const Agenda = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -413,11 +467,36 @@ const Agenda = () => {
   
   // Filtros para todas as seções
   const [generalSearchTerm, setGeneralSearchTerm] = useState("");
+  
+  // Estado para disponibilidade das assessorias
+  const [disponibilidadeAssessorias, setDisponibilidadeAssessorias] = useState<Record<string, boolean>>({});
 
   // Obter valores únicos para os filtros
   const regioes = Array.from(new Set(clientesExemplo.map(cliente => cliente.regiao)));
   const escritorios = Array.from(new Set(clientesExemplo.map(cliente => cliente.escritorio)));
   const tiposContrato = Array.from(new Set(clientesExemplo.map(cliente => cliente.tipoContrato)));
+
+  // Efeito para verificar a disponibilidade das assessorias
+  useEffect(() => {
+    const checkDisponibilidade = () => {
+      const disponibilidade: Record<string, boolean> = {};
+      
+      assessoriasExemplo.forEach(assessoria => {
+        disponibilidade[assessoria.id] = verificarDisponibilidade(assessoria.horarioFuncionamento);
+      });
+      
+      setDisponibilidadeAssessorias(disponibilidade);
+    };
+    
+    // Verifica a disponibilidade inicialmente
+    checkDisponibilidade();
+    
+    // Configura um intervalo para verificar a disponibilidade a cada minuto
+    const intervalId = setInterval(checkDisponibilidade, 60000);
+    
+    // Limpa o intervalo quando o componente é desmontado
+    return () => clearInterval(intervalId);
+  }, []);
 
   // Efeito para simular carregamento e detectar erros
   useEffect(() => {
@@ -516,6 +595,36 @@ const Agenda = () => {
 
   const handleClienteClick = (id: string) => {
     navigate(`/cliente/${id}`);
+  };
+
+  // Formatar o horário de funcionamento para exibição
+  const formatarHorarioFuncionamento = (horario: Assessoria['horarioFuncionamento']) => {
+    const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const diasFormatados = horario.diasFuncionamento.map(dia => diasSemana[dia]);
+    
+    // Agrupar dias consecutivos (ex: "Segunda a Sexta" em vez de "Segunda, Terça, Quarta, Quinta, Sexta")
+    let resultado = '';
+    let inicio = -1;
+    let fim = -1;
+    
+    for (let i = 0; i <= horario.diasFuncionamento.length; i++) {
+      if (i < horario.diasFuncionamento.length && (i === 0 || horario.diasFuncionamento[i] === horario.diasFuncionamento[i-1] + 1)) {
+        if (inicio === -1) inicio = horario.diasFuncionamento[i];
+        fim = horario.diasFuncionamento[i];
+      } else if (inicio !== -1) {
+        if (resultado) resultado += ', ';
+        if (inicio === fim) {
+          resultado += diasSemana[inicio];
+        } else if (fim - inicio === 1) {
+          resultado += `${diasSemana[inicio]}, ${diasSemana[fim]}`;
+        } else {
+          resultado += `${diasSemana[inicio]} a ${diasSemana[fim]}`;
+        }
+        inicio = -1;
+      }
+    }
+    
+    return `${resultado} das ${horario.inicio} às ${horario.fim}`;
   };
 
   // Se estiver carregando, mostre um indicador de carregamento
@@ -842,7 +951,7 @@ const Agenda = () => {
                             <span>{cliente.email}</span>
                           </div>
 
-                          <div className="flex items-center text-sm">
+                          <div className="flex items-start text-sm">
                             <MapPin className="w-4 h-4 mr-2 text-muted-foreground" />
                             <span>{cliente.regiao}</span>
                             <span className="text-muted-foreground mx-1">-</span>
@@ -979,6 +1088,11 @@ const Agenda = () => {
                           <div className="flex items-start text-sm">
                             <MapPin className="w-4 h-4 mr-2 mt-1 text-muted-foreground" />
                             <span>{assessoria.endereco}</span>
+                          </div>
+
+                          <div className="flex items-start text-sm">
+                            <Clock className="w-4 h-4 mr-2 mt-1 text-muted-foreground" />
+                            <span>{formatarHorarioFuncionamento(assessoria.horarioFuncionamento)}</span>
                           </div>
                         </div>
                       </CardContent>
