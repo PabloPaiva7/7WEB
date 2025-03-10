@@ -18,22 +18,39 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Buscar dados do Supabase
   useEffect(() => {
     const fetchClientes = async () => {
-      const { data, error } = await supabase
-        .from("carteira_clientes")
-        .select("*");
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("carteira_clientes")
+          .select("*");
 
-      if (error) {
-        console.error("Erro ao buscar clientes:", error);
-        return;
-      }
+        if (error) {
+          console.error("Erro ao buscar clientes:", error);
+          setError("Erro ao carregar dados dos clientes");
+          // Carregando dados de exemplo em caso de erro
+          setClientes(gerarDadosExemplo() as Cliente[]);
+          return;
+        }
 
-      if (data) {
-        console.log("Dados recebidos:", data);
-        setClientes(data);
+        if (data) {
+          console.log("Dados recebidos:", data);
+          setClientes(data);
+        } else {
+          // Se não houver dados, usar dados de exemplo
+          setClientes(gerarDadosExemplo() as Cliente[]);
+        }
+      } catch (err) {
+        console.error("Erro inesperado:", err);
+        setError("Erro inesperado ao carregar dados");
+        setClientes(gerarDadosExemplo() as Cliente[]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -55,13 +72,19 @@ const Index = () => {
   // Calcular valor total dos clientes filtrados
   const valorTotal = calcularValorTotal(valoresPorBanco);
 
-  // Gerar dados de exemplo para teste
-  const dadosExemplo = gerarDadosExemplo();
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[70vh]">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   // Filtrar dados de exemplo com o mesmo critério
-  const exemplosFiltrados = dadosExemplo.filter(
-    exemplo => statusFilter === "todos" || exemplo.situacao.toLowerCase() === statusFilter.toLowerCase()
-  );
+  const exemplosFiltrados = (error || clientes.length === 0) ? 
+    gerarDadosExemplo().filter(
+      exemplo => statusFilter === "todos" || exemplo.situacao.toLowerCase() === statusFilter.toLowerCase()
+    ) : [];
 
   return (
     <div className="space-y-4 animate-fadeIn">
@@ -90,11 +113,13 @@ const Index = () => {
       </div>
 
       {/* Cards adicionais para testes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {exemplosFiltrados.map((exemplo, index) => (
-          <ClienteCard key={`test-card-${index}`} cliente={exemplo as Cliente} />
-        ))}
-      </div>
+      {(error || clientes.length === 0) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {exemplosFiltrados.map((exemplo, index) => (
+            <ClienteCard key={`test-card-${index}`} cliente={exemplo as Cliente} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

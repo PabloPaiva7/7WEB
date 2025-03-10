@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import Index from "./pages/Index";
 import Carteira from "./pages/Carteira";
@@ -13,29 +13,74 @@ import NotFound from "./pages/NotFound";
 import Tickets from "./pages/Tickets";
 import BatePapo from "./pages/BatePapo";
 import { Toaster } from "./components/ui/toaster";
+import { Suspense, lazy } from "react";
 
 import "./App.css";
 
 // Get the basename from the public URL or default to "/"
 const basename = import.meta.env.BASE_URL || "/";
 
+// Loading fallback
+const LoadingFallback = () => (
+  <div className="flex h-screen w-full items-center justify-center">
+    <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+  </div>
+);
+
+// Error boundary component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Erro na renderização:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex h-screen w-full items-center justify-center flex-col gap-4">
+          <h2 className="text-xl font-semibold">Algo deu errado.</h2>
+          <p>Tente recarregar a página.</p>
+          <button 
+            className="px-4 py-2 bg-primary text-white rounded-md"
+            onClick={() => window.location.reload()}
+          >
+            Recarregar
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 function App() {
   return (
     <Router basename={basename}>
       <Layout>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/carteira" element={<Carteira />} />
-          <Route path="/calendario" element={<Calendario />} />
-          <Route path="/documentos" element={<Documentos />} />
-          <Route path="/painel" element={<Painel />} />
-          <Route path="/agenda" element={<Agenda />} />
-          <Route path="/configuracoes" element={<Configuracoes />} />
-          <Route path="/cliente/:id" element={<DetalhesCliente />} />
-          <Route path="/tickets" element={<Tickets />} />
-          <Route path="/bate-papo" element={<BatePapo />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/carteira" element={<Carteira />} />
+            <Route path="/calendario" element={<Calendario />} />
+            <Route path="/documentos" element={<Documentos />} />
+            <Route path="/painel" element={<Painel />} />
+            <Route path="/agenda" element={<Agenda />} />
+            <Route path="/configuracoes" element={<Configuracoes />} />
+            <Route path="/cliente/:id" element={<DetalhesCliente />} />
+            <Route path="/tickets" element={<Tickets />} />
+            <Route path="/bate-papo" element={<BatePapo />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </Layout>
       <Toaster />
     </Router>
