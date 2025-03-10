@@ -1,12 +1,12 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { TicketProgress } from "@/types/ticket.types";
+import { TicketProgresso } from "@/types/ticket.types";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface TicketProgressoCardProps {
-  progresso: TicketProgress;
+  progresso: TicketProgresso;
 }
 
 export function TicketProgressoCard({ progresso }: TicketProgressoCardProps) {

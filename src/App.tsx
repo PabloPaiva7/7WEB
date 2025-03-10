@@ -1,4 +1,5 @@
 
+import React, { Suspense, lazy, Component, ReactNode } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import Index from "./pages/Index";
@@ -13,7 +14,6 @@ import NotFound from "./pages/NotFound";
 import Tickets from "./pages/Tickets";
 import BatePapo from "./pages/BatePapo";
 import { Toaster } from "./components/ui/toaster";
-import { Suspense, lazy } from "react";
 
 import "./App.css";
 
@@ -27,18 +27,26 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Error boundary component
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+// Error boundary component with proper TypeScript interface
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     console.error("Erro na renderização:", error, errorInfo);
   }
 
@@ -66,21 +74,23 @@ function App() {
   return (
     <Router basename={basename}>
       <Layout>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/carteira" element={<Carteira />} />
-            <Route path="/calendario" element={<Calendario />} />
-            <Route path="/documentos" element={<Documentos />} />
-            <Route path="/painel" element={<Painel />} />
-            <Route path="/agenda" element={<Agenda />} />
-            <Route path="/configuracoes" element={<Configuracoes />} />
-            <Route path="/cliente/:id" element={<DetalhesCliente />} />
-            <Route path="/tickets" element={<Tickets />} />
-            <Route path="/bate-papo" element={<BatePapo />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/carteira" element={<Carteira />} />
+              <Route path="/calendario" element={<Calendario />} />
+              <Route path="/documentos" element={<Documentos />} />
+              <Route path="/painel" element={<Painel />} />
+              <Route path="/agenda" element={<Agenda />} />
+              <Route path="/configuracoes" element={<Configuracoes />} />
+              <Route path="/cliente/:id" element={<DetalhesCliente />} />
+              <Route path="/tickets" element={<Tickets />} />
+              <Route path="/bate-papo" element={<BatePapo />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </Layout>
       <Toaster />
     </Router>
