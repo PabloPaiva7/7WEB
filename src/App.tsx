@@ -10,6 +10,7 @@ import Documentos from "./pages/Documentos";
 import Painel from "./pages/Painel";
 import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
+import Tickets from "./pages/Tickets";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/cliente/:id" element={<DetalhesCliente />} />
+          <Route path="/tickets" element={<Tickets />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
