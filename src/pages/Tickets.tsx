@@ -23,25 +23,15 @@ const Tickets = () => {
   
   const [ticketDetalhe, setTicketDetalhe] = useState<Ticket | null>(null);
   const [detalheDialogOpen, setDetalheDialogOpen] = useState(false);
+  const [showNovoTicketForm, setShowNovoTicketForm] = useState(false);
 
-  const handleNovoTicket = (data: any) => {
-    const novoTicket: Ticket = {
-      id: uuidv4(),
-      clienteNome: data.clienteNome,
-      clienteContato: data.clienteContato,
-      oferta: data.oferta,
-      valor: data.valor,
-      data: new Date().toISOString(),
-      banco: data.banco,
-      status: 'novo',
-      atendente: data.atendente,
-      progressos: []
-    };
+  const handleNovoTicket = (ticket: Ticket) => {
+    setTickets([ticket, ...tickets]);
+    setShowNovoTicketForm(false);
     
-    setTickets([novoTicket, ...tickets]);
     toast({
       title: "Ticket criado",
-      description: `Ticket para ${data.clienteNome} criado com sucesso.`
+      description: `Ticket para ${ticket.clienteNome} criado com sucesso.`
     });
   };
 
@@ -111,7 +101,16 @@ const Tickets = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Tickets de Ofertas</h1>
-        <NovoTicketForm onSubmit={handleNovoTicket} />
+        {showNovoTicketForm ? (
+          <NovoTicketForm 
+            onSave={handleNovoTicket} 
+            onCancel={() => setShowNovoTicketForm(false)} 
+          />
+        ) : (
+          <Button onClick={() => setShowNovoTicketForm(true)}>
+            Novo Ticket
+          </Button>
+        )}
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 items-end">

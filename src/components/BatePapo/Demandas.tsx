@@ -151,7 +151,7 @@ export function Demandas() {
   const getCorPrioridade = (prioridade: Demanda["prioridade"]) => {
     switch (prioridade) {
       case "alta": return "destructive";
-      case "media": return "warning";
+      case "media": return "secondary";
       case "baixa": return "secondary";
       default: return "secondary";
     }
@@ -299,7 +299,7 @@ export function Demandas() {
                     <Badge variant={
                       demanda.status === "pendente" ? "outline" : 
                       demanda.status === "em_progresso" ? "secondary" : 
-                      "success"
+                      "default"
                     }>
                       {demanda.status === "pendente" ? "Pendente" : 
                        demanda.status === "em_progresso" ? "Em progresso" : 
