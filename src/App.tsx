@@ -12,6 +12,7 @@ import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
 import Tickets from "./pages/Tickets";
 import Tarefas from "./pages/Tarefas";
+import Mural from "./pages/Mural";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
@@ -86,6 +87,7 @@ function App() {
               <Route path="/cliente/:id" element={<DetalhesCliente />} />
               <Route path="/tickets" element={<Tickets />} />
               <Route path="/tarefas" element={<Tarefas />} />
+              <Route path="/mural" element={<Mural />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
