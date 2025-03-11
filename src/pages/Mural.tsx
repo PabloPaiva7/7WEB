@@ -4,11 +4,13 @@ import { Anuncio, NovoAnuncio } from "@/types/mural.types";
 import { AnuncioCard } from "@/components/Mural/AnuncioCard";
 import { AnuncioForm } from "@/components/Mural/AnuncioForm";
 import { FiltroAnuncios } from "@/components/Mural/FiltroAnuncios";
+import { AnuncioCarousel } from "@/components/Mural/AnuncioCarousel";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Calendar, Megaphone } from "lucide-react";
+import { Calendar, Megaphone, LayoutGrid, Maximize2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const dadosExemplo: Anuncio[] = [
   {
@@ -51,6 +53,7 @@ export default function Mural() {
   const [filtroTipo, setFiltroTipo] = useState("todos");
   const [visualizacao, setVisualizacao] = useState("todos");
   const [excluirId, setExcluirId] = useState<string | null>(null);
+  const [modoVisualizacao, setModoVisualizacao] = useState<"carrossel" | "grade">("carrossel");
 
   // Carregar anúncios do localStorage
   useEffect(() => {
@@ -141,6 +144,10 @@ export default function Mural() {
     }
   };
 
+  const toggleModoVisualizacao = () => {
+    setModoVisualizacao(prev => prev === "carrossel" ? "grade" : "carrossel");
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -152,23 +159,43 @@ export default function Mural() {
         </div>
       </div>
       
-      <Tabs 
-        defaultValue="todos" 
-        value={visualizacao}
-        onValueChange={setVisualizacao}
-        className="mb-6"
-      >
-        <TabsList>
-          <TabsTrigger value="todos" className="gap-2">
-            <Megaphone className="h-4 w-4" />
-            Todos os Anúncios
-          </TabsTrigger>
-          <TabsTrigger value="proximos" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            Próximos Eventos
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div className="flex justify-between items-center mb-6">
+        <Tabs 
+          defaultValue="todos" 
+          value={visualizacao}
+          onValueChange={setVisualizacao}
+        >
+          <TabsList>
+            <TabsTrigger value="todos" className="gap-2">
+              <Megaphone className="h-4 w-4" />
+              Todos os Anúncios
+            </TabsTrigger>
+            <TabsTrigger value="proximos" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              Próximos Eventos
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleModoVisualizacao}
+          className="flex items-center gap-2"
+        >
+          {modoVisualizacao === "carrossel" ? (
+            <>
+              <LayoutGrid className="h-4 w-4" />
+              Ver em grade
+            </>
+          ) : (
+            <>
+              <Maximize2 className="h-4 w-4" />
+              Ver em carrossel
+            </>
+          )}
+        </Button>
+      </div>
       
       <FiltroAnuncios
         filtroTexto={filtroTexto}
@@ -178,28 +205,36 @@ export default function Mural() {
         setMostrarNovoAnuncio={setMostrarNovoAnuncio}
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {anunciosFiltrados.length > 0 ? (
-          anunciosFiltrados.map(anuncio => (
-            <AnuncioCard
-              key={anuncio.id}
-              anuncio={anuncio}
-              onEdit={handleEditar}
-              onDelete={handleExcluir}
-            />
-          ))
+      {anunciosFiltrados.length > 0 ? (
+        modoVisualizacao === "carrossel" ? (
+          <AnuncioCarousel
+            anuncios={anunciosFiltrados}
+            onEdit={handleEditar}
+            onDelete={handleExcluir}
+          />
         ) : (
-          <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-12 text-center">
-            <Megaphone className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium">Nenhum anúncio encontrado</h3>
-            <p className="text-muted-foreground mt-1">
-              {filtroTexto || filtroTipo !== "todos" 
-                ? "Tente ajustar os filtros para encontrar o que procura" 
-                : "Publique o primeiro anúncio para começar"}
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {anunciosFiltrados.map(anuncio => (
+              <AnuncioCard
+                key={anuncio.id}
+                anuncio={anuncio}
+                onEdit={handleEditar}
+                onDelete={handleExcluir}
+              />
+            ))}
           </div>
-        )}
-      </div>
+        )
+      ) : (
+        <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-12 text-center">
+          <Megaphone className="h-12 w-12 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium">Nenhum anúncio encontrado</h3>
+          <p className="text-muted-foreground mt-1">
+            {filtroTexto || filtroTipo !== "todos" 
+              ? "Tente ajustar os filtros para encontrar o que procura" 
+              : "Publique o primeiro anúncio para começar"}
+          </p>
+        </div>
+      )}
       
       {/* Dialog para novo/editar anúncio */}
       <AnuncioForm
