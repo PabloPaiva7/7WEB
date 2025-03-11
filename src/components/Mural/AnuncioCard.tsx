@@ -37,9 +37,10 @@ interface AnuncioCardProps {
   anuncio: Anuncio;
   onEdit: (anuncio: Anuncio) => void;
   onDelete: (id: string) => void;
+  onUpdate: (anuncio: Anuncio) => void;
 }
 
-export const AnuncioCard = ({ anuncio, onEdit, onDelete }: AnuncioCardProps) => {
+export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCardProps) => {
   const dataPublicacaoFormatada = format(new Date(anuncio.dataPublicacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   const temDataEvento = anuncio.dataEvento && anuncio.dataEvento.trim() !== "";
   
