@@ -56,7 +56,8 @@ const assessoriaSchema = z.object({
   endereco: z.string().min(5, { message: "Endereço deve ter no mínimo 5 caracteres" }),
   horarioFuncionamento: z.object({
     inicio: z.string(),
-    fim: z.string()
+    fim: z.string(),
+    diasFuncionamento: z.array(z.number())
   })
 });
 
@@ -107,7 +108,16 @@ const AssessoriasTab = ({ searchTerm, setSearchTerm }: AssessoriasTabProps) => {
   const adicionarAssessoria = (dados: z.infer<typeof assessoriaSchema>) => {
     const novaAssessoria: Assessoria = {
       id: `assessoria-${Date.now()}`,
-      ...dados
+      nome: dados.nome,
+      contato: dados.contato,
+      telefone: dados.telefone,
+      email: dados.email,
+      endereco: dados.endereco,
+      horarioFuncionamento: {
+        inicio: dados.horarioFuncionamento.inicio,
+        fim: dados.horarioFuncionamento.fim,
+        diasFuncionamento: dados.horarioFuncionamento.diasFuncionamento
+      }
     };
     
     setAssessorias([...assessorias, novaAssessoria]);
@@ -124,7 +134,19 @@ const AssessoriasTab = ({ searchTerm, setSearchTerm }: AssessoriasTabProps) => {
     if (!assessoriaParaEditar) return;
     
     const assessoriasAtualizadas = assessorias.map(assessoria => 
-      assessoria.id === assessoriaParaEditar.id ? { ...assessoria, ...dados } : assessoria
+      assessoria.id === assessoriaParaEditar.id ? { 
+        ...assessoria, 
+        nome: dados.nome,
+        contato: dados.contato,
+        telefone: dados.telefone,
+        email: dados.email,
+        endereco: dados.endereco,
+        horarioFuncionamento: {
+          inicio: dados.horarioFuncionamento.inicio,
+          fim: dados.horarioFuncionamento.fim,
+          diasFuncionamento: dados.horarioFuncionamento.diasFuncionamento
+        }
+      } : assessoria
     );
     
     setAssessorias(assessoriasAtualizadas);
@@ -375,7 +397,8 @@ const FormularioAssessoria = ({
       endereco: assessoria.endereco,
       horarioFuncionamento: {
         inicio: assessoria.horarioFuncionamento.inicio,
-        fim: assessoria.horarioFuncionamento.fim
+        fim: assessoria.horarioFuncionamento.fim,
+        diasFuncionamento: assessoria.horarioFuncionamento.diasFuncionamento
       }
     } : {
       nome: "",
@@ -385,7 +408,8 @@ const FormularioAssessoria = ({
       endereco: "",
       horarioFuncionamento: {
         inicio: "08:00",
-        fim: "18:00"
+        fim: "18:00",
+        diasFuncionamento: [1, 2, 3, 4, 5] // Segunda a sexta por padrão
       }
     }
   });
