@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { SearchBar } from "@/components/Documentos/SearchBar";
 import { NovaPastaDialog } from "@/components/Documentos/NovasPastaDialog";
@@ -14,7 +13,7 @@ import {
   filtrarPastas, 
   removerDocumento,
   uploadDocumentos 
-} from "@/utils/documentUtils";
+} from "@/utils/document";
 
 const Documentos = () => {
   const [pastas, setPastas] = useState<Pasta[]>([]);
@@ -54,7 +53,6 @@ const Documentos = () => {
           throw new Error("Falha ao criar pasta");
         }
 
-        // Atualizar a lista de pastas localmente
         const novaPastaObj = {
           id: Date.now(),
           nome: nomePasta.toLowerCase(),
@@ -68,7 +66,6 @@ const Documentos = () => {
           description: "A pasta foi criada com sucesso."
         });
 
-        // Recarregar pastas para garantir sincronização
         await fetchPastas();
       } catch (error: any) {
         console.error('Erro ao criar pasta:', error);
@@ -97,7 +94,6 @@ const Documentos = () => {
         return pasta;
       }));
 
-      // Atualizar a pasta aberta também
       setPastaAberta(prev => {
         if (!prev) return null;
         return {
@@ -127,7 +123,6 @@ const Documentos = () => {
         return pasta;
       }));
 
-      // Atualizar a pasta aberta também
       setPastaAberta(prev => {
         if (!prev) return null;
         return {

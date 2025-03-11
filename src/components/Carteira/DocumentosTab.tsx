@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { FileText, Upload, X, Folder } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { criarPasta, pastasDisplay, pastasPredefinidas } from "@/utils/documentUtils";
+import { criarPasta, pastasDisplay, pastasPredefinidas } from "@/utils/document";
 
 interface Documento {
   id: string;
@@ -33,13 +32,11 @@ export const DocumentosTab = ({
   const [pastaCriada, setPastaCriada] = useState(false);
   const { toast } = useToast();
 
-  // Criar pastas predefinidas quando o componente for montado
   useEffect(() => {
     const criarPastasPredefinidas = async () => {
       if (pastaCriada) return;
       
       try {
-        // Verifica se as pastas já existem
         const { data: buckets, error } = await supabase.storage.listBuckets();
         
         if (error) {
@@ -49,7 +46,6 @@ export const DocumentosTab = ({
         
         const bucketsExistentes = buckets?.map(b => b.name) || [];
         
-        // Criar pastas que não existem
         for (const nomePasta of pastasPredefinidas) {
           if (!bucketsExistentes.includes(nomePasta)) {
             await criarPasta(nomePasta);
@@ -73,7 +69,6 @@ export const DocumentosTab = ({
     criarPastasPredefinidas();
   }, [pastaCriada, toast]);
 
-  // Renderizar as pastas predefinidas
   const renderPastas = () => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -91,7 +86,6 @@ export const DocumentosTab = ({
     );
   };
 
-  // Função para lidar com o clique em uma pasta
   const handlePastaClick = (nomePasta: string) => {
     toast({
       title: `Pasta ${pastasDisplay[nomePasta]}`,
@@ -147,13 +141,11 @@ export const DocumentosTab = ({
           </Dialog>
         </div>
         
-        {/* Mostrar pastas predefinidas */}
         <div className="mb-6">
           <h4 className="text-md font-medium mb-3">Pastas Principais</h4>
           {renderPastas()}
         </div>
         
-        {/* Lista de documentos */}
         <div>
           <h4 className="text-md font-medium mb-3">Documentos Recentes</h4>
           {documentos.length > 0 ? (
