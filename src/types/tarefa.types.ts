@@ -1,7 +1,7 @@
 
 export type PrioridadeTarefa = "baixa" | "media" | "alta";
 
-export type StatusTarefa = "pendente" | "em_andamento" | "concluida";
+export type StatusTarefa = "pendente" | "em_andamento" | "concluida" | "todas";
 
 export interface Tarefa {
   id: string;
@@ -14,7 +14,12 @@ export interface Tarefa {
   categoria: string;
 }
 
-export type NovaTarefa = Omit<Tarefa, "id" | "criacao"> & {
+export type NovaTarefa = Partial<Omit<Tarefa, "id" | "criacao">> & {
   id?: string;
   criacao?: string;
+  titulo: string;
+  descricao: string;
+  prioridade: PrioridadeTarefa;
+  status: StatusTarefa;
+  categoria: string;
 };

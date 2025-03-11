@@ -17,7 +17,7 @@ const Tarefas = () => {
     return savedTarefas ? JSON.parse(savedTarefas) : [];
   });
   const [tarefaParaEditar, setTarefaParaEditar] = useState<Tarefa | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("todas");
+  const [activeTab, setActiveTab] = useState<StatusTarefa>("todas");
   const [viewMode, setViewMode] = useState<"list" | "board">("list");
 
   const salvarTarefasNoLocalStorage = (tarefasAtualizadas: Tarefa[]) => {
@@ -85,12 +85,12 @@ const Tarefas = () => {
   };
 
   // Filtrar tarefas com base na aba ativa
-  const filtrarTarefasPorStatus = (status?: StatusTarefa) => {
-    if (!status || status === "todas") return tarefas;
+  const filtrarTarefasPorStatus = (status: StatusTarefa) => {
+    if (status === "todas") return tarefas;
     return tarefas.filter((tarefa) => tarefa.status === status);
   };
 
-  const tarefasFiltradas = filtrarTarefasPorStatus(activeTab as StatusTarefa);
+  const tarefasFiltradas = filtrarTarefasPorStatus(activeTab);
 
   return (
     <div className="space-y-6">

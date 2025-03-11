@@ -60,14 +60,26 @@ const TarefaForm = ({ onSubmit, tarefaInicial, onCancel }: TarefaFormProps) => {
       descricao: tarefaInicial?.descricao || "",
       prazo: tarefaInicial?.prazo || null,
       prioridade: tarefaInicial?.prioridade || "media",
-      status: tarefaInicial?.status || "pendente",
+      status: tarefaInicial?.status === "todas" ? "pendente" : (tarefaInicial?.status || "pendente"),
       categoria: tarefaInicial?.categoria || "",
       criacao: tarefaInicial?.criacao || undefined,
     },
   });
 
   const handleSubmit = (values: TarefaFormValues) => {
-    onSubmit(values);
+    const novaTarefa: NovaTarefa = {
+      id: values.id,
+      titulo: values.titulo,
+      descricao: values.descricao,
+      prazo: values.prazo,
+      prioridade: values.prioridade,
+      status: values.status,
+      categoria: values.categoria,
+      criacao: values.criacao
+    };
+    
+    onSubmit(novaTarefa);
+    
     if (!tarefaInicial) {
       form.reset({
         titulo: "",
