@@ -119,7 +119,11 @@ const Tarefas = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           {viewMode === "list" ? (
-            <Tabs defaultValue="todas" value={activeTab} onValueChange={setActiveTab}>
+            <Tabs 
+              defaultValue="todas" 
+              value={activeTab} 
+              onValueChange={(value) => setActiveTab(value as StatusTarefa)}
+            >
               <div className="flex justify-between items-center mb-4">
                 <TabsList>
                   <TabsTrigger value="todas">Todas ({tarefas.length})</TabsTrigger>
