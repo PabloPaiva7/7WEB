@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Anuncio, NovoAnuncio } from "@/types/mural.types";
 import { AnuncioCard } from "@/components/Mural/AnuncioCard";
@@ -55,55 +54,45 @@ export default function Mural() {
   const [excluirId, setExcluirId] = useState<string | null>(null);
   const [modoVisualizacao, setModoVisualizacao] = useState<"carrossel" | "grade">("carrossel");
 
-  // Carregar anúncios do localStorage
   useEffect(() => {
     const storedAnuncios = localStorage.getItem(STORAGE_KEY);
     if (storedAnuncios) {
       setAnuncios(JSON.parse(storedAnuncios));
     } else {
-      // Usar dados de exemplo na primeira execução
       setAnuncios(dadosExemplo);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dadosExemplo));
     }
   }, []);
 
-  // Salvar anúncios no localStorage quando mudar
   useEffect(() => {
     if (anuncios.length > 0) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(anuncios));
     }
   }, [anuncios]);
 
-  // Filtrar anúncios
   const anunciosFiltrados = anuncios
     .filter(anuncio => {
-      // Filtro de texto
       const matchTexto = 
         anuncio.titulo.toLowerCase().includes(filtroTexto.toLowerCase()) ||
         anuncio.conteudo.toLowerCase().includes(filtroTexto.toLowerCase()) ||
         anuncio.autor.toLowerCase().includes(filtroTexto.toLowerCase());
       
-      // Filtro de tipo
       const matchTipo = filtroTipo === "todos" || anuncio.tipo === filtroTipo;
       
-      // Filtro de visualização (próximos eventos ou todos)
       const matchVisualizacao = visualizacao === "todos" || 
         (visualizacao === "proximos" && anuncio.dataEvento && new Date(anuncio.dataEvento) > new Date());
       
       return matchTexto && matchTipo && matchVisualizacao;
     })
     .sort((a, b) => {
-      // Ordenar por importância (importantes primeiro)
       if (a.importante !== b.importante) {
         return a.importante ? -1 : 1;
       }
-      // Em seguida por data de publicação (mais recentes primeiro)
       return new Date(b.dataPublicacao).getTime() - new Date(a.dataPublicacao).getTime();
     });
 
   const handleSalvarAnuncio = (novoAnuncio: NovoAnuncio) => {
     if (anuncioSelecionado) {
-      // Editar anúncio existente
       const anunciosAtualizados = anuncios.map(anuncio => 
         anuncio.id === anuncioSelecionado.id 
           ? { ...novoAnuncio, id: anuncio.id, dataPublicacao: anuncio.dataPublicacao } 
@@ -112,7 +101,6 @@ export default function Mural() {
       setAnuncios(anunciosAtualizados);
       toast.success("Anúncio atualizado com sucesso!");
     } else {
-      // Criar novo anúncio
       const anuncioCompleto: Anuncio = {
         ...novoAnuncio,
         id: uuidv4(),
@@ -146,6 +134,14 @@ export default function Mural() {
 
   const toggleModoVisualizacao = () => {
     setModoVisualizacao(prev => prev === "carrossel" ? "grade" : "carrossel");
+  };
+
+  const handleUpdate = (anuncioAtualizado: Anuncio) => {
+    const anunciosAtualizados = anuncios.map(anuncio => 
+      anuncio.id === anuncioAtualizado.id ? anuncioAtualizado : anuncio
+    );
+    setAnuncios(anunciosAtualizados);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(anunciosAtualizados));
   };
 
   return (
@@ -211,6 +207,7 @@ export default function Mural() {
             anuncios={anunciosFiltrados}
             onEdit={handleEditar}
             onDelete={handleExcluir}
+            onUpdate={handleUpdate}
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -220,6 +217,7 @@ export default function Mural() {
                 anuncio={anuncio}
                 onEdit={handleEditar}
                 onDelete={handleExcluir}
+                onUpdate={handleUpdate}
               />
             ))}
           </div>
@@ -236,7 +234,6 @@ export default function Mural() {
         </div>
       )}
       
-      {/* Dialog para novo/editar anúncio */}
       <AnuncioForm
         anuncio={anuncioSelecionado}
         isOpen={mostrarNovoAnuncio}
@@ -247,7 +244,6 @@ export default function Mural() {
         onSave={handleSalvarAnuncio}
       />
       
-      {/* Dialog de confirmação para exclusão */}
       <AlertDialog open={!!excluirId} onOpenChange={() => setExcluirId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

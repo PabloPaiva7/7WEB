@@ -1,18 +1,30 @@
 
 export type TipoAnuncio = "treinamento" | "corporativo" | "mudanca" | "chamada" | "outro";
 
+export interface Participante {
+  id: string;
+  nomeCompleto: string;
+  email: string;
+  departamento: string;
+  observacoes?: string;
+  dataInscricao: string;
+}
+
 export interface Anuncio {
   id: string;
   titulo: string;
   conteudo: string;
   tipo: TipoAnuncio;
-  dataPublicacao: string; // ISO date
-  dataEvento?: string; // ISO date, optional for events with specific dates
+  dataPublicacao: string;
+  dataEvento?: string;
   autor: string;
   importante: boolean;
+  permitirInscricao: boolean;
+  participantes?: Participante[];
 }
 
-export type NovoAnuncio = Omit<Anuncio, "id" | "dataPublicacao"> & {
+export type NovoAnuncio = Omit<Anuncio, "id" | "dataPublicacao" | "participantes"> & {
   id?: string;
   dataPublicacao?: string;
 };
+

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,8 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
     tipo: "corporativo",
     autor: "",
     dataEvento: "",
-    importante: false
+    importante: false,
+    permitirInscricao: false
   });
 
   useEffect(() => {
@@ -39,7 +39,8 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
         tipo: "corporativo",
         autor: "",
         dataEvento: "",
-        importante: false
+        importante: false,
+        permitirInscricao: false
       });
     }
   }, [anuncio, isOpen]);
@@ -60,7 +61,6 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
     if (!formData.titulo || !formData.conteudo || !formData.autor) {
       toast.error("Preencha todos os campos obrigatórios.");
       return;
@@ -149,15 +149,27 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
                 />
               </div>
               
-              <div className="flex items-end space-x-2">
-                <div className="flex items-center space-x-2 h-10">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="importante" 
                     checked={formData.importante} 
-                    onCheckedChange={handleCheckboxChange} 
+                    onCheckedChange={(checked) => handleCheckboxChange(checked as boolean)} 
                   />
                   <Label htmlFor="importante" className="cursor-pointer">
                     Marcar como importante
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 ml-4">
+                  <Checkbox 
+                    id="permitirInscricao" 
+                    checked={formData.permitirInscricao} 
+                    onCheckedChange={(checked) => 
+                      setFormData(prev => ({ ...prev, permitirInscricao: checked as boolean }))
+                    } 
+                  />
+                  <Label htmlFor="permitirInscricao" className="cursor-pointer">
+                    Permitir inscrições
                   </Label>
                 </div>
               </div>
