@@ -23,7 +23,8 @@ export default function Painel() {
       descricao: 'Pendência de assinatura em contrato do cliente João Silva',
       status: 'em_andamento',
       prioridade: 'media',
-      criacao: new Date(2023, 6, 20)
+      criacao: new Date(2023, 6, 20),
+      inicioProcessamento: new Date(2023, 6, 21)
     },
     {
       id: '3',
@@ -37,25 +38,30 @@ export default function Painel() {
       id: '4',
       titulo: 'Notificação extrajudicial - Maria Oliveira',
       descricao: 'Notificação extrajudicial para cliente Maria Oliveira',
-      status: 'concluida',
+      status: 'finalizado',
       prioridade: 'baixa',
-      criacao: new Date(2023, 4, 10)
+      criacao: new Date(2023, 4, 10),
+      inicioProcessamento: new Date(2023, 4, 11),
+      conclusao: new Date(2023, 4, 15),
+      tempoProcessamento: 4 * 24 * 60 * 60 * 1000 // 4 dias em ms
     },
     {
       id: '5',
       titulo: 'Contrato 56789 - Reconhecimento de firma',
       descricao: 'Necessário reconhecimento de firma no contrato 56789',
-      status: 'em_andamento',
+      status: 'encaminhado',
       prioridade: 'media',
-      criacao: new Date(2023, 7, 5)
+      criacao: new Date(2023, 7, 5),
+      inicioProcessamento: new Date(2023, 7, 6)
     },
     {
       id: '6',
       titulo: 'Ação judicial 2022/456 - Audiência',
       descricao: 'Audiência marcada para ação judicial 2022/456',
-      status: 'pendente',
+      status: 'confirmado',
       prioridade: 'alta',
-      criacao: new Date(2023, 8, 15)
+      criacao: new Date(2023, 8, 15),
+      inicioProcessamento: new Date(2023, 8, 16)
     },
   ]);
 
@@ -82,15 +88,32 @@ export default function Painel() {
     });
   };
 
-  const handleChangeDemandaStatus = (id: string, status: 'pendente' | 'em_andamento' | 'concluida') => {
+  const handleChangeDemandaStatus = (id: string, status: Demanda['status']) => {
     setDemandas(prevDemandas => 
-      prevDemandas.map(d => 
-        d.id === id ? { ...d, status } : d
-      )
+      prevDemandas.map(d => {
+        if (d.id === id) {
+          let updates: Partial<Demanda> = { status };
+          
+          // Se estamos iniciando o processamento
+          if ((status === 'em_andamento' || status === 'encaminhado') && !d.inicioProcessamento) {
+            updates.inicioProcessamento = new Date();
+          }
+          
+          // Se estamos finalizando
+          if ((status === 'finalizado' || status === 'concluida') && d.inicioProcessamento && !d.conclusao) {
+            const conclusao = new Date();
+            updates.conclusao = conclusao;
+            updates.tempoProcessamento = conclusao.getTime() - d.inicioProcessamento.getTime();
+          }
+          
+          return { ...d, ...updates };
+        }
+        return d;
+      })
     );
     toast({
       title: "Status atualizado",
-      description: `O status da demanda foi atualizado.`,
+      description: `O status da demanda foi atualizado para ${status}.`,
     });
   };
 
@@ -128,6 +151,9 @@ export default function Painel() {
           demandas={demandas} 
           setDemandas={setDemandas}
           onSelectDemanda={handleDemandaSelect}
+          onChangeDemandaStatus={handleChangeDemandaStatus}
+          onEditDemanda={handleEditDemanda}
+          onDeleteDemanda={handleDeleteDemanda}
         />
       </div>
     </div>

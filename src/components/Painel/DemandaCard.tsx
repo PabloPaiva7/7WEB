@@ -2,16 +2,17 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Demanda } from "@/types/demanda";
-import { AlertTriangle, CheckCircle2, Clock, Flag, Inbox, Pencil, Trash } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock, Flag, Send, FileCheck, Pencil, Trash } from "lucide-react";
 
 interface DemandaCardProps {
   demanda: Demanda;
   onSelect?: (id: string) => void;
-  onChangeStatus: (id: string, status: 'pendente' | 'em_andamento' | 'concluida') => void;
+  onChangeStatus: (id: string, status: Demanda['status']) => void;
   onEdit: (demanda: Demanda) => void;
   onDelete: (id: string) => void;
-  showMoveBackIcon?: boolean;
-  showCompleteIcon?: boolean;
+  showMoveToEncaminhado?: boolean;
+  showMoveToConfirmado?: boolean;
+  showMoveToFinalizado?: boolean;
 }
 
 export const DemandaCard = ({
@@ -20,11 +21,20 @@ export const DemandaCard = ({
   onChangeStatus,
   onEdit,
   onDelete,
-  showMoveBackIcon = false,
-  showCompleteIcon = false
+  showMoveToEncaminhado = false,
+  showMoveToConfirmado = false,
+  showMoveToFinalizado = false
 }: DemandaCardProps) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, id: string) => {
+    e.dataTransfer.setData("demandaId", id);
+  };
+
   return (
-    <Card className="p-3 bg-white shadow-sm hover:shadow-md transition-shadow">
+    <Card 
+      className="p-3 bg-white shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
+      draggable
+      onDragStart={(e) => handleDragStart(e, demanda.id)}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-2">
           {demanda.prioridade === 'alta' && (
@@ -41,20 +51,26 @@ export const DemandaCard = ({
               variant="ghost" 
               size="icon" 
               className="h-7 w-7" 
-              onClick={() => onSelect(demanda.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(demanda.id);
+              }}
             >
               <AlertTriangle className="h-3 w-3 text-amber-500" />
             </Button>
           )}
           
-          {showMoveBackIcon && (
+          {showMoveToEncaminhado && (
             <Button 
               variant="ghost" 
               size="icon" 
               className="h-7 w-7" 
-              onClick={() => onChangeStatus(demanda.id, 'pendente')}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChangeStatus(demanda.id, 'encaminhado');
+              }}
             >
-              <Clock className="h-3 w-3 text-amber-500" />
+              <Send className="h-3 w-3 text-blue-500" />
             </Button>
           )}
           
@@ -63,18 +79,38 @@ export const DemandaCard = ({
               variant="ghost" 
               size="icon" 
               className="h-7 w-7" 
-              onClick={() => onChangeStatus(demanda.id, 'em_andamento')}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChangeStatus(demanda.id, 'em_andamento');
+              }}
             >
-              <Inbox className="h-3 w-3 text-purple-500" />
+              <Clock className="h-3 w-3 text-purple-500" />
             </Button>
           )}
           
-          {showCompleteIcon && (
+          {showMoveToConfirmado && (
             <Button 
               variant="ghost" 
               size="icon" 
               className="h-7 w-7" 
-              onClick={() => onChangeStatus(demanda.id, 'concluida')}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChangeStatus(demanda.id, 'confirmado');
+              }}
+            >
+              <FileCheck className="h-3 w-3 text-purple-500" />
+            </Button>
+          )}
+          
+          {showMoveToFinalizado && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-7 w-7" 
+              onClick={(e) => {
+                e.stopPropagation();
+                onChangeStatus(demanda.id, 'finalizado');
+              }}
             >
               <CheckCircle2 className="h-3 w-3 text-green-500" />
             </Button>
@@ -84,7 +120,10 @@ export const DemandaCard = ({
             variant="ghost" 
             size="icon" 
             className="h-7 w-7" 
-            onClick={() => onEdit(demanda)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(demanda);
+            }}
           >
             <Pencil className="h-3 w-3" />
           </Button>
@@ -93,7 +132,10 @@ export const DemandaCard = ({
             variant="ghost" 
             size="icon" 
             className="h-7 w-7" 
-            onClick={() => onDelete(demanda.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(demanda.id);
+            }}
           >
             <Trash className="h-3 w-3 text-red-500" />
           </Button>
