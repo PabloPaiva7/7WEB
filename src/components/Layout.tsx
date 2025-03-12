@@ -8,9 +8,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   
   // Simulação de contadores de notificações - em um cenário real, esses valores viriam de um contexto ou API
   const notificationCounts = {
+    calendario: 2,
+    agenda: 4,
     tickets: 3,
     tarefas: 5,
-    documentos: 2,
     mural: 1
   };
   
@@ -46,6 +47,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Calendário</span>
                   </Link>
                 </SidebarMenuButton>
+                {notificationCounts.calendario > 0 && (
+                  <SidebarMenuBadge className="bg-red-500">
+                    {notificationCounts.calendario}
+                  </SidebarMenuBadge>
+                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/agenda"}>
@@ -54,6 +60,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Agenda</span>
                   </Link>
                 </SidebarMenuButton>
+                {notificationCounts.agenda > 0 && (
+                  <SidebarMenuBadge className="bg-red-500">
+                    {notificationCounts.agenda}
+                  </SidebarMenuBadge>
+                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/tickets"}>
@@ -101,11 +112,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Documentos</span>
                   </Link>
                 </SidebarMenuButton>
-                {notificationCounts.documentos > 0 && (
-                  <SidebarMenuBadge className="bg-red-500">
-                    {notificationCounts.documentos}
-                  </SidebarMenuBadge>
-                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/painel"}>
