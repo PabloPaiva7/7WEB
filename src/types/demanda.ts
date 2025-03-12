@@ -9,4 +9,6 @@ export type Demanda = {
   inicioProcessamento?: Date | null;
   conclusao?: Date | null;
   tempoProcessamento?: number | null; // tempo em milissegundos
+  responsavel?: string;
+  categoria?: string;
 };

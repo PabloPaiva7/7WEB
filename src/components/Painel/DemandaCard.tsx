@@ -2,7 +2,23 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Demanda } from "@/types/demanda";
-import { AlertTriangle, CheckCircle2, Clock, Flag, Send, FileCheck, Pencil, Trash } from "lucide-react";
+import { 
+  AlertTriangle, 
+  CheckCircle2, 
+  Clock, 
+  Flag, 
+  Send, 
+  FileCheck, 
+  Pencil, 
+  Trash, 
+  Tag, 
+  User,
+  Calendar
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface DemandaCardProps {
   demanda: Demanda;
@@ -29,23 +45,62 @@ export const DemandaCard = ({
     e.dataTransfer.setData("demandaId", id);
   };
 
+  const getBorderColorByPriority = () => {
+    switch (demanda.prioridade) {
+      case 'alta': return 'border-l-4 border-l-red-500';
+      case 'media': return 'border-l-4 border-l-yellow-500';
+      case 'baixa': return 'border-l-4 border-l-green-500';
+      default: return '';
+    }
+  };
+
   return (
     <Card 
-      className="p-3 bg-white shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
+      className={cn(
+        "p-3 bg-white shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing",
+        getBorderColorByPriority()
+      )}
       draggable
       onDragStart={(e) => handleDragStart(e, demanda.id)}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-2">
-          {demanda.prioridade === 'alta' && (
-            <Flag className="h-4 w-4 text-red-500 mt-1 flex-shrink-0" />
-          )}
-          <div>
-            <h3 className="text-sm font-medium line-clamp-1">{demanda.titulo}</h3>
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{demanda.descricao}</p>
+      <div className="space-y-2">
+        {/* Header with title and priority */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-2">
+            {demanda.prioridade === 'alta' && (
+              <Flag className="h-4 w-4 text-red-500 mt-1 flex-shrink-0" />
+            )}
+            <div>
+              <h3 className="text-sm font-medium line-clamp-1">{demanda.titulo}</h3>
+              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{demanda.descricao}</p>
+            </div>
           </div>
         </div>
-        <div className="flex flex-shrink-0 gap-1">
+        
+        {/* Metadata */}
+        <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+          {demanda.categoria && (
+            <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5">
+              <Tag className="h-3 w-3" />
+              {demanda.categoria}
+            </Badge>
+          )}
+          
+          {demanda.responsavel && (
+            <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5">
+              <User className="h-3 w-3" />
+              {demanda.responsavel}
+            </Badge>
+          )}
+          
+          <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5">
+            <Calendar className="h-3 w-3" />
+            {formatDistanceToNow(new Date(demanda.criacao), { addSuffix: true, locale: ptBR })}
+          </Badge>
+        </div>
+        
+        {/* Action buttons */}
+        <div className="flex justify-end gap-1">
           {onSelect && (
             <Button 
               variant="ghost" 
@@ -55,6 +110,7 @@ export const DemandaCard = ({
                 e.stopPropagation();
                 onSelect(demanda.id);
               }}
+              title="Marcar como prioritária"
             >
               <AlertTriangle className="h-3 w-3 text-amber-500" />
             </Button>
@@ -69,6 +125,7 @@ export const DemandaCard = ({
                 e.stopPropagation();
                 onChangeStatus(demanda.id, 'encaminhado');
               }}
+              title="Encaminhar"
             >
               <Send className="h-3 w-3 text-blue-500" />
             </Button>
@@ -83,6 +140,7 @@ export const DemandaCard = ({
                 e.stopPropagation();
                 onChangeStatus(demanda.id, 'em_andamento');
               }}
+              title="Iniciar processamento"
             >
               <Clock className="h-3 w-3 text-purple-500" />
             </Button>
@@ -97,6 +155,7 @@ export const DemandaCard = ({
                 e.stopPropagation();
                 onChangeStatus(demanda.id, 'confirmado');
               }}
+              title="Confirmar recebimento"
             >
               <FileCheck className="h-3 w-3 text-purple-500" />
             </Button>
@@ -111,6 +170,7 @@ export const DemandaCard = ({
                 e.stopPropagation();
                 onChangeStatus(demanda.id, 'finalizado');
               }}
+              title="Finalizar"
             >
               <CheckCircle2 className="h-3 w-3 text-green-500" />
             </Button>
@@ -124,6 +184,7 @@ export const DemandaCard = ({
               e.stopPropagation();
               onEdit(demanda);
             }}
+            title="Editar"
           >
             <Pencil className="h-3 w-3" />
           </Button>
@@ -136,6 +197,7 @@ export const DemandaCard = ({
               e.stopPropagation();
               onDelete(demanda.id);
             }}
+            title="Excluir"
           >
             <Trash className="h-3 w-3 text-red-500" />
           </Button>
