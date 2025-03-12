@@ -1,10 +1,18 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
 import { Users, BarChart2, Calendar, Settings, FolderOpen, LayoutPanelLeft, CalendarClock, Ticket, CheckSquare, Megaphone } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  
+  // Simulação de contadores de notificações - em um cenário real, esses valores viriam de um contexto ou API
+  const notificationCounts = {
+    tickets: 3,
+    tarefas: 5,
+    documentos: 2,
+    mural: 1
+  };
   
   return (
     <SidebarProvider>
@@ -54,6 +62,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Tickets</span>
                   </Link>
                 </SidebarMenuButton>
+                {notificationCounts.tickets > 0 && (
+                  <SidebarMenuBadge className="bg-red-500">
+                    {notificationCounts.tickets}
+                  </SidebarMenuBadge>
+                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/tarefas"}>
@@ -62,6 +75,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Tarefas</span>
                   </Link>
                 </SidebarMenuButton>
+                {notificationCounts.tarefas > 0 && (
+                  <SidebarMenuBadge className="bg-red-500">
+                    {notificationCounts.tarefas}
+                  </SidebarMenuBadge>
+                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/mural"}>
@@ -70,6 +88,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Mural</span>
                   </Link>
                 </SidebarMenuButton>
+                {notificationCounts.mural > 0 && (
+                  <SidebarMenuBadge className="bg-red-500">
+                    {notificationCounts.mural}
+                  </SidebarMenuBadge>
+                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/documentos"}>
@@ -78,6 +101,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Documentos</span>
                   </Link>
                 </SidebarMenuButton>
+                {notificationCounts.documentos > 0 && (
+                  <SidebarMenuBadge className="bg-red-500">
+                    {notificationCounts.documentos}
+                  </SidebarMenuBadge>
+                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/painel"}>
