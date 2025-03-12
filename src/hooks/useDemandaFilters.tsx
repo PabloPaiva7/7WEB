@@ -7,7 +7,7 @@ type SortField = 'prioridade' | 'criacao' | 'tempoProcessamento';
 type SortOrder = 'asc' | 'desc';
 
 export const useDemandaFilters = (demandas: Demanda[]) => {
-  const [activeTab, setActiveTab] = useState<string>("todos");
+  const [activeTab, setActiveTab] = useState<string>("novos");
   const [sortField, setSortField] = useState<SortField>('criacao');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [filterPrioridade, setFilterPrioridade] = useState<Demanda['prioridade'] | 'todas'>('todas');

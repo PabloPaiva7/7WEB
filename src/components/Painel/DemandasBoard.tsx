@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useDemandaFilters } from "@/hooks/useDemandaFilters";
 import { FilterBar } from "./FilterBar";
 import { StatusTabsNav } from "./StatusTabsNav";
-import { AllStatusColumns, SingleStatusColumn } from "./StatusColumns";
+import { SingleStatusColumn } from "./StatusColumns";
 import { formatTempoProcessamento } from "./DemandaFiltering";
 
 export interface DemandasBoardProps {
@@ -92,7 +92,7 @@ export function DemandasBoard({
       </div>
 
       {/* Tabs and board */}
-      <Tabs defaultValue="todos" value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs defaultValue="novos" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <StatusTabsNav 
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -102,22 +102,6 @@ export function DemandasBoard({
           confirmados={confirmados}
           finalizados={finalizados}
         />
-
-        <TabsContent value="todos" className="mt-0">
-          <AllStatusColumns 
-            novos={novos}
-            emAndamento={emAndamento}
-            encaminhados={encaminhados}
-            confirmados={confirmados}
-            finalizados={finalizados}
-            onSelectDemanda={onSelectDemanda}
-            handleDrag={handleDrag}
-            onEditDemanda={onEditDemanda}
-            onDeleteDemanda={onDeleteDemanda}
-            formatTempo={formatTempoProcessamento}
-            onAddDemanda={onAddDemanda}
-          />
-        </TabsContent>
 
         <TabsContent value="novos" className="mt-0">
           <SingleStatusColumn 

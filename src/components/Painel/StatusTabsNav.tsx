@@ -23,13 +23,7 @@ export const StatusTabsNav = ({
   finalizados
 }: StatusTabsNavProps) => {
   return (
-    <TabsList className="grid grid-cols-5 mb-4">
-      <TabsTrigger value="todos">
-        Todos
-        <Badge variant="outline" className="ml-2 bg-slate-100">
-          {demandas.length}
-        </Badge>
-      </TabsTrigger>
+    <TabsList className="grid grid-cols-4 mb-4">
       <TabsTrigger value="novos">
         Novos
         <Badge variant="outline" className="ml-2 bg-amber-100 text-amber-800">
