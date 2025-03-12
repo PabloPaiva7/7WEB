@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy, Component, ReactNode } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
@@ -13,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import Tickets from "./pages/Tickets";
 import Tarefas from "./pages/Tarefas";
 import Mural from "./pages/Mural";
+import Calculadora from "./pages/Calculadora";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
@@ -88,6 +90,7 @@ function App() {
               <Route path="/tickets" element={<Tickets />} />
               <Route path="/tarefas" element={<Tarefas />} />
               <Route path="/mural" element={<Mural />} />
+              <Route path="/calculadora" element={<Calculadora />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
