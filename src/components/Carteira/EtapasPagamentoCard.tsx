@@ -36,6 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import { EtapaPagamento } from "@/types/agenda.types";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
+import { Separator } from "@/components/ui/separator";
 
 interface EtapasPagamentoCardProps {
   clienteId: string;
@@ -54,7 +55,25 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
   const [etapas, setEtapas] = useState<EtapaPagamento[]>(() => {
     try {
       const salvo = localStorage.getItem(`etapas-pagamento-${clienteId}`);
-      return salvo ? JSON.parse(salvo) : [];
+      if (salvo) {
+        return JSON.parse(salvo);
+      } else {
+        // Criar etapas predefinidas se não houver dados salvos
+        const etapasPredefinidas = tiposEtapas.map(tipo => ({
+          id: uuidv4(),
+          nome: tipo.nome,
+          descricao: `Etapa de ${tipo.nome.toLowerCase()}`,
+          concluido: false,
+          porcentagemConcluida: 0,
+          clienteId: clienteId,
+          dataInicio: new Date().toISOString(),
+          dataConclusao: undefined
+        }));
+        
+        // Salvar as etapas predefinidas no localStorage
+        localStorage.setItem(`etapas-pagamento-${clienteId}`, JSON.stringify(etapasPredefinidas));
+        return etapasPredefinidas;
+      }
     } catch (error) {
       console.error("Erro ao carregar etapas:", error);
       return [];
@@ -191,20 +210,52 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     return Math.round(soma / etapas.length);
   };
   
+  const adicionarEtapasPadrao = () => {
+    const etapasPredefinidas = tiposEtapas.map(tipo => ({
+      id: uuidv4(),
+      nome: tipo.nome,
+      descricao: `Etapa de ${tipo.nome.toLowerCase()}`,
+      concluido: false,
+      porcentagemConcluida: 0,
+      clienteId: clienteId,
+      dataInicio: new Date().toISOString(),
+      dataConclusao: undefined
+    }));
+    
+    salvarEtapas(etapasPredefinidas);
+    toast({
+      title: "Etapas restauradas",
+      description: "As etapas padrão foram restauradas com sucesso."
+    });
+  };
+  
   return (
     <>
       <Card className="mt-4">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-lg font-semibold">Etapas de Pagamento</CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => abrirDialog()}
-            className="w-auto"
-          >
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Nova Etapa
-          </Button>
+          <div className="flex gap-2">
+            {etapas.length === 0 && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={adicionarEtapasPadrao}
+                className="w-auto"
+              >
+                <CalendarCheck className="h-4 w-4 mr-2" />
+                Restaurar Etapas Padrão
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => abrirDialog()}
+              className="w-auto"
+            >
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Nova Etapa
+            </Button>
+          </div>
         </CardHeader>
         
         <CardContent>
@@ -212,13 +263,22 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-muted-foreground">Nenhuma etapa cadastrada</p>
-              <Button 
-                variant="outline" 
-                className="mt-4"
-                onClick={() => abrirDialog()}
-              >
-                Adicionar Primeira Etapa
-              </Button>
+              <div className="flex gap-2 mt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={adicionarEtapasPadrao}
+                >
+                  <CalendarCheck className="h-4 w-4 mr-2" />
+                  Adicionar Etapas Padrão
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => abrirDialog()}
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Adicionar Etapa Personalizada
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-6">
@@ -300,6 +360,23 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
                   </div>
                 );
               })}
+              
+              {etapas.length > 0 && (
+                <div className="pt-4">
+                  <Separator className="my-4" />
+                  <div className="flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={adicionarEtapasPadrao}
+                      className="w-auto"
+                    >
+                      <CalendarCheck className="h-4 w-4 mr-2" />
+                      Restaurar Etapas Padrão
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
