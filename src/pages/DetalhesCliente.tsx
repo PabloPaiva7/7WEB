@@ -375,7 +375,9 @@ const DetalhesCliente = () => {
         </TabsContent>
         
         <TabsContent value="pagamentos" className="space-y-4 mt-6">
-          <PagamentosTab ultimoPagamento={cliente.ultimo_pagamento} />
+          <PagamentosTab 
+            ultimoPagamento={cliente.ultimo_pagamento} 
+          />
         </TabsContent>
         
         <TabsContent value="documentos" className="space-y-4 mt-6">

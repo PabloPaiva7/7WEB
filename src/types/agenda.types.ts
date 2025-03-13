@@ -76,3 +76,15 @@ export interface Senha {
   observacoes?: string;
   ultimaAtualizacao: string;
 }
+
+// Interface para etapas de pagamento
+export interface EtapaPagamento {
+  id: string;
+  nome: string;
+  descricao?: string;
+  concluido: boolean;
+  dataInicio?: string;
+  dataConclusao?: string;
+  porcentagemConcluida: number; // 0-100
+  clienteId: string;
+}
