@@ -6,9 +6,10 @@ import { EtapasPagamentoCard } from "./EtapasPagamentoCard";
 
 interface PagamentosTabProps {
   ultimoPagamento: string | null;
+  clienteId: string;
 }
 
-export const PagamentosTab = ({ ultimoPagamento }: PagamentosTabProps) => {
+export const PagamentosTab = ({ ultimoPagamento, clienteId }: PagamentosTabProps) => {
   return (
     <div className="space-y-6">
       <Card>
@@ -34,7 +35,7 @@ export const PagamentosTab = ({ ultimoPagamento }: PagamentosTabProps) => {
         </CardContent>
       </Card>
       
-      <EtapasPagamentoCard clienteId="44e89f89-bef0-4dfd-9d11-7e20ccc48699" />
+      <EtapasPagamentoCard clienteId={clienteId} />
     </div>
   );
 };

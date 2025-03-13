@@ -1,8 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   PlusCircle, 
   Edit, 
@@ -11,7 +12,8 @@ import {
   BarChart, 
   DollarSign, 
   UserCheck, 
-  Calendar
+  Calendar,
+  Check
 } from "lucide-react";
 import { 
   Dialog, 
@@ -170,15 +172,15 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     });
   };
   
-  const atualizarProgresso = (id: string, progresso: number) => {
+  // Modificado para usar o Checkbox em vez do Slider
+  const toggleEtapaConcluida = (id: string, concluido: boolean) => {
     const novasEtapas = etapas.map(etapa => {
       if (etapa.id === id) {
-        const concluido = progresso === 100;
         return {
           ...etapa,
-          porcentagemConcluida: progresso,
+          porcentagemConcluida: concluido ? 100 : 0,
           concluido,
-          dataConclusao: concluido ? new Date().toISOString() : etapa.dataConclusao
+          dataConclusao: concluido ? new Date().toISOString() : undefined
         };
       }
       return etapa;
@@ -186,7 +188,7 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     
     salvarEtapas(novasEtapas);
     
-    if (progresso === 100) {
+    if (concluido) {
       toast({
         title: "Etapa concluída",
         description: "A etapa foi marcada como concluída."
@@ -204,10 +206,16 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     return tipoEtapa?.icon || CalendarCheck;
   };
   
+  // Calculando progresso total com base no número de etapas concluídas
+  // Cada etapa vale exatamente 20% (100% / 5 etapas = 20%)
   const getProgressoTotal = () => {
     if (etapas.length === 0) return 0;
-    const soma = etapas.reduce((acc, etapa) => acc + etapa.porcentagemConcluida, 0);
-    return Math.round(soma / etapas.length);
+    
+    // Contar o número de etapas concluídas
+    const etapasConcluidas = etapas.filter(etapa => etapa.concluido).length;
+    
+    // Cada etapa vale 20% (5 etapas = 100%)
+    return Math.round((etapasConcluidas / 5) * 100);
   };
   
   const adicionarEtapasPadrao = () => {
@@ -284,8 +292,8 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
             <div className="space-y-6">
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
-                  <Label>Progresso Total</Label>
-                  <span className="font-medium">{getProgressoTotal()}%</span>
+                  <Label>Progresso Total ({getProgressoTotal()}%)</Label>
+                  <span className="font-medium">{Math.min(etapas.filter(e => e.concluido).length, 5)}/5 etapas concluídas</span>
                 </div>
                 <Progress value={getProgressoTotal()} className="h-2" />
               </div>
@@ -296,13 +304,25 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
                 return (
                   <div key={etapa.id} className="border rounded-md p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center">
-                        <EtapaIcon className="h-5 w-5 mr-2 text-primary" />
-                        <div>
-                          <h4 className="font-medium">{etapa.nome}</h4>
-                          {etapa.descricao && (
-                            <p className="text-sm text-muted-foreground">{etapa.descricao}</p>
-                          )}
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id={`check-${etapa.id}`}
+                          checked={etapa.concluido}
+                          onCheckedChange={(checked) => toggleEtapaConcluida(etapa.id, checked === true)}
+                        />
+                        <div className="flex items-center">
+                          <EtapaIcon className="h-5 w-5 mr-2 text-primary" />
+                          <div>
+                            <label
+                              htmlFor={`check-${etapa.id}`}
+                              className={`font-medium ${etapa.concluido ? 'line-through text-muted-foreground' : ''}`}
+                            >
+                              {etapa.nome}
+                            </label>
+                            {etapa.descricao && (
+                              <p className="text-sm text-muted-foreground">{etapa.descricao}</p>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex space-x-2">
@@ -323,24 +343,20 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
                       </div>
                     </div>
                     
-                    <div className="mt-2">
-                      <div className="flex justify-between items-center mb-1">
+                    <div className="mt-2 ml-6">
+                      <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">
-                          {etapa.concluido ? 'Concluído' : 'Em andamento'}
+                          {etapa.concluido ? 'Concluído' : 'Pendente'}
                         </span>
-                        <span className="text-sm font-medium">{etapa.porcentagemConcluida}%</span>
+                        <span className="text-sm font-medium">
+                          {etapa.concluido ? '100%' : '0%'}
+                        </span>
                       </div>
                       
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1">
-                          <Slider 
-                            defaultValue={[etapa.porcentagemConcluida]} 
-                            max={100} 
-                            step={10}
-                            onValueChange={(values) => atualizarProgresso(etapa.id, values[0])}
-                          />
-                        </div>
-                      </div>
+                      <Progress 
+                        value={etapa.concluido ? 100 : 0} 
+                        className="h-2 mt-1"
+                      />
                       
                       {(etapa.dataInicio || etapa.dataConclusao) && (
                         <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
@@ -427,19 +443,21 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
               
               <FormField
                 control={form.control}
-                name="porcentagemConcluida"
+                name="concluido"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Porcentagem Concluída ({field.value}%)</FormLabel>
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                     <FormControl>
-                      <Slider 
-                        defaultValue={[field.value]} 
-                        max={100} 
-                        step={10}
-                        onValueChange={(values) => field.onChange(values[0])}
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Etapa concluída</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Marque esta opção se a etapa já foi concluída
+                      </p>
+                    </div>
                   </FormItem>
                 )}
               />
@@ -459,3 +477,4 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     </>
   );
 };
+
