@@ -1,4 +1,3 @@
-
 import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 import { useState } from "react";
 import { Demanda } from "@/types/demanda";
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { v4 as uuidv4 } from "uuid";
+import { GoalsSection } from "@/components/Painel/GoalsSection";
 
 export default function Painel() {
   const [demandas, setDemandas] = useState<Demanda[]>([
@@ -219,6 +219,8 @@ export default function Painel() {
       )}
       
       <StatisticsSection />
+      
+      <GoalsSection />
       
       <ChartSection />
       
