@@ -1,10 +1,15 @@
 
 import { useMuralAnuncios } from "@/hooks/useMuralAnuncios";
+import { useMuralInterativo } from "@/hooks/useMuralInterativo";
 import { FiltroAnuncios } from "@/components/Mural/FiltroAnuncios";
 import { AnuncioForm } from "@/components/Mural/AnuncioForm";
 import { MuralHeader } from "@/components/Mural/MuralHeader";
 import { MuralContent } from "@/components/Mural/MuralContent";
 import { ExcluirAnuncioDialog } from "@/components/Mural/ExcluirAnuncioDialog";
+import { Aniversariantes } from "@/components/Mural/Aniversariantes";
+import { ConteudosRecomendados } from "@/components/Mural/ConteudosRecomendados";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Megaphone, Cake, BookOpen } from "lucide-react";
 
 export default function Mural() {
   const {
@@ -30,6 +35,15 @@ export default function Mural() {
     handleUpdate
   } = useMuralAnuncios();
 
+  const {
+    aniversariantesDoDia,
+    aniversariantesDaSemana,
+    aniversariantesDoMes,
+    conteudosFiltrados,
+    filtroConteudo,
+    setFiltroConteudo
+  } = useMuralInterativo();
+
   return (
     <div>
       <MuralHeader 
@@ -39,23 +53,58 @@ export default function Mural() {
         toggleModoVisualizacao={toggleModoVisualizacao}
       />
       
-      <FiltroAnuncios
-        filtroTexto={filtroTexto}
-        setFiltroTexto={setFiltroTexto}
-        filtroTipo={filtroTipo}
-        setFiltroTipo={setFiltroTipo}
-        setMostrarNovoAnuncio={setMostrarNovoAnuncio}
-      />
-      
-      <MuralContent 
-        anuncios={anunciosFiltrados}
-        filtroTexto={filtroTexto}
-        filtroTipo={filtroTipo}
-        modoVisualizacao={modoVisualizacao}
-        onEdit={handleEditar}
-        onDelete={handleExcluir}
-        onUpdate={handleUpdate}
-      />
+      <Tabs defaultValue="anuncios" className="mt-4">
+        <TabsList className="mb-4">
+          <TabsTrigger value="anuncios">
+            <Megaphone className="h-4 w-4 mr-2" />
+            Anúncios
+          </TabsTrigger>
+          <TabsTrigger value="aniversariantes">
+            <Cake className="h-4 w-4 mr-2" />
+            Aniversariantes
+          </TabsTrigger>
+          <TabsTrigger value="conteudos">
+            <BookOpen className="h-4 w-4 mr-2" />
+            Conteúdos Recomendados
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="anuncios">
+          <FiltroAnuncios
+            filtroTexto={filtroTexto}
+            setFiltroTexto={setFiltroTexto}
+            filtroTipo={filtroTipo}
+            setFiltroTipo={setFiltroTipo}
+            setMostrarNovoAnuncio={setMostrarNovoAnuncio}
+          />
+          
+          <MuralContent 
+            anuncios={anunciosFiltrados}
+            filtroTexto={filtroTexto}
+            filtroTipo={filtroTipo}
+            modoVisualizacao={modoVisualizacao}
+            onEdit={handleEditar}
+            onDelete={handleExcluir}
+            onUpdate={handleUpdate}
+          />
+        </TabsContent>
+        
+        <TabsContent value="aniversariantes">
+          <Aniversariantes 
+            aniversariantesDoDia={aniversariantesDoDia}
+            aniversariantesDaSemana={aniversariantesDaSemana}
+            aniversariantesDoMes={aniversariantesDoMes}
+          />
+        </TabsContent>
+        
+        <TabsContent value="conteudos">
+          <ConteudosRecomendados 
+            conteudos={conteudosFiltrados}
+            filtroConteudo={filtroConteudo}
+            setFiltroConteudo={setFiltroConteudo}
+          />
+        </TabsContent>
+      </Tabs>
       
       <AnuncioForm
         anuncio={anuncioSelecionado}

@@ -1,6 +1,8 @@
 
 export type TipoAnuncio = "treinamento" | "corporativo" | "mudanca" | "chamada" | "outro";
 
+export type TipoConteudo = "livro" | "filme" | "serie" | "curso" | "versiculo";
+
 export interface Participante {
   id: string;
   nomeCompleto: string;
@@ -8,6 +10,25 @@ export interface Participante {
   departamento: string;
   observacoes?: string;
   dataInscricao: string;
+}
+
+export interface Aniversariante {
+  id: string;
+  nome: string;
+  departamento: string;
+  data: string; // formato ISO
+  foto?: string;
+}
+
+export interface ConteudoRecomendado {
+  id: string;
+  titulo: string;
+  descricao: string;
+  tipo: TipoConteudo;
+  autor?: string;
+  imagem?: string;
+  link?: string;
+  dataCriacao: string;
 }
 
 export interface Anuncio {
