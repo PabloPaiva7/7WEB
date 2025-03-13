@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Calendar, User, Phone, GanttChart, Landmark, Link as LinkIcon, Scale } from "lucide-react";
+import { Calendar, User, Phone, GanttChart, Landmark, Link as LinkIcon, Scale, Key } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +13,7 @@ import AssessoriasTab from "@/components/Agenda/AssessoriasTab";
 import BancosTab from "@/components/Agenda/BancosTab";
 import LinksUteisTab from "@/components/Agenda/LinksUteisTab";
 import PaginasJuridicasTab from "@/components/Agenda/PaginasJuridicasTab";
+import SenhasTab from "@/components/Agenda/SenhasTab";
 
 // Tipos de dados
 import { 
@@ -89,7 +90,7 @@ const Agenda = () => {
       </div>
 
       <Tabs value={secaoAtual} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-4">
+        <TabsList className="grid grid-cols-3 lg:grid-cols-7 mb-4">
           <TabsTrigger value="clientes" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Clientes</span>
@@ -113,6 +114,10 @@ const Agenda = () => {
           <TabsTrigger value="juridico" className="flex items-center gap-2">
             <Scale className="h-4 w-4" />
             <span className="hidden sm:inline">Jurídico</span>
+          </TabsTrigger>
+          <TabsTrigger value="senhas" className="flex items-center gap-2">
+            <Key className="h-4 w-4" />
+            <span className="hidden sm:inline">Senhas</span>
           </TabsTrigger>
         </TabsList>
 
@@ -144,6 +149,11 @@ const Agenda = () => {
         {/* Seção de Páginas Jurídicas */}
         <TabsContent value="juridico" className="space-y-4">
           <PaginasJuridicasTab searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </TabsContent>
+
+        {/* Seção de Senhas */}
+        <TabsContent value="senhas" className="space-y-4">
+          <SenhasTab searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </TabsContent>
       </Tabs>
     </div>

@@ -65,3 +65,14 @@ export interface PaginaJuridica {
   link: string;
   categoria: string;
 }
+
+// Interface para senhas
+export interface Senha {
+  id: string;
+  nome: string;
+  url: string;
+  usuario: string;
+  senha: string;
+  observacoes?: string;
+  ultimaAtualizacao: string;
+}
