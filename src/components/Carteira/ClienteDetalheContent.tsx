@@ -70,6 +70,7 @@ export const ClienteDetalheContent = () => {
         <TabsContent value="pagamentos" className="space-y-4 mt-6">
           <PagamentosTab 
             ultimoPagamento={cliente.ultimo_pagamento} 
+            clienteId={cliente.id}
           />
         </TabsContent>
         
