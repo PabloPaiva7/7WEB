@@ -21,10 +21,10 @@ export interface Anuncio {
   importante: boolean;
   permitirInscricao: boolean;
   participantes?: Participante[];
+  imagem?: string; // URL da imagem ou base64
 }
 
 export type NovoAnuncio = Omit<Anuncio, "id" | "dataPublicacao" | "participantes"> & {
   id?: string;
   dataPublicacao?: string;
 };
-

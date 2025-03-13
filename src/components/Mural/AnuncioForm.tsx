@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { NovoAnuncio, Anuncio, TipoAnuncio } from "@/types/mural.types";
 import { toast } from "sonner";
+import { Upload, Image, XCircle } from "lucide-react";
 
 interface AnuncioFormProps {
   anuncio?: Anuncio;
@@ -26,12 +28,16 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
     importante: false,
     permitirInscricao: false
   });
+  
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (anuncio) {
       setFormData({
         ...anuncio
       });
+      setPreviewImage(anuncio.imagem || null);
     } else {
       setFormData({
         titulo: "",
@@ -42,6 +48,7 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
         importante: false,
         permitirInscricao: false
       });
+      setPreviewImage(null);
     }
   }, [anuncio, isOpen]);
 
@@ -54,8 +61,45 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData(prev => ({ ...prev, importante: checked }));
+  const handleCheckboxChange = (checked: boolean, name: string) => {
+    setFormData(prev => ({ ...prev, [name]: checked }));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validar tamanho do arquivo (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("A imagem não pode ter mais de 5MB");
+      return;
+    }
+    
+    // Validar tipo do arquivo
+    if (!file.type.startsWith('image/')) {
+      toast.error("O arquivo deve ser uma imagem");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageDataUrl = event.target?.result as string;
+      setPreviewImage(imageDataUrl);
+      setFormData(prev => ({ ...prev, imagem: imageDataUrl }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setPreviewImage(null);
+    setFormData(prev => {
+      const newData = { ...prev };
+      delete newData.imagem;
+      return newData;
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -102,6 +146,47 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
                 rows={5} 
                 required
               />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="imagem">Imagem (opcional)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="imagem"
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {previewImage && (
+                <div className="relative mt-2">
+                  <div className="relative rounded-md overflow-hidden border border-gray-200">
+                    <img 
+                      src={previewImage} 
+                      alt="Preview" 
+                      className="w-full h-auto max-h-[200px] object-contain"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 bg-white rounded-full shadow-md p-1"
+                    >
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="grid grid-cols-2 gap-4">
@@ -154,7 +239,7 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
                   <Checkbox 
                     id="importante" 
                     checked={formData.importante} 
-                    onCheckedChange={(checked) => handleCheckboxChange(checked as boolean)} 
+                    onCheckedChange={(checked) => handleCheckboxChange(checked as boolean, "importante")} 
                   />
                   <Label htmlFor="importante" className="cursor-pointer">
                     Marcar como importante
@@ -165,7 +250,7 @@ export const AnuncioForm = ({ anuncio, isOpen, onClose, onSave }: AnuncioFormPro
                     id="permitirInscricao" 
                     checked={formData.permitirInscricao} 
                     onCheckedChange={(checked) => 
-                      setFormData(prev => ({ ...prev, permitirInscricao: checked as boolean }))
+                      handleCheckboxChange(checked as boolean, "permitirInscricao")
                     } 
                   />
                   <Label htmlFor="permitirInscricao" className="cursor-pointer">
