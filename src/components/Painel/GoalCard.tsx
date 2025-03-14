@@ -28,14 +28,14 @@ export const GoalCard = ({
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium text-sm">{title}</h3>
-          <div className={cn("p-2 rounded-full", color, "bg-white/80")}>
+          <div className={cn("p-2 rounded-full", color, "bg-white/80 dark:bg-gray-800/80")}>
             <Icon className="h-4 w-4" />
           </div>
         </div>
         
         <div className="flex justify-between items-baseline mb-1">
-          <span className="text-2xl font-bold">{current}</span>
-          <span className="text-sm text-muted-foreground">de {target}</span>
+          <span className="text-2xl font-bold text-foreground dark:text-white">{current}</span>
+          <span className="text-sm text-muted-foreground dark:text-gray-300">de {target}</span>
         </div>
         
         <Progress 
@@ -44,7 +44,7 @@ export const GoalCard = ({
           indicatorClassName={color.replace("text-", "bg-")}
         />
         
-        <p className="text-xs text-right mt-1 text-muted-foreground">
+        <p className="text-xs text-right mt-1 text-muted-foreground dark:text-gray-300">
           {percentage}% concluído
         </p>
       </CardContent>

@@ -24,9 +24,9 @@ export const StatisticCard = ({
       <CardContent className="p-4 flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
+          <p className="text-2xl font-bold text-foreground dark:text-white">{value}</p>
         </div>
-        <div className="p-3 rounded-full bg-white">
+        <div className="p-3 rounded-full bg-white dark:bg-gray-800">
           <Icon className={`h-6 w-6 ${iconColor}`} />
         </div>
       </CardContent>
