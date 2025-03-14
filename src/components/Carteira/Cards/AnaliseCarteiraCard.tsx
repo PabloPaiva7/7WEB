@@ -12,19 +12,19 @@ export const AnaliseCarteiraCard = ({ totalClientes, valorTotal, dadosGrafico }:
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Análise da Carteira</CardTitle>
-        <CardDescription>Distribuição de contratos por situação</CardDescription>
+        <CardTitle className="text-lg font-semibold dark:text-[#D9B300]">Análise da Carteira</CardTitle>
+        <CardDescription className="dark:text-[#D9B300]/80">Distribuição de contratos por situação</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Total de Clientes</p>
-              <p className="text-xl font-bold">{totalClientes}</p>
+              <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">Total de Clientes</p>
+              <p className="text-xl font-bold dark:text-[#D9B300]">{totalClientes}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Valor Total</p>
-              <p className="text-xl font-bold">
+              <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">Valor Total</p>
+              <p className="text-xl font-bold dark:text-[#D9B300]">
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL'

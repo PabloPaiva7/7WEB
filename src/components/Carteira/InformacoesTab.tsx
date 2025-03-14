@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -54,33 +55,33 @@ export const InformacoesTab = ({
   return <Card>
       <CardContent className="p-6 space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold flex items-center">
+          <h3 className="text-lg font-semibold flex items-center dark:text-[#D9B300]">
             <Phone className="mr-2 h-4 w-4" />
             Informações de Contato
           </h3>
           {!isEditing ? <Button variant="outline" size="sm" onClick={handleEdit}>
-              <Pencil className="h-4 w-4 mr-1" /> Editar
+              <Pencil className="h-4 w-4 mr-1" /> <span className="dark:text-[#D9B300]">Editar</span>
             </Button> : <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleCancel}>
-                <X className="h-4 w-4 mr-1" /> Cancelar
+                <X className="h-4 w-4 mr-1" /> <span className="dark:text-[#D9B300]">Cancelar</span>
               </Button>
               <Button variant="default" size="sm" onClick={handleSave}>
-                <Save className="h-4 w-4 mr-1" /> Salvar
+                <Save className="h-4 w-4 mr-1" /> <span className="dark:text-[#D9B300]">Salvar</span>
               </Button>
             </div>}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-muted-foreground">Contato</p>
-            {isEditing ? <Input value={editableInfo.contato || ""} onChange={e => handleChange("contato", e.target.value)} placeholder="Informe o contato" /> : <p className="font-medium">{cliente.contato || "Não informado"}</p>}
+            <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">Contato</p>
+            {isEditing ? <Input value={editableInfo.contato || ""} onChange={e => handleChange("contato", e.target.value)} placeholder="Informe o contato" /> : <p className="font-medium dark:text-[#D9B300]">{cliente.contato || "Não informado"}</p>}
           </div>
         </div>
         
         <Separator className="my-4" />
         
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold flex items-center">
+          <h3 className="text-lg font-semibold flex items-center dark:text-[#D9B300]">
             <Calendar className="mr-2 h-4 w-4" />
             Datas Importantes
           </h3>
@@ -88,26 +89,26 @@ export const InformacoesTab = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-muted-foreground">Data de Entrada</p>
-            {isEditing ? <Input type="date" value={formatDate(editableInfo.entrada)} onChange={e => handleChange("entrada", e.target.value)} /> : <p className="font-medium">
+            <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">Data de Entrada</p>
+            {isEditing ? <Input type="date" value={formatDate(editableInfo.entrada)} onChange={e => handleChange("entrada", e.target.value)} /> : <p className="font-medium dark:text-[#D9B300]">
                 {cliente.entrada ? new Date(cliente.entrada).toLocaleDateString('pt-BR') : "Não informado"}
               </p>}
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Prazo do Contrato</p>
-            {isEditing ? <Input type="date" value={formatDate(editableInfo.prazo)} onChange={e => handleChange("prazo", e.target.value)} /> : <p className="font-medium">
+            <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">Prazo do Contrato</p>
+            {isEditing ? <Input type="date" value={formatDate(editableInfo.prazo)} onChange={e => handleChange("prazo", e.target.value)} /> : <p className="font-medium dark:text-[#D9B300]">
                 {cliente.prazo ? new Date(cliente.prazo).toLocaleDateString('pt-BR') : "Não informado"}
               </p>}
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Negociação</p>
-            {isEditing ? <Input type="date" value={formatDate(editableInfo.negociacao)} onChange={e => handleChange("negociacao", e.target.value)} /> : <p className="font-medium">
+            <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">Negociação</p>
+            {isEditing ? <Input type="date" value={formatDate(editableInfo.negociacao)} onChange={e => handleChange("negociacao", e.target.value)} /> : <p className="font-medium dark:text-[#D9B300]">
                 {cliente.negociacao ? new Date(cliente.negociacao).toLocaleDateString('pt-BR') : "Não informado"}
               </p>}
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Resolução</p>
-            {isEditing ? <Input type="date" value={formatDate(editableInfo.resolucao)} onChange={e => handleChange("resolucao", e.target.value)} /> : <p className="font-medium">
+            <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">Resolução</p>
+            {isEditing ? <Input type="date" value={formatDate(editableInfo.resolucao)} onChange={e => handleChange("resolucao", e.target.value)} /> : <p className="font-medium dark:text-[#D9B300]">
                 {cliente.resolucao ? new Date(cliente.resolucao).toLocaleDateString('pt-BR') : "Não informado"}
               </p>}
           </div>

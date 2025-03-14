@@ -27,7 +27,7 @@ export const GoalCard = ({
     <Card className={cn("border", bgColor)}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="font-medium text-sm">{title}</h3>
+          <h3 className="font-medium text-sm dark:text-[#D9B300]/90">{title}</h3>
           <div className={cn("p-2 rounded-full", color, "bg-white/80 dark:bg-gray-800/80")}>
             <Icon className="h-4 w-4" />
           </div>

@@ -23,7 +23,7 @@ export const StatisticCard = ({
     <Card className={`${bgColor} ${borderColor}`}>
       <CardContent className="p-4 flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">{title}</p>
+          <p className="text-sm text-muted-foreground dark:text-[#D9B300]/80">{title}</p>
           <p className="text-2xl font-bold text-foreground dark:text-[#D9B300]">{value}</p>
         </div>
         <div className="p-3 rounded-full bg-white dark:bg-gray-800">

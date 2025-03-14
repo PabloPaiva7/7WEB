@@ -33,9 +33,9 @@ export function ResultDisplay({ resultado, porcentagem }: ResultDisplayProps) {
     <div className="pt-2">
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className="font-medium">Economia</span>
+          <span className="font-medium dark:text-[#D9B300]">Economia</span>
           <div className="flex items-center gap-2">
-            <span>{valorFormatado}</span>
+            <span className="dark:text-[#D9B300]">{valorFormatado}</span>
             <Button
               variant="ghost"
               size="sm"
@@ -43,14 +43,14 @@ export function ResultDisplay({ resultado, porcentagem }: ResultDisplayProps) {
               className="h-6"
             >
               <Copy className="h-3 w-3 mr-1" />
-              Copiar
+              <span className="dark:text-[#D9B300]">Copiar</span>
             </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="font-medium">Desconto</span>
+          <span className="font-medium dark:text-[#D9B300]">Desconto</span>
           <div className="flex items-center gap-2">
-            <span>{porcentagem.toFixed(2)}%</span>
+            <span className="dark:text-[#D9B300]">{porcentagem.toFixed(2)}%</span>
             <Button
               variant="ghost"
               size="sm"
@@ -58,7 +58,7 @@ export function ResultDisplay({ resultado, porcentagem }: ResultDisplayProps) {
               className="h-6"
             >
               <Copy className="h-3 w-3 mr-1" />
-              Copiar
+              <span className="dark:text-[#D9B300]">Copiar</span>
             </Button>
           </div>
         </div>
