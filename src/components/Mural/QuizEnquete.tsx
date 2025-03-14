@@ -1,22 +1,24 @@
 
 import { useState } from "react";
-import { Quiz, TipoQuiz, NovoQuiz } from "@/types/mural.types";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Quiz, TipoQuiz } from "@/types/mural.types";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, Edit, Trash2, PlusCircle, BarChart } from "lucide-react";
-import { QuizEnqueteForm } from "./QuizEnqueteForm";
-import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
-import { cn } from "@/lib/utils";
+import { BarChart, ChevronRight, Clock, PlusCircle, UserCheck, Users, VoteIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { QuizEnqueteForm } from "./QuizEnqueteForm";
+import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
+import { Progress } from "@/components/ui/progress";
+import { QuizDetalheDialog } from "./QuizDetalheDialog";
 
 interface QuizEnqueteProps {
   quizzes: Quiz[];
   filtroQuiz: TipoQuiz | "";
-  setFiltroQuiz: (filtro: TipoQuiz | "") => void;
-  onAdd: (quiz: NovoQuiz) => void;
+  setFiltroQuiz: (tipo: TipoQuiz | "") => void;
+  onAdd: (quiz: Omit<Quiz, "id" | "dataCriacao" | "respostas">) => void;
   onEdit: (quiz: Quiz) => void;
   onDelete: (id: string) => void;
   onVote: (quizId: string, opcaoId: string) => void;
@@ -34,55 +36,46 @@ export const QuizEnquete = ({
   onToggleActive
 }: QuizEnqueteProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [quizParaEditar, setQuizParaEditar] = useState<Quiz | undefined>(undefined);
   const [quizParaExcluir, setQuizParaExcluir] = useState<string | null>(null);
-  const [usuarioId] = useState(`user-${Math.random().toString(36).substr(2, 9)}`); // Simulando ID de usuário
+  const [quizSelecionado, setQuizSelecionado] = useState<Quiz | null>(null);
 
   // Filtros
   const filteredQuizzes = quizzes.filter(quiz => {
     const matchesSearchTerm = quiz.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
       quiz.descricao.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filtroQuiz === "" || quiz.tipo === filtroQuiz;
-    return matchesSearchTerm && matchesType;
+    const matchesTipo = filtroQuiz === "" || quiz.tipo === filtroQuiz;
+    return matchesSearchTerm && matchesTipo;
   });
 
-  // Ordenar por data de criação (mais recentes primeiro) e ativo
+  // Ordenar por data (mais recentes primeiro)
   const sortedQuizzes = [...filteredQuizzes].sort((a, b) => {
-    // Primeiro os ativos
-    if (a.ativo && !b.ativo) return -1;
-    if (!a.ativo && b.ativo) return 1;
-    
-    // Depois por data
     return new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime();
   });
 
-  // Verificar se o usuário já votou em um quiz
-  const usuarioJaVotou = (quiz: Quiz) => {
-    return quiz.respostas.some(resposta => resposta.usuarioId === usuarioId);
-  };
-
-  // Calcular total de votos para um quiz
-  const totalVotos = (quiz: Quiz) => {
-    return quiz.opcoes.reduce((sum, opcao) => sum + opcao.votos, 0);
-  };
-
-  // Calcular percentual de votos para uma opção
-  const percentualVotos = (quiz: Quiz, opcaoId: string) => {
-    const total = totalVotos(quiz);
-    if (total === 0) return 0;
-    
+  // Calcula a porcentagem de votos para uma opção
+  const percentualVotos = (quiz: Quiz, opcaoId: string): number => {
     const opcao = quiz.opcoes.find(op => op.id === opcaoId);
     if (!opcao) return 0;
     
-    return Math.round((opcao.votos / total) * 100);
+    const totalVotos = quiz.opcoes.reduce((sum, op) => sum + op.votos, 0);
+    return totalVotos > 0 ? Math.round((opcao.votos / totalVotos) * 100) : 0;
   };
 
-  const handleVote = (quizId: string, opcaoId: string) => {
-    onVote(quizId, opcaoId);
+  // Verifica se o usuário já votou (simulado para esta demo)
+  const usuarioJaVotou = (quiz: Quiz): boolean => {
+    // Em uma implementação real, verificaria o ID do usuário atual
+    // Para esta demo, vamos simular aleatoriamente
+    return Math.random() > 0.5;
   };
 
-  const handleExcluir = (id: string) => {
+  const handleEdit = (quiz: Quiz) => {
+    setQuizParaEditar(quiz);
+    setShowForm(true);
+  };
+
+  const handleDelete = (id: string) => {
     setQuizParaExcluir(id);
   };
 
@@ -93,21 +86,57 @@ export const QuizEnquete = ({
     }
   };
 
-  const handleEditar = (quiz: Quiz) => {
-    setQuizParaEditar(quiz);
-    setShowAddForm(true);
-  };
-  
-  const handleSalvar = (quiz: NovoQuiz) => {
+  const handleFormSave = (quizData: Omit<Quiz, "id" | "dataCriacao" | "respostas">) => {
     if (quizParaEditar) {
-      onEdit({ ...quizParaEditar, ...quiz });
+      const quizAtualizado = {
+        ...quizParaEditar,
+        ...quizData
+      };
+      onEdit(quizAtualizado);
     } else {
-      onAdd(quiz);
+      onAdd(quizData);
     }
-    setShowAddForm(false);
+    setShowForm(false);
     setQuizParaEditar(undefined);
   };
 
+  const handleCardClick = (quiz: Quiz) => {
+    setQuizSelecionado(quiz);
+  };
+
+  // Helper para obter rótulo do tipo de quiz
+  const getTipoQuizLabel = (tipo: TipoQuiz): string => {
+    const tipoMap: Record<TipoQuiz, string> = {
+      "opiniao": "Opinião",
+      "conhecimento": "Conhecimento",
+      "preferencia": "Preferência",
+      "feedback": "Feedback",
+      "outro": "Outro"
+    };
+    
+    return tipoMap[tipo] || tipo;
+  };
+
+  // Helper para obter cor do tipo de quiz
+  const getTipoQuizColor = (tipo: TipoQuiz): string => {
+    const colorMap: Record<TipoQuiz, string> = {
+      "opiniao": "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100",
+      "conhecimento": "bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100",
+      "preferencia": "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100",
+      "feedback": "bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100",
+      "outro": "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
+    };
+    
+    return colorMap[tipo] || "";
+  };
+
+  // Formatação de data
+  const formatarData = (dataISO: string) => {
+    const data = new Date(dataISO);
+    return format(data, "d 'de' MMMM", { locale: ptBR });
+  };
+
+  // Renderizar filtros
   const renderFiltros = () => (
     <div className="flex items-center space-x-2 mb-4 flex-wrap">
       <Button
@@ -145,21 +174,20 @@ export const QuizEnquete = ({
       >
         Feedback
       </Button>
-      <Button
-        variant={filtroQuiz === "outro" ? "default" : "outline"}
-        size="sm"
-        onClick={() => setFiltroQuiz("outro")}
-      >
-        Outro
-      </Button>
     </div>
   );
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Quiz e Enquetes</h2>
-        <Button onClick={() => setShowAddForm(true)}>
+        <h2 className="text-2xl font-bold flex items-center">
+          <BarChart className="h-5 w-5 mr-2 text-primary" />
+          Quiz e Enquetes
+        </h2>
+        <Button onClick={() => {
+          setQuizParaEditar(undefined);
+          setShowForm(true);
+        }}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Nova Enquete
         </Button>
@@ -168,7 +196,7 @@ export const QuizEnquete = ({
       <div className="flex flex-wrap gap-4 items-center">
         <div className="flex-1 min-w-[300px]">
           <Input
-            placeholder="Buscar enquetes..."
+            placeholder="Buscar quiz e enquetes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full"
@@ -179,129 +207,119 @@ export const QuizEnquete = ({
 
       {sortedQuizzes.length === 0 ? (
         <div className="text-center py-10">
-          <HelpCircle className="h-10 w-10 mx-auto text-muted-foreground" />
+          <BarChart className="h-10 w-10 mx-auto text-muted-foreground" />
           <h3 className="mt-4 text-lg font-medium">Nenhuma enquete encontrada</h3>
           <p className="text-muted-foreground mt-2">
-            Crie uma nova enquete ou ajuste seus filtros de busca.
+            Crie uma nova enquete para coletar opiniões ou compartilhar conhecimentos
           </p>
-          <Button onClick={() => setShowAddForm(true)} className="mt-4">
+          <Button onClick={() => {
+            setQuizParaEditar(undefined);
+            setShowForm(true);
+          }} className="mt-4">
             <PlusCircle className="h-4 w-4 mr-2" />
-            Nova Enquete
+            Criar Enquete
           </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedQuizzes.map((quiz) => (
-            <Card key={quiz.id} className={cn("transition-all", !quiz.ativo && "opacity-70")}>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-xl">{quiz.titulo}</CardTitle>
-                  <div className="flex space-x-1">
-                    <Badge variant={quiz.ativo ? "default" : "outline"}>
-                      {quiz.ativo ? "Ativo" : "Encerrado"}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  <span>Criado em {format(new Date(quiz.dataCriacao), "dd/MM/yyyy", { locale: ptBR })}</span>
-                  <span className="mx-1">•</span>
-                  <span>por {quiz.autor}</span>
-                </div>
-                <Badge variant="outline" className="mt-2 w-fit">
-                  {quiz.tipo.charAt(0).toUpperCase() + quiz.tipo.slice(1)}
-                </Badge>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm mb-4">{quiz.descricao}</p>
-                <div className="space-y-2">
-                  {quiz.opcoes.map((opcao) => {
-                    const percent = percentualVotos(quiz, opcao.id);
-                    const usuarioVotou = usuarioJaVotou(quiz);
-                    
-                    return (
-                      <div key={opcao.id} className="space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">{opcao.texto}</span>
-                          {usuarioVotou && <span className="text-sm">{percent}%</span>}
-                        </div>
-                        
-                        {usuarioVotou ? (
-                          // Mostrar progresso se já votou
-                          <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-primary h-2 rounded-full" 
-                              style={{width: `${percent}%`}}
-                            />
-                          </div>
-                        ) : (
-                          // Mostrar botão se não votou e quiz está ativo
-                          quiz.ativo && (
-                            <Button 
-                              variant="outline" 
-                              className="w-full justify-start text-left h-auto py-2"
-                              onClick={() => handleVote(quiz.id, opcao.id)}
-                            >
-                              {opcao.texto}
-                            </Button>
-                          )
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                {usuarioJaVotou(quiz) && (
-                  <div className="mt-3 text-sm text-muted-foreground text-center">
-                    <span>Total: {totalVotos(quiz)} votos</span>
-                  </div>
+          {sortedQuizzes.map((quiz) => {
+            const totalVotos = quiz.opcoes.reduce((sum, op) => sum + op.votos, 0);
+            const usuarioVotou = usuarioJaVotou(quiz);
+            
+            // Selecionar a opção mais votada para exibir
+            let opcaoMaisVotada = quiz.opcoes[0];
+            quiz.opcoes.forEach(op => {
+              if (op.votos > opcaoMaisVotada.votos) {
+                opcaoMaisVotada = op;
+              }
+            });
+            
+            const percentMaisVotada = percentualVotos(quiz, opcaoMaisVotada.id);
+            
+            return (
+              <Card 
+                key={quiz.id} 
+                className={cn(
+                  "h-full flex flex-col hover:shadow-lg transition-all cursor-pointer",
+                  !quiz.ativo && "opacity-80"
                 )}
-              </CardContent>
-              <CardFooter className="flex justify-between pt-0">
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditar(quiz)}
-                  >
-                    <Edit className="h-4 w-4 mr-1" /> Editar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleExcluir(quiz.id)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" /> Excluir
-                  </Button>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onToggleActive(quiz.id, !quiz.ativo)}
-                >
-                  {quiz.ativo ? "Encerrar" : "Reativar"}
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                onClick={() => handleCardClick(quiz)}
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-xl">{quiz.titulo}</CardTitle>
+                    <div className="flex flex-col gap-1">
+                      <Badge variant={quiz.ativo ? "default" : "secondary"} className="ml-auto">
+                        {quiz.ativo ? "Ativo" : "Encerrado"}
+                      </Badge>
+                      <Badge 
+                        variant="outline" 
+                        className={cn("ml-auto", getTipoQuizColor(quiz.tipo))}
+                      >
+                        {getTipoQuizLabel(quiz.tipo)}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardDescription>
+                    Por {quiz.autor} • {formatarData(quiz.dataCriacao)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0 flex-grow">
+                  <p className="whitespace-pre-line line-clamp-2 mb-4">{quiz.descricao}</p>
+                  
+                  {usuarioVotou && (
+                    <div className="space-y-2 border p-3 rounded-md bg-muted/20">
+                      <div className="flex justify-between text-sm">
+                        <span className="font-medium">Opção mais votada:</span>
+                        <span>{percentMaisVotada}%</span>
+                      </div>
+                      <div className="text-sm line-clamp-1">{opcaoMaisVotada.texto}</div>
+                      <Progress value={percentMaisVotada} className="h-2" />
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="border-t pt-4 flex justify-between">
+                  <div className="flex gap-2 items-center text-sm text-muted-foreground">
+                    <Users className="h-4 w-4" />
+                    <span>{totalVotos} votos</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-primary">
+                    <span className="text-sm font-medium">Ver detalhes</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </div>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       )}
 
       <QuizEnqueteForm
+        isOpen={showForm}
         quiz={quizParaEditar}
-        isOpen={showAddForm}
         onClose={() => {
-          setShowAddForm(false);
+          setShowForm(false);
           setQuizParaEditar(undefined);
         }}
-        onSave={handleSalvar}
+        onSave={handleFormSave}
       />
 
       <ConfirmDeleteDialog
         isOpen={!!quizParaExcluir}
         onClose={() => setQuizParaExcluir(null)}
         onConfirm={confirmarExclusao}
-        title="Excluir Enquete"
+        title="Excluir enquete"
         description="Tem certeza que deseja excluir esta enquete? Esta ação não pode ser desfeita."
+      />
+
+      <QuizDetalheDialog
+        quiz={quizSelecionado}
+        isOpen={!!quizSelecionado}
+        onClose={() => setQuizSelecionado(null)}
+        onVote={onVote}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onToggleActive={onToggleActive}
       />
     </div>
   );

@@ -11,6 +11,7 @@ import { ptBR } from "date-fns/locale";
 import { DicaHackForm } from "./DicaHackForm";
 import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
 import { cn } from "@/lib/utils";
+import { DicaDetalheDialog } from "./DicaDetalheDialog";
 
 interface DicasHacksProps {
   dicas: DicaHack[];
@@ -35,6 +36,7 @@ export const DicasHacks = ({
   const [showAddForm, setShowAddForm] = useState(false);
   const [dicaParaEditar, setDicaParaEditar] = useState<DicaHack | undefined>(undefined);
   const [dicaParaExcluir, setDicaParaExcluir] = useState<string | null>(null);
+  const [dicaSelecionada, setDicaSelecionada] = useState<DicaHack | null>(null);
 
   // Filtros
   const filteredDicas = dicas.filter(dica => {
@@ -80,6 +82,10 @@ export const DicasHacks = ({
     }
     setShowAddForm(false);
     setDicaParaEditar(undefined);
+  };
+
+  const handleCardClick = (dica: DicaHack) => {
+    setDicaSelecionada(dica);
   };
 
   // Obter a cor da tag baseada na categoria
@@ -204,7 +210,11 @@ export const DicasHacks = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedDicas.map((dica) => (
-            <Card key={dica.id} className="h-full flex flex-col">
+            <Card 
+              key={dica.id} 
+              className="h-full flex flex-col hover:shadow-lg transition-all cursor-pointer"
+              onClick={() => handleCardClick(dica)}
+            >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-xl">{dica.titulo}</CardTitle>
@@ -217,36 +227,45 @@ export const DicasHacks = ({
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-0 flex-grow">
-                <p className="whitespace-pre-line">{dica.conteudo}</p>
+                <p className="whitespace-pre-line line-clamp-3">{dica.conteudo}</p>
               </CardContent>
               <CardFooter className="border-t pt-4 flex justify-between">
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(dica)}
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(dica.id)}
-                  >
-                    <Trash className="h-4 w-4 mr-1" />
-                    Excluir
-                  </Button>
-                </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleLike(dica.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLike(dica.id);
+                  }}
                   className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   <ThumbsUp className="h-4 w-4 mr-1" />
                   {dica.curtidas}
                 </Button>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(dica);
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Editar</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(dica.id);
+                    }}
+                  >
+                    <Trash className="h-4 w-4" />
+                    <span className="sr-only">Excluir</span>
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           ))}
@@ -269,6 +288,15 @@ export const DicasHacks = ({
         onConfirm={confirmarExclusao}
         title="Excluir dica"
         description="Tem certeza que deseja excluir esta dica? Esta ação não pode ser desfeita."
+      />
+
+      <DicaDetalheDialog
+        dica={dicaSelecionada}
+        isOpen={!!dicaSelecionada}
+        onClose={() => setDicaSelecionada(null)}
+        onLike={handleLike}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
     </div>
   );
