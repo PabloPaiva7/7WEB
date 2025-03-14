@@ -3,6 +3,8 @@ export type TipoAnuncio = "treinamento" | "corporativo" | "mudanca" | "chamada" 
 
 export type TipoConteudo = "livro" | "filme" | "serie" | "curso" | "versiculo";
 
+export type CategoriaDica = "trabalho" | "produtividade" | "tecnologia" | "bem-estar" | "outro";
+
 export interface Participante {
   id: string;
   nomeCompleto: string;
@@ -29,6 +31,16 @@ export interface ConteudoRecomendado {
   imagem?: string;
   link?: string;
   dataCriacao: string;
+}
+
+export interface DicaHack {
+  id: string;
+  titulo: string;
+  conteudo: string;
+  categoria: CategoriaDica;
+  autor: string;
+  dataCriacao: string;
+  curtidas: number;
 }
 
 export interface Anuncio {
