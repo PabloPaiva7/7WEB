@@ -41,7 +41,13 @@ export default function Mural() {
     aniversariantesDoMes,
     conteudosFiltrados,
     filtroConteudo,
-    setFiltroConteudo
+    setFiltroConteudo,
+    adicionarAniversariante,
+    editarAniversariante,
+    excluirAniversariante,
+    adicionarConteudo,
+    editarConteudo,
+    excluirConteudo
   } = useMuralInterativo();
 
   return (
@@ -94,6 +100,9 @@ export default function Mural() {
             aniversariantesDoDia={aniversariantesDoDia}
             aniversariantesDaSemana={aniversariantesDaSemana}
             aniversariantesDoMes={aniversariantesDoMes}
+            onAdd={adicionarAniversariante}
+            onEdit={editarAniversariante}
+            onDelete={excluirAniversariante}
           />
         </TabsContent>
         
@@ -102,6 +111,9 @@ export default function Mural() {
             conteudos={conteudosFiltrados}
             filtroConteudo={filtroConteudo}
             setFiltroConteudo={setFiltroConteudo}
+            onAdd={adicionarConteudo}
+            onEdit={editarConteudo}
+            onDelete={excluirConteudo}
           />
         </TabsContent>
       </Tabs>

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Aniversariante, ConteudoRecomendado, TipoConteudo } from "@/types/mural.types";
 import { v4 as uuidv4 } from "uuid";
 import { dadosExemploAniversariantes, dadosExemploConteudos } from "@/data/muralInterativoData";
+import { toast } from "sonner";
 
 const STORAGE_KEY_ANIVERSARIANTES = "mural_aniversariantes";
 const STORAGE_KEY_CONTEUDOS = "mural_conteudos";
@@ -90,6 +91,34 @@ export const useMuralInterativo = () => {
     return conteudoCompleto;
   };
 
+  // Editar conteúdo recomendado existente
+  const editarConteudo = (id: string, conteudoAtualizado: Omit<ConteudoRecomendado, "id" | "dataCriacao">) => {
+    const conteudoExistente = conteudosRecomendados.find(c => c.id === id);
+    
+    if (!conteudoExistente) {
+      toast.error("Conteúdo não encontrado");
+      return null;
+    }
+    
+    const novosConteudos = conteudosRecomendados.map(c => 
+      c.id === id 
+        ? { ...conteudoAtualizado, id, dataCriacao: conteudoExistente.dataCriacao } 
+        : c
+    );
+    
+    setConteudosRecomendados(novosConteudos);
+    localStorage.setItem(STORAGE_KEY_CONTEUDOS, JSON.stringify(novosConteudos));
+    
+    return { ...conteudoAtualizado, id, dataCriacao: conteudoExistente.dataCriacao };
+  };
+
+  // Excluir conteúdo recomendado
+  const excluirConteudo = (id: string) => {
+    const novosConteudos = conteudosRecomendados.filter(c => c.id !== id);
+    setConteudosRecomendados(novosConteudos);
+    localStorage.setItem(STORAGE_KEY_CONTEUDOS, JSON.stringify(novosConteudos));
+  };
+
   // Adicionar novo aniversariante
   const adicionarAniversariante = (novoAniversariante: Omit<Aniversariante, "id">) => {
     const aniversarianteCompleto: Aniversariante = {
@@ -104,6 +133,34 @@ export const useMuralInterativo = () => {
     return aniversarianteCompleto;
   };
 
+  // Editar aniversariante existente
+  const editarAniversariante = (id: string, aniversarianteAtualizado: Omit<Aniversariante, "id">) => {
+    const aniversarianteExistente = aniversariantes.find(a => a.id === id);
+    
+    if (!aniversarianteExistente) {
+      toast.error("Aniversariante não encontrado");
+      return null;
+    }
+    
+    const novosAniversariantes = aniversariantes.map(a => 
+      a.id === id 
+        ? { ...aniversarianteAtualizado, id } 
+        : a
+    );
+    
+    setAniversariantes(novosAniversariantes);
+    localStorage.setItem(STORAGE_KEY_ANIVERSARIANTES, JSON.stringify(novosAniversariantes));
+    
+    return { ...aniversarianteAtualizado, id };
+  };
+
+  // Excluir aniversariante
+  const excluirAniversariante = (id: string) => {
+    const novosAniversariantes = aniversariantes.filter(a => a.id !== id);
+    setAniversariantes(novosAniversariantes);
+    localStorage.setItem(STORAGE_KEY_ANIVERSARIANTES, JSON.stringify(novosAniversariantes));
+  };
+
   return {
     aniversariantesDoDia,
     aniversariantesDaSemana,
@@ -112,6 +169,10 @@ export const useMuralInterativo = () => {
     filtroConteudo,
     setFiltroConteudo,
     adicionarConteudo,
-    adicionarAniversariante
+    editarConteudo,
+    excluirConteudo,
+    adicionarAniversariante,
+    editarAniversariante,
+    excluirAniversariante
   };
 };
