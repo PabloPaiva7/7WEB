@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,19 @@ export const QuizDetalheDialog = ({
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [hasVoted, setHasVoted] = useState(false);
+
+  // Reset hasVoted state when dialog closes or quiz changes
+  useEffect(() => {
+    if (!isOpen) {
+      setHasVoted(false);
+    }
+  }, [isOpen]);
+  
+  useEffect(() => {
+    setHasVoted(false);
+    setSelectedOption("");
+    setSelectedOptions([]);
+  }, [quiz?.id]);
 
   if (!quiz) return null;
 
@@ -97,6 +110,10 @@ export const QuizDetalheDialog = ({
   };
 
   const jaVotou = usuarioJaVotou();
+
+  const handleVoteAgain = () => {
+    setHasVoted(false);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -167,10 +184,16 @@ export const QuizDetalheDialog = ({
                   );
                 })}
                 
-                {quiz.ativo && !jaVotou && (
-                  <Button onClick={handleMultipleVote} className="mt-4">
-                    Enviar Votos
-                  </Button>
+                {quiz.ativo && (
+                  jaVotou ? (
+                    <Button onClick={handleVoteAgain} className="mt-4">
+                      Votar Novamente
+                    </Button>
+                  ) : (
+                    <Button onClick={handleMultipleVote} className="mt-4">
+                      Enviar Votos
+                    </Button>
+                  )
                 )}
               </div>
             ) : (
@@ -207,10 +230,16 @@ export const QuizDetalheDialog = ({
                   );
                 })}
                 
-                {quiz.ativo && !jaVotou && (
-                  <Button onClick={handleSingleVote} className="mt-4">
-                    Votar
-                  </Button>
+                {quiz.ativo && (
+                  jaVotou ? (
+                    <Button onClick={handleVoteAgain} className="mt-4">
+                      Votar Novamente
+                    </Button>
+                  ) : (
+                    <Button onClick={handleSingleVote} className="mt-4">
+                      Votar
+                    </Button>
+                  )
                 )}
               </RadioGroup>
             )}
@@ -248,3 +277,4 @@ export const QuizDetalheDialog = ({
     </Dialog>
   );
 };
+
