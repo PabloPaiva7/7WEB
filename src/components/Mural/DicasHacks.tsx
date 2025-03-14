@@ -1,53 +1,26 @@
 
 import { useState } from "react";
 import { DicaHack, CategoriaDica } from "@/types/mural.types";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Lightbulb, ThumbsUp, Sparkles, Zap, BookOpen, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Lightbulb, ThumbsUp, Edit, Trash, PlusCircle, HelpCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DicaHackForm } from "./DicaHackForm";
 import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
+import { cn } from "@/lib/utils";
 
 interface DicasHacksProps {
   dicas: DicaHack[];
-  filtroDica: CategoriaDica | "todos";
+  filtroDica: CategoriaDica | "";
   setFiltroDica: (categoria: CategoriaDica | "todos") => void;
   onAdd: (dica: Omit<DicaHack, "id" | "dataCriacao" | "curtidas">) => void;
   onEdit: (id: string, dica: Omit<DicaHack, "id" | "dataCriacao" | "curtidas">) => void;
   onDelete: (id: string) => void;
   onLike: (id: string) => void;
 }
-
-// Ícones para cada categoria de dica
-const iconesPorCategoria: Record<CategoriaDica, React.ReactNode> = {
-  trabalho: <BookOpen className="h-5 w-5 text-blue-500" />,
-  produtividade: <Zap className="h-5 w-5 text-yellow-500" />,
-  tecnologia: <Sparkles className="h-5 w-5 text-purple-500" />,
-  "bem-estar": <MessageSquare className="h-5 w-5 text-green-500" />,
-  outro: <Lightbulb className="h-5 w-5 text-gray-500" />
-};
-
-// Cores para cada categoria de dica
-const corPorCategoria: Record<CategoriaDica, string> = {
-  trabalho: "bg-blue-100 text-blue-800",
-  produtividade: "bg-yellow-100 text-yellow-800",
-  tecnologia: "bg-purple-100 text-purple-800",
-  "bem-estar": "bg-green-100 text-green-800",
-  outro: "bg-gray-100 text-gray-800"
-};
-
-// Labels para cada categoria
-const labelPorCategoria: Record<CategoriaDica, string> = {
-  trabalho: "Trabalho",
-  produtividade: "Produtividade",
-  tecnologia: "Tecnologia",
-  "bem-estar": "Bem-estar",
-  outro: "Outro"
-};
 
 export const DicasHacks = ({
   dicas,
@@ -58,184 +31,245 @@ export const DicasHacks = ({
   onDelete,
   onLike
 }: DicasHacksProps) => {
-  const [pesquisa, setPesquisa] = useState("");
-  const [mostrarFormDica, setMostrarFormDica] = useState(false);
-  const [dicaSelecionada, setDicaSelecionada] = useState<DicaHack | undefined>(undefined);
-  const [excluirId, setExcluirId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [dicaParaEditar, setDicaParaEditar] = useState<DicaHack | undefined>(undefined);
+  const [dicaParaExcluir, setDicaParaExcluir] = useState<string | null>(null);
 
-  // Filtrar dicas com base na pesquisa e categoria
-  const dicasFiltradas = dicas.filter(dica => {
-    const matchTexto = 
-      dica.titulo.toLowerCase().includes(pesquisa.toLowerCase()) ||
-      dica.conteudo.toLowerCase().includes(pesquisa.toLowerCase()) ||
-      dica.autor.toLowerCase().includes(pesquisa.toLowerCase());
-    
-    const matchCategoria = filtroDica === "todos" || dica.categoria === filtroDica;
-    
-    return matchTexto && matchCategoria;
+  // Filtros
+  const filteredDicas = dicas.filter(dica => {
+    const matchesSearchTerm = dica.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dica.conteudo.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filtroDica === "" || dica.categoria === filtroDica;
+    return matchesSearchTerm && matchesCategory;
   });
 
-  const handleEditarDica = (dica: DicaHack) => {
-    setDicaSelecionada(dica);
-    setMostrarFormDica(true);
+  // Ordenar por curtidas e data
+  const sortedDicas = [...filteredDicas].sort((a, b) => {
+    if (b.curtidas !== a.curtidas) {
+      return b.curtidas - a.curtidas; // Mais curtidas primeiro
+    }
+    return new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime(); // Mais recente depois
+  });
+
+  const handleLike = (id: string) => {
+    onLike(id);
   };
 
-  const handleExcluirDica = (id: string) => {
-    setExcluirId(id);
+  const handleEdit = (dica: DicaHack) => {
+    setDicaParaEditar(dica);
+    setShowAddForm(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setDicaParaExcluir(id);
   };
 
   const confirmarExclusao = () => {
-    if (excluirId) {
-      onDelete(excluirId);
-      setExcluirId(null);
+    if (dicaParaExcluir) {
+      onDelete(dicaParaExcluir);
+      setDicaParaExcluir(null);
     }
   };
 
-  const handleSalvarDica = (novaDica: Omit<DicaHack, "id" | "dataCriacao" | "curtidas">) => {
-    if (dicaSelecionada) {
-      onEdit(dicaSelecionada.id, novaDica);
+  const handleSave = (dicaData: Omit<DicaHack, "id" | "dataCriacao" | "curtidas">) => {
+    if (dicaParaEditar) {
+      onEdit(dicaParaEditar.id, dicaData);
     } else {
-      onAdd(novaDica);
+      onAdd(dicaData);
     }
-    setDicaSelecionada(undefined);
-    setMostrarFormDica(false);
+    setShowAddForm(false);
+    setDicaParaEditar(undefined);
   };
+
+  // Obter a cor da tag baseada na categoria
+  const getCategoryColor = (categoria: CategoriaDica) => {
+    switch (categoria) {
+      case "trabalho": return "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100";
+      case "produtividade": return "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100";
+      case "tecnologia": return "bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100";
+      case "bem-estar": return "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100";
+      default: return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100";
+    }
+  };
+
+  // Formatar data para exibição
+  const formatarData = (dataISO: string) => {
+    const data = new Date(dataISO);
+    return format(data, "d 'de' MMMM", { locale: ptBR });
+  };
+
+  // Transform categoria string to display format
+  const formatCategoria = (categoria: CategoriaDica) => {
+    const categoriaMap: Record<CategoriaDica, string> = {
+      "trabalho": "Trabalho",
+      "produtividade": "Produtividade",
+      "tecnologia": "Tecnologia",
+      "bem-estar": "Bem-estar",
+      "outro": "Outro"
+    };
+    return categoriaMap[categoria] || categoria;
+  };
+
+  const tabValue = filtroDica === "" ? "todos" : filtroDica;
+
+  const renderFiltros = () => (
+    <div className="flex items-center space-x-2 mb-4 flex-wrap">
+      <Button
+        variant={filtroDica === "" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setFiltroDica("todos")}
+      >
+        Todos
+      </Button>
+      <Button
+        variant={filtroDica === "trabalho" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setFiltroDica("trabalho")}
+      >
+        Trabalho
+      </Button>
+      <Button
+        variant={filtroDica === "produtividade" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setFiltroDica("produtividade")}
+      >
+        Produtividade
+      </Button>
+      <Button
+        variant={filtroDica === "tecnologia" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setFiltroDica("tecnologia")}
+      >
+        Tecnologia
+      </Button>
+      <Button
+        variant={filtroDica === "bem-estar" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setFiltroDica("bem-estar")}
+      >
+        Bem-Estar
+      </Button>
+      <Button
+        variant={filtroDica === "outro" ? "default" : "outline"}
+        size="sm"
+        onClick={() => setFiltroDica("outro")}
+      >
+        Outro
+      </Button>
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Barra de filtros */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
-        <div className="flex flex-1 flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Input
-              placeholder="Pesquisar dicas..."
-              value={pesquisa}
-              onChange={(e) => setPesquisa(e.target.value)}
-              className="pl-10"
-            />
-            <Lightbulb className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          </div>
-          
-          <div className="w-full sm:w-48">
-            <Select
-              value={filtroDica}
-              onValueChange={(value) => setFiltroDica(value as CategoriaDica | "todos")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Filtrar por categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todas as categorias</SelectItem>
-                <SelectItem value="trabalho">Trabalho</SelectItem>
-                <SelectItem value="produtividade">Produtividade</SelectItem>
-                <SelectItem value="tecnologia">Tecnologia</SelectItem>
-                <SelectItem value="bem-estar">Bem-estar</SelectItem>
-                <SelectItem value="outro">Outro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        <Button
-          onClick={() => {
-            setDicaSelecionada(undefined);
-            setMostrarFormDica(true);
-          }}
-          className="gap-2"
-        >
-          <Lightbulb className="h-4 w-4" />
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold flex items-center">
+          <Lightbulb className="h-5 w-5 mr-2 text-yellow-500" />
+          Dicas e Hacks
+        </h2>
+        <Button onClick={() => {
+          setDicaParaEditar(undefined);
+          setShowAddForm(true);
+        }}>
+          <PlusCircle className="h-4 w-4 mr-2" />
           Nova Dica
         </Button>
       </div>
 
-      {/* Lista de dicas */}
-      {dicasFiltradas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-8 text-center">
-          <Lightbulb className="h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium">Nenhuma dica encontrada</h3>
+      <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex-1 min-w-[300px]">
+          <Input
+            placeholder="Buscar dicas e hacks..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full"
+          />
+        </div>
+        {renderFiltros()}
+      </div>
+
+      {sortedDicas.length === 0 ? (
+        <div className="text-center py-10">
+          <HelpCircle className="h-10 w-10 mx-auto text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-medium">Nenhuma dica encontrada</h3>
           <p className="text-muted-foreground mt-2">
-            {pesquisa || filtroDica !== "todos" ? 
-              "Tente ajustar seus filtros ou adicione uma nova dica." : 
-              "Seja o primeiro a compartilhar uma dica útil!"}
+            Compartilhe uma dica útil com a equipe ou ajuste seus filtros de busca.
           </p>
-          <Button 
-            variant="outline" 
-            className="mt-4"
-            onClick={() => {
-              setDicaSelecionada(undefined);
-              setMostrarFormDica(true);
-            }}
-          >
-            <Lightbulb className="h-4 w-4 mr-2" />
-            Adicionar Dica
+          <Button onClick={() => {
+            setDicaParaEditar(undefined);
+            setShowAddForm(true);
+          }} className="mt-4">
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Compartilhar Dica
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {dicasFiltradas.map(dica => (
-            <Card key={dica.id} className="transition-all hover:shadow-md">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedDicas.map((dica) => (
+            <Card key={dica.id} className="h-full flex flex-col">
               <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <Badge className={`${corPorCategoria[dica.categoria]}`}>
-                    {labelPorCategoria[dica.categoria]}
+                <div className="flex items-start justify-between">
+                  <CardTitle className="text-xl">{dica.titulo}</CardTitle>
+                  <Badge className={cn("font-normal", getCategoryColor(dica.categoria))}>
+                    {formatCategoria(dica.categoria)}
                   </Badge>
                 </div>
-                <CardTitle className="text-xl mt-2">{dica.titulo}</CardTitle>
                 <CardDescription>
-                  {format(new Date(dica.dataCriacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                  Por {dica.autor} • {formatarData(dica.dataCriacao)}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap">{dica.conteudo}</div>
+              <CardContent className="pt-0 flex-grow">
+                <p className="whitespace-pre-line">{dica.conteudo}</p>
               </CardContent>
-              <CardFooter className="flex justify-between pt-2">
-                <div className="text-sm text-gray-500">Por: {dica.autor}</div>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => onLike(dica.id)}
-                    className="flex items-center gap-1 text-gray-600 hover:text-blue-600"
+              <CardFooter className="border-t pt-4 flex justify-between">
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(dica)}
                   >
-                    <ThumbsUp className="h-4 w-4" />
-                    <span>{dica.curtidas}</span>
-                  </button>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => handleEditarDica(dica)} 
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      Editar
-                    </button>
-                    <button 
-                      onClick={() => handleExcluirDica(dica.id)} 
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Excluir
-                    </button>
-                  </div>
+                    <Edit className="h-4 w-4 mr-1" />
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(dica.id)}
+                  >
+                    <Trash className="h-4 w-4 mr-1" />
+                    Excluir
+                  </Button>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleLike(dica.id)}
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  <ThumbsUp className="h-4 w-4 mr-1" />
+                  {dica.curtidas}
+                </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Form para adicionar/editar dica */}
       <DicaHackForm
-        dica={dicaSelecionada}
-        isOpen={mostrarFormDica}
+        dica={dicaParaEditar}
+        isOpen={showAddForm}
         onClose={() => {
-          setMostrarFormDica(false);
-          setDicaSelecionada(undefined);
+          setShowAddForm(false);
+          setDicaParaEditar(undefined);
         }}
-        onSave={handleSalvarDica}
+        onSave={handleSave}
       />
 
-      {/* Diálogo de confirmação de exclusão */}
       <ConfirmDeleteDialog
-        isOpen={!!excluirId}
-        onClose={() => setExcluirId(null)}
+        isOpen={!!dicaParaExcluir}
+        onClose={() => setDicaParaExcluir(null)}
         onConfirm={confirmarExclusao}
-        title="Excluir Dica"
+        title="Excluir dica"
         description="Tem certeza que deseja excluir esta dica? Esta ação não pode ser desfeita."
       />
     </div>

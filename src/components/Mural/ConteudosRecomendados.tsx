@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 interface ConteudosRecomendadosProps {
   conteudos: ConteudoRecomendado[];
-  filtroConteudo: TipoConteudo | "todos";
+  filtroConteudo: TipoConteudo | "";
   setFiltroConteudo: (filtro: TipoConteudo | "todos") => void;
   onAdd: (conteudo: Omit<ConteudoRecomendado, "id" | "dataCriacao">) => void;
   onEdit: (id: string, conteudo: Omit<ConteudoRecomendado, "id" | "dataCriacao">) => void;
@@ -82,8 +82,12 @@ export const ConteudosRecomendados = ({
       onAdd(conteudoData);
       toast.success("Conteúdo adicionado com sucesso");
     }
+    setFormOpen(false);
     setSelectedConteudo(undefined);
   };
+
+  // Determinar o valor atual da tab
+  const tabValue = filtroConteudo === "" ? "todos" : filtroConteudo;
 
   return (
     <div className="space-y-6">
@@ -98,7 +102,7 @@ export const ConteudosRecomendados = ({
         </Button>
       </div>
       
-      <Tabs defaultValue="todos" value={filtroConteudo} onValueChange={(value) => setFiltroConteudo(value as TipoConteudo | "todos")}>
+      <Tabs defaultValue="todos" value={tabValue} onValueChange={(value) => setFiltroConteudo(value as TipoConteudo | "todos")}>
         <TabsList className="w-full flex justify-start mb-4 overflow-x-auto">
           <TabsTrigger value="todos">Todos</TabsTrigger>
           <TabsTrigger value="livro">Livros</TabsTrigger>
@@ -108,7 +112,7 @@ export const ConteudosRecomendados = ({
           <TabsTrigger value="curso">Cursos</TabsTrigger>
         </TabsList>
         
-        <TabsContent value={filtroConteudo} className="mt-0">
+        <TabsContent value={tabValue} className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {conteudos.length > 0 ? (
               conteudos.map((conteudo) => (

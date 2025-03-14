@@ -135,7 +135,7 @@ export default function Mural() {
           <ConteudosRecomendados 
             conteudos={conteudosFiltrados}
             filtroConteudo={filtroConteudo}
-            setFiltroConteudo={setFiltroConteudo}
+            setFiltroConteudo={(filtro) => setFiltroConteudo(filtro === "todos" ? "" : filtro)}
             onAdd={adicionarConteudo}
             onEdit={editarConteudo}
             onDelete={excluirConteudo}
@@ -146,7 +146,7 @@ export default function Mural() {
           <DicasHacks
             dicas={dicasFiltradas}
             filtroDica={filtroDica}
-            setFiltroDica={setFiltroDica}
+            setFiltroDica={(categoria) => setFiltroDica(categoria === "todos" ? "" : categoria)}
             onAdd={adicionarDica}
             onEdit={editarDica}
             onDelete={excluirDica}

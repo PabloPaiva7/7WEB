@@ -66,6 +66,7 @@ export const Aniversariantes = ({
       onAdd(aniversarianteData);
       toast.success("Aniversariante adicionado com sucesso");
     }
+    setFormOpen(false);
     setSelectedAniversariante(undefined);
   };
 

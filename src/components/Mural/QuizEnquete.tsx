@@ -250,7 +250,7 @@ export const QuizEnquete = ({
                   })}
                 </div>
                 
-                {jaVotou && (
+                {usuarioJaVotou(quiz) && (
                   <div className="mt-3 text-sm text-muted-foreground text-center">
                     <span>Total: {totalVotos(quiz)} votos</span>
                   </div>
@@ -301,7 +301,7 @@ export const QuizEnquete = ({
         onClose={() => setQuizParaExcluir(null)}
         onConfirm={confirmarExclusao}
         title="Excluir Enquete"
-        message="Tem certeza que deseja excluir esta enquete? Esta ação não pode ser desfeita."
+        description="Tem certeza que deseja excluir esta enquete? Esta ação não pode ser desfeita."
       />
     </div>
   );

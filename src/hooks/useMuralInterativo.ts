@@ -240,9 +240,9 @@ export const useMuralInterativo = () => {
     toast.success("Aniversariante adicionado com sucesso!");
   };
 
-  const editarAniversariante = (aniversariante: Aniversariante) => {
+  const editarAniversariante = (id: string, aniversariante: Omit<Aniversariante, "id">) => {
     setAniversariantes(prev => 
-      prev.map(a => a.id === aniversariante.id ? aniversariante : a)
+      prev.map(a => a.id === id ? { ...aniversariante, id } : a)
     );
     toast.success("Aniversariante atualizado com sucesso!");
   };
@@ -263,9 +263,9 @@ export const useMuralInterativo = () => {
     toast.success("Conteúdo adicionado com sucesso!");
   };
 
-  const editarConteudo = (conteudo: ConteudoRecomendado) => {
+  const editarConteudo = (id: string, conteudo: Omit<ConteudoRecomendado, "id" | "dataCriacao">) => {
     setConteudos(prev => 
-      prev.map(c => c.id === conteudo.id ? conteudo : c)
+      prev.map(c => c.id === id ? { ...conteudo, id, dataCriacao: prev.find(item => item.id === id)?.dataCriacao || new Date().toISOString() } : c)
     );
     toast.success("Conteúdo atualizado com sucesso!");
   };
@@ -287,9 +287,14 @@ export const useMuralInterativo = () => {
     toast.success("Dica adicionada com sucesso!");
   };
 
-  const editarDica = (dica: DicaHack) => {
+  const editarDica = (id: string, dica: Omit<DicaHack, "id" | "dataCriacao" | "curtidas">) => {
     setDicas(prev => 
-      prev.map(d => d.id === dica.id ? dica : d)
+      prev.map(d => d.id === id ? {
+        ...dica,
+        id,
+        dataCriacao: prev.find(item => item.id === id)?.dataCriacao || new Date().toISOString(),
+        curtidas: prev.find(item => item.id === id)?.curtidas || 0
+      } : d)
     );
     toast.success("Dica atualizada com sucesso!");
   };
