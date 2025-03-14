@@ -34,6 +34,7 @@ export const QuizDetalheDialog = ({
 }: QuizDetalheDialogProps) => {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [hasVoted, setHasVoted] = useState(false);
 
   if (!quiz) return null;
 
@@ -46,10 +47,10 @@ export const QuizDetalheDialog = ({
     return totalVotos > 0 ? Math.round((opcao.votos / totalVotos) * 100) : 0;
   };
 
-  const usuarioJaVotou = (quiz: Quiz): boolean => {
-    // Em uma implementação real, verificaria o ID do usuário atual
-    // Para esta demo, vamos simular aleatoriamente
-    return Math.random() > 0.5;
+  // In a real implementation, this would check the current user's ID against the quiz's responses
+  // For this demo, we'll use the state instead of random simulation
+  const usuarioJaVotou = (): boolean => {
+    return hasVoted;
   };
 
   const handleSingleVote = () => {
@@ -60,6 +61,7 @@ export const QuizDetalheDialog = ({
     
     onVote(quiz.id, selectedOption);
     setSelectedOption("");
+    setHasVoted(true);
     toast.success("Voto registrado com sucesso!");
   };
 
@@ -69,10 +71,11 @@ export const QuizDetalheDialog = ({
       return;
     }
     
-    // Em uma implementação real, enviaria todos os votos
-    // Para esta demo, vamos enviar apenas o primeiro
+    // In a real implementation, we would send all votes
+    // For this demo, we'll just send the first one
     onVote(quiz.id, selectedOptions[0]);
     setSelectedOptions([]);
+    setHasVoted(true);
     toast.success("Votos registrados com sucesso!");
   };
 
@@ -93,7 +96,7 @@ export const QuizDetalheDialog = ({
     return format(data, "d 'de' MMMM 'de' yyyy", { locale: ptBR });
   };
 
-  const jaVotou = usuarioJaVotou(quiz);
+  const jaVotou = usuarioJaVotou();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

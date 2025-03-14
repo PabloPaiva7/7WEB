@@ -63,11 +63,9 @@ export const QuizEnquete = ({
     return totalVotos > 0 ? Math.round((opcao.votos / totalVotos) * 100) : 0;
   };
 
-  // Verifica se o usuário já votou (simulado para esta demo)
-  const usuarioJaVotou = (quiz: Quiz): boolean => {
-    // Em uma implementação real, verificaria o ID do usuário atual
-    // Para esta demo, vamos simular aleatoriamente
-    return Math.random() > 0.5;
+  // Esta função será substituída pelo estado no diálogo
+  const usuarioJaVotou = (): boolean => {
+    return false; // Agora sempre permitimos tentar votar
   };
 
   const handleEdit = (quiz: Quiz) => {
@@ -224,7 +222,7 @@ export const QuizEnquete = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedQuizzes.map((quiz) => {
             const totalVotos = quiz.opcoes.reduce((sum, op) => sum + op.votos, 0);
-            const usuarioVotou = usuarioJaVotou(quiz);
+            const usuarioVotou = usuarioJaVotou();
             
             // Selecionar a opção mais votada para exibir
             let opcaoMaisVotada = quiz.opcoes[0];
@@ -267,7 +265,7 @@ export const QuizEnquete = ({
                 <CardContent className="pt-0 flex-grow">
                   <p className="whitespace-pre-line line-clamp-2 mb-4">{quiz.descricao}</p>
                   
-                  {usuarioVotou && (
+                  {totalVotos > 0 && (
                     <div className="space-y-2 border p-3 rounded-md bg-muted/20">
                       <div className="flex justify-between text-sm">
                         <span className="font-medium">Opção mais votada:</span>
