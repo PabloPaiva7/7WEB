@@ -9,8 +9,9 @@ import { ExcluirAnuncioDialog } from "@/components/Mural/ExcluirAnuncioDialog";
 import { Aniversariantes } from "@/components/Mural/Aniversariantes";
 import { ConteudosRecomendados } from "@/components/Mural/ConteudosRecomendados";
 import { DicasHacks } from "@/components/Mural/DicasHacks";
+import { QuizEnquete } from "@/components/Mural/QuizEnquete";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Megaphone, Cake, BookOpen, Lightbulb } from "lucide-react";
+import { Megaphone, Cake, BookOpen, Lightbulb, BarChart } from "lucide-react";
 
 export default function Mural() {
   const {
@@ -42,10 +43,13 @@ export default function Mural() {
     aniversariantesDoMes,
     conteudosFiltrados,
     dicasFiltradas,
+    quizzes,
     filtroConteudo,
     filtroDica,
+    filtroQuiz,
     setFiltroConteudo,
     setFiltroDica,
+    setFiltroQuiz,
     adicionarAniversariante,
     editarAniversariante,
     excluirAniversariante,
@@ -55,7 +59,12 @@ export default function Mural() {
     adicionarDica,
     editarDica,
     excluirDica,
-    curtirDica
+    curtirDica,
+    adicionarQuiz,
+    editarQuiz,
+    excluirQuiz,
+    votarQuiz,
+    alternarAtivoQuiz
   } = useMuralInterativo();
 
   return (
@@ -84,6 +93,10 @@ export default function Mural() {
           <TabsTrigger value="dicas">
             <Lightbulb className="h-4 w-4 mr-2" />
             Dicas e Hacks
+          </TabsTrigger>
+          <TabsTrigger value="quizzes">
+            <BarChart className="h-4 w-4 mr-2" />
+            Quiz e Enquetes
           </TabsTrigger>
         </TabsList>
         
@@ -138,6 +151,19 @@ export default function Mural() {
             onEdit={editarDica}
             onDelete={excluirDica}
             onLike={curtirDica}
+          />
+        </TabsContent>
+        
+        <TabsContent value="quizzes">
+          <QuizEnquete
+            quizzes={quizzes}
+            filtroQuiz={filtroQuiz}
+            setFiltroQuiz={setFiltroQuiz}
+            onAdd={adicionarQuiz}
+            onEdit={editarQuiz}
+            onDelete={excluirQuiz}
+            onVote={votarQuiz}
+            onToggleActive={alternarAtivoQuiz}
           />
         </TabsContent>
       </Tabs>
