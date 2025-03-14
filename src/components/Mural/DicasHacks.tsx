@@ -111,8 +111,6 @@ export const DicasHacks = ({
     return categoriaMap[categoria] || categoria;
   };
 
-  const tabValue = filtroDica === "" ? "todos" : filtroDica;
-
   const renderFiltros = () => (
     <div className="flex items-center space-x-2 mb-4 flex-wrap">
       <Button

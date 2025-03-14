@@ -216,16 +216,16 @@ export const QuizEnquete = ({
                 <div className="space-y-2">
                   {quiz.opcoes.map((opcao) => {
                     const percent = percentualVotos(quiz, opcao.id);
-                    const jaVotou = usuarioJaVotou(quiz);
+                    const usuarioVotou = usuarioJaVotou(quiz);
                     
                     return (
                       <div key={opcao.id} className="space-y-1">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">{opcao.texto}</span>
-                          {jaVotou && <span className="text-sm">{percent}%</span>}
+                          {usuarioVotou && <span className="text-sm">{percent}%</span>}
                         </div>
                         
-                        {jaVotou ? (
+                        {usuarioVotou ? (
                           // Mostrar progresso se já votou
                           <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
                             <div 
