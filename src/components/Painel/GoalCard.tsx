@@ -34,8 +34,8 @@ export const GoalCard = ({
         </div>
         
         <div className="flex justify-between items-baseline mb-1">
-          <span className="text-2xl font-bold text-foreground dark:text-white">{current}</span>
-          <span className="text-sm text-muted-foreground dark:text-gray-300">de {target}</span>
+          <span className="text-2xl font-bold text-foreground dark:text-[#D9B300]">{current}</span>
+          <span className="text-sm text-muted-foreground dark:text-[#D9B300]/80">de {target}</span>
         </div>
         
         <Progress 
@@ -44,7 +44,7 @@ export const GoalCard = ({
           indicatorClassName={color.replace("text-", "bg-")}
         />
         
-        <p className="text-xs text-right mt-1 text-muted-foreground dark:text-gray-300">
+        <p className="text-xs text-right mt-1 text-muted-foreground dark:text-[#D9B300]/80">
           {percentage}% concluído
         </p>
       </CardContent>
