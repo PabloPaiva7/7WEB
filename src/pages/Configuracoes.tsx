@@ -5,6 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Moon, Sun } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const cores = [
   { nome: "Roxo", hex: "#9b87f5" },
@@ -12,6 +16,24 @@ const cores = [
   { nome: "Azul", hex: "#3b82f6" },
   { nome: "Laranja", hex: "#f97316" },
   { nome: "Rosa", hex: "#ec4899" },
+];
+
+const fontes = [
+  { nome: "Padrão", valor: "sans-serif" },
+  { nome: "Serifa", valor: "serif" },
+  { nome: "Monospace", valor: "monospace" },
+];
+
+const layouts = [
+  { nome: "Padrão", valor: "padrao" },
+  { nome: "Compacto", valor: "compacto" },
+  { nome: "Espaçado", valor: "espacado" },
+];
+
+const idiomas = [
+  { nome: "Português", valor: "pt-BR" },
+  { nome: "English", valor: "en-US" },
+  { nome: "Español", valor: "es" },
 ];
 
 const hexToHsl = (hex: string) => {
@@ -61,6 +83,10 @@ const hexToHsl = (hex: string) => {
 export function Configuracoes() {
   const [corSelecionada, setCorSelecionada] = useState(cores[0].hex);
   const [corPersonalizada, setCorPersonalizada] = useState("");
+  const [modoEscuro, setModoEscuro] = useState(false);
+  const [fonteSelecionada, setFonteSelecionada] = useState(fontes[0].valor);
+  const [layoutSelecionado, setLayoutSelecionado] = useState(layouts[0].valor);
+  const [idiomaSelecionado, setIdiomaSelecionado] = useState(idiomas[0].valor);
   const { toast } = useToast();
 
   const aplicarCor = (cor: string) => {
@@ -87,12 +113,89 @@ export function Configuracoes() {
     aplicarCor(corPersonalizada);
   };
 
-  // Recuperar e aplicar cor salva ao carregar a página
+  const alternarTema = () => {
+    const novoModo = !modoEscuro;
+    setModoEscuro(novoModo);
+    
+    // Atualiza o atributo data-theme no elemento html
+    if (novoModo) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('tema-modo', 'escuro');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('tema-modo', 'claro');
+    }
+    
+    toast({
+      title: novoModo ? "Modo escuro ativado" : "Modo claro ativado",
+      description: `O tema foi alterado para o modo ${novoModo ? "escuro" : "claro"}.`,
+    });
+  };
+
+  const aplicarFonte = (fonte: string) => {
+    document.documentElement.style.setProperty('--font-family', fonte);
+    localStorage.setItem('tema-fonte', fonte);
+    toast({
+      title: "Fonte atualizada!",
+      description: "A fonte da interface foi alterada com sucesso.",
+    });
+  };
+
+  const aplicarLayout = (layout: string) => {
+    localStorage.setItem('tema-layout', layout);
+    // Aqui você pode adicionar lógica adicional para ajustar o layout conforme necessário
+    toast({
+      title: "Layout atualizado!",
+      description: "O layout da interface foi alterado com sucesso.",
+    });
+  };
+
+  const aplicarIdioma = (idioma: string) => {
+    localStorage.setItem('app-idioma', idioma);
+    toast({
+      title: "Idioma atualizado!",
+      description: "O idioma da aplicação foi alterado com sucesso. Algumas alterações podem exigir recarregar a página.",
+    });
+  };
+
+  // Recuperar e aplicar configurações salvas ao carregar a página
   useEffect(() => {
+    // Recuperar cor
     const corSalva = localStorage.getItem('tema-cor');
     if (corSalva) {
       setCorSelecionada(corSalva);
       aplicarCor(corSalva);
+    }
+
+    // Recuperar modo escuro/claro
+    const modoSalvo = localStorage.getItem('tema-modo');
+    if (modoSalvo === 'escuro') {
+      setModoEscuro(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      setModoEscuro(false);
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Recuperar fonte
+    const fonteSalva = localStorage.getItem('tema-fonte');
+    if (fonteSalva) {
+      setFonteSelecionada(fonteSalva);
+      aplicarFonte(fonteSalva);
+    }
+
+    // Recuperar layout
+    const layoutSalvo = localStorage.getItem('tema-layout');
+    if (layoutSalvo) {
+      setLayoutSelecionado(layoutSalvo);
+      // Aplicar layout salvo
+    }
+
+    // Recuperar idioma
+    const idiomaSalvo = localStorage.getItem('app-idioma');
+    if (idiomaSalvo) {
+      setIdiomaSelecionado(idiomaSalvo);
+      // Aplicar idioma salvo
     }
   }, []);
 
@@ -101,6 +204,31 @@ export function Configuracoes() {
       <h1 className="text-2xl font-bold mb-6">Configurações</h1>
       
       <div className="grid gap-6">
+        {/* Seção de Tema (Escuro/Claro) */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tema</CardTitle>
+            <CardDescription>
+              Escolha entre o modo escuro e claro
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Sun className="h-5 w-5 text-orange-400" />
+                <Label htmlFor="modo-tema">Alternar tema</Label>
+                <Moon className="h-5 w-5 text-blue-700 dark:text-blue-400" />
+              </div>
+              <Switch 
+                id="modo-tema" 
+                checked={modoEscuro}
+                onCheckedChange={alternarTema}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Seção de Cores */}
         <Card>
           <CardHeader>
             <CardTitle>Personalização</CardTitle>
@@ -165,6 +293,95 @@ export function Configuracoes() {
                   <div className="h-8 rounded-md bg-primary/60" />
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Seção de Fontes e Layout */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Interface</CardTitle>
+            <CardDescription>
+              Personalize a aparência da interface
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Seleção de Fonte */}
+            <div className="space-y-4">
+              <Label htmlFor="fonte-select">Fonte</Label>
+              <Select
+                value={fonteSelecionada}
+                onValueChange={(valor) => {
+                  setFonteSelecionada(valor);
+                  aplicarFonte(valor);
+                }}
+              >
+                <SelectTrigger id="fonte-select">
+                  <SelectValue placeholder="Selecione uma fonte" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontes.map((fonte) => (
+                    <SelectItem key={fonte.valor} value={fonte.valor}>
+                      {fonte.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Seleção de Layout */}
+            <div className="space-y-4">
+              <Label>Densidade do Layout</Label>
+              <ToggleGroup 
+                type="single" 
+                value={layoutSelecionado}
+                onValueChange={(valor) => {
+                  if (valor) {
+                    setLayoutSelecionado(valor);
+                    aplicarLayout(valor);
+                  }
+                }}
+                className="justify-start"
+              >
+                {layouts.map((layout) => (
+                  <ToggleGroupItem key={layout.valor} value={layout.valor}>
+                    {layout.nome}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Seção de Idiomas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Idioma</CardTitle>
+            <CardDescription>
+              Selecione o idioma da aplicação
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Label htmlFor="idioma-select">Idioma</Label>
+              <Select
+                value={idiomaSelecionado}
+                onValueChange={(valor) => {
+                  setIdiomaSelecionado(valor);
+                  aplicarIdioma(valor);
+                }}
+              >
+                <SelectTrigger id="idioma-select">
+                  <SelectValue placeholder="Selecione um idioma" />
+                </SelectTrigger>
+                <SelectContent>
+                  {idiomas.map((idioma) => (
+                    <SelectItem key={idioma.valor} value={idioma.valor}>
+                      {idioma.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
