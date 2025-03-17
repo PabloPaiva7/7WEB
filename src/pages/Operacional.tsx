@@ -1,36 +1,19 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { 
-  PencilLine, 
-  FileSignature, 
-  ScrollText, 
-  Receipt, 
-  AlertCircle, 
-  KeyRound, 
-  FileCheck, 
-  FileText,
-  Plus,
-  Check,
-  X,
-} from "lucide-react";
-
+import { PencilLine, FileSignature, ScrollText, Receipt, AlertCircle, KeyRound, FileCheck, FileText, Plus, Check, X } from "lucide-react";
 const Operacional = () => {
   const [activeTab, setActiveTab] = useState("anotacoes");
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogType, setDialogType] = useState("");
-
   const handleAddItem = (type: string) => {
     setDialogType(type);
     setOpenDialog(true);
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Operacional</h1>
         <p className="text-muted-foreground">
@@ -48,7 +31,7 @@ const Operacional = () => {
           </TabsTrigger>
           <TabsTrigger value="minutas-assinar" className="flex flex-col items-center gap-1 py-2">
             <FileSignature className="h-4 w-4" />
-            <span>Minutas para Assinar</span>
+            <span>Minutas </span>
           </TabsTrigger>
           <TabsTrigger value="procuracoes" className="flex flex-col items-center gap-1 py-2">
             <ScrollText className="h-4 w-4" />
@@ -86,8 +69,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-all">
+            {[1, 2, 3].map(item => <Card key={item} className="hover:shadow-md transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -109,8 +91,7 @@ const Operacional = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
 
@@ -124,8 +105,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-all">
+            {[1, 2].map(item => <Card key={item} className="hover:shadow-md transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -145,8 +125,7 @@ const Operacional = () => {
                     <Button size="sm">Marcar como Assinado</Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
 
@@ -160,8 +139,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-all">
+            {[1, 2, 3].map(item => <Card key={item} className="hover:shadow-md transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -181,8 +159,7 @@ const Operacional = () => {
                     <Button size="sm" variant="outline">Ver Detalhes</Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
 
@@ -196,8 +173,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-all">
+            {[1, 2, 3, 4].map(item => <Card key={item} className="hover:shadow-md transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -217,8 +193,7 @@ const Operacional = () => {
                     <Button size="sm" variant="outline">Enviar por Email</Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
 
@@ -232,8 +207,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2].map((item) => (
-              <Card key={item} className={`hover:shadow-md transition-all ${item === 1 ? 'border-red-500 dark:border-red-700' : ''}`}>
+            {[1, 2].map(item => <Card key={item} className={`hover:shadow-md transition-all ${item === 1 ? 'border-red-500 dark:border-red-700' : ''}`}>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -256,8 +230,7 @@ const Operacional = () => {
                     <Button size="sm">Iniciar Atendimento</Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
 
@@ -271,8 +244,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-all">
+            {[1, 2, 3].map(item => <Card key={item} className="hover:shadow-md transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -292,8 +264,7 @@ const Operacional = () => {
                     <Button size="sm" variant="outline">Revogar Acesso</Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
 
@@ -307,8 +278,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-all">
+            {[1, 2, 3].map(item => <Card key={item} className="hover:shadow-md transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -329,8 +299,7 @@ const Operacional = () => {
                     <Button size="sm" variant="outline">Visualizar</Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
 
@@ -344,8 +313,7 @@ const Operacional = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4].map((item) => (
-              <Card key={item} className="hover:shadow-md transition-all">
+            {[1, 2, 3, 4].map(item => <Card key={item} className="hover:shadow-md transition-all">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between">
                     <div>
@@ -369,8 +337,7 @@ const Operacional = () => {
                     <Button size="sm">Validar Minuta</Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </TabsContent>
       </Tabs>
@@ -401,8 +368,6 @@ const Operacional = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default Operacional;
