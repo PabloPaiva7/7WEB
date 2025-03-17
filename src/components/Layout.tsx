@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
-import { Users, BarChart2, Calendar, Settings, LayoutPanelLeft, CalendarClock, Ticket, CheckSquare, Megaphone, Calculator, FileText } from "lucide-react";
+import { Users, BarChart2, Calendar, Settings, LayoutPanelLeft, CalendarClock, Ticket, CheckSquare, Megaphone, Calculator, FileText, PieChart } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -118,6 +118,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <Link to="/relatorios" className="flex items-center gap-3">
                     <FileText className="h-5 w-5" />
                     <span>Relatórios</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location.pathname === "/dashboard"}>
+                  <Link to="/dashboard" className="flex items-center gap-3">
+                    <PieChart className="h-5 w-5" />
+                    <span>Dashboard</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

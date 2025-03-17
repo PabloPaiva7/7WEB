@@ -15,6 +15,7 @@ import Tarefas from "./pages/Tarefas";
 import Mural from "./pages/Mural";
 import Calculadora from "./pages/Calculadora";
 import Relatorios from "./pages/Relatorios";
+import Dashboard from "./pages/Dashboard";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
@@ -92,6 +93,7 @@ function App() {
               <Route path="/mural" element={<Mural />} />
               <Route path="/calculadora" element={<Calculadora />} />
               <Route path="/relatorios" element={<Relatorios />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
