@@ -33,8 +33,8 @@ export const InteracoesTab = ({
     <Card>
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold flex items-center">
-            <MessageSquare className="mr-2 h-4 w-4" />
+          <h3 className="text-lg font-semibold flex items-center dark:text-[#D9B300]">
+            <MessageSquare className="mr-2 h-4 w-4 dark:text-[#D9B300]" />
             Interações com o Cliente
           </h3>
         </div>
@@ -61,9 +61,9 @@ export const InteracoesTab = ({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Nenhuma interação registrada</p>
-            <p className="text-sm text-muted-foreground mt-2">
+            <MessageSquare className="h-12 w-12 text-muted-foreground dark:text-[#D9B300]/50 mb-4" />
+            <p className="text-muted-foreground dark:text-[#D9B300]/80">Nenhuma interação registrada</p>
+            <p className="text-sm text-muted-foreground dark:text-[#D9B300]/60 mt-2">
               Adicione interações preenchendo o formulário acima
             </p>
           </div>

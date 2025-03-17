@@ -49,16 +49,16 @@ export const ClientesTable = ({
           <TableHeader>
             <TableRow>
               {Object.entries(columnConfig).map(([key, config]) => (
-                <TableHead key={key}>{config.label}</TableHead>
+                <TableHead key={key} className="dark:text-[#D9B300]">{config.label}</TableHead>
               ))}
-              <TableHead>Ações</TableHead>
+              <TableHead className="dark:text-[#D9B300]">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {clientes.map((cliente) => (
-              <TableRow key={cliente.id}>
+              <TableRow key={cliente.id} className="dark:hover:bg-slate-800/40">
                 {Object.entries(columnConfig).map(([key]) => (
-                  <TableCell key={`${cliente.id}-${key}`}>
+                  <TableCell key={`${cliente.id}-${key}`} className="dark:text-[#D9B300]/80">
                     {cliente[key]}
                   </TableCell>
                 ))}
@@ -68,6 +68,7 @@ export const ClientesTable = ({
                       variant="outline"
                       size="icon"
                       onClick={() => onEdit(cliente)}
+                      className="dark:hover:bg-slate-800 dark:text-[#D9B300]"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -75,6 +76,7 @@ export const ClientesTable = ({
                       variant="outline"
                       size="icon"
                       onClick={() => onDelete(cliente)}
+                      className="dark:hover:bg-slate-800 dark:text-[#D9B300]"
                     >
                       <Trash className="h-4 w-4" />
                     </Button>

@@ -20,7 +20,7 @@ export const KpiCards = ({
       icon: Users,
       bgColor: 'bg-indigo-50',
       borderColor: 'border-indigo-200',
-      iconColor: 'text-indigo-500'
+      iconColor: 'text-indigo-500 dark:text-[#D9B300]'
     },
     { 
       title: 'Carteira Total',
@@ -31,7 +31,7 @@ export const KpiCards = ({
       icon: Wallet,
       bgColor: 'bg-emerald-50',
       borderColor: 'border-emerald-200',
-      iconColor: 'text-emerald-500'
+      iconColor: 'text-emerald-500 dark:text-[#D9B300]'
     },
     { 
       title: 'Contratos Pendentes',
@@ -39,7 +39,7 @@ export const KpiCards = ({
       icon: FileText,
       bgColor: 'bg-amber-50',
       borderColor: 'border-amber-200',
-      iconColor: 'text-amber-500'
+      iconColor: 'text-amber-500 dark:text-[#D9B300]'
     },
     { 
       title: 'Prazo Médio',
@@ -47,7 +47,7 @@ export const KpiCards = ({
       icon: CreditCard,
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
-      iconColor: 'text-blue-500'
+      iconColor: 'text-blue-500 dark:text-[#D9B300]'
     }
   ];
 

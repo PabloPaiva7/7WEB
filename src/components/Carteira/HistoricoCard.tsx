@@ -14,15 +14,15 @@ export const HistoricoCard = ({ historico }: HistoricoCardProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Histórico de Ações</CardTitle>
-        <CardDescription>Registro das últimas alterações na carteira</CardDescription>
+        <CardTitle className="text-lg font-semibold dark:text-[#D9B300]">Histórico de Ações</CardTitle>
+        <CardDescription className="dark:text-[#D9B300]/80">Registro das últimas alterações na carteira</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-1">
           {historico.map((item, index) => (
             <div key={index} className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{new Date(item.data).toLocaleString()}</span>
-              <span>{item.acao}</span>
+              <span className="text-muted-foreground dark:text-[#D9B300]/80">{new Date(item.data).toLocaleString()}</span>
+              <span className="dark:text-[#D9B300]">{item.acao}</span>
             </div>
           ))}
         </div>

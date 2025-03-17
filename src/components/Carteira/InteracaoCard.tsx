@@ -22,11 +22,11 @@ export const InteracaoCard = ({
 }: InteracaoCardProps) => {
   const getCardColor = () => {
     switch(tipo) {
-      case "pagamento": return "bg-green-50 border-green-200";
-      case "negociacao": return "bg-blue-50 border-blue-200";
-      case "contato": return "bg-yellow-50 border-yellow-200";
-      case "assessoria": return "bg-purple-50 border-purple-200";
-      default: return "bg-gray-50 border-gray-200";
+      case "pagamento": return "bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-700";
+      case "negociacao": return "bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-700";
+      case "contato": return "bg-yellow-50 border-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-700";
+      case "assessoria": return "bg-purple-50 border-purple-200 dark:bg-purple-900/30 dark:border-purple-700";
+      default: return "bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700";
     }
   };
 
@@ -53,14 +53,14 @@ export const InteracaoCard = ({
       
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-start">
-          <span className="text-xs font-medium text-muted-foreground">{getTipoLabel()}</span>
-          <span className="text-xs text-muted-foreground">{new Date(data).toLocaleDateString('pt-BR')}</span>
+          <span className="text-xs font-medium text-muted-foreground dark:text-[#D9B300]">{getTipoLabel()}</span>
+          <span className="text-xs text-muted-foreground dark:text-[#D9B300]/80">{new Date(data).toLocaleDateString('pt-BR')}</span>
         </div>
         
-        <p className="text-sm">{conteudo}</p>
+        <p className="text-sm dark:text-[#D9B300]">{conteudo}</p>
         
         <div className="flex justify-end">
-          <span className="text-xs italic text-muted-foreground">Atendente: {atendente}</span>
+          <span className="text-xs italic text-muted-foreground dark:text-[#D9B300]/80">Atendente: {atendente}</span>
         </div>
       </div>
     </div>
