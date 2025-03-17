@@ -31,7 +31,7 @@ const Operacional = () => {
           </TabsTrigger>
           <TabsTrigger value="minutas-assinar" className="flex flex-col items-center gap-1 py-2">
             <FileSignature className="h-4 w-4" />
-            <span>Minutas </span>
+            <span>Minutas Para Assinar</span>
           </TabsTrigger>
           <TabsTrigger value="procuracoes" className="flex flex-col items-center gap-1 py-2">
             <ScrollText className="h-4 w-4" />
