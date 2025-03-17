@@ -57,7 +57,7 @@ export const DemandaCard = ({
   return (
     <Card 
       className={cn(
-        "p-3 bg-white shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing",
+        "p-3 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing",
         getBorderColorByPriority()
       )}
       draggable
@@ -71,29 +71,29 @@ export const DemandaCard = ({
               <Flag className="h-4 w-4 text-red-500 mt-1 flex-shrink-0" />
             )}
             <div>
-              <h3 className="text-sm font-medium line-clamp-1">{demanda.titulo}</h3>
-              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{demanda.descricao}</p>
+              <h3 className="text-sm font-medium line-clamp-1 text-gray-900 dark:text-gray-100">{demanda.titulo}</h3>
+              <p className="text-xs text-muted-foreground line-clamp-2 mt-1 dark:text-gray-300">{demanda.descricao}</p>
             </div>
           </div>
         </div>
         
         {/* Metadata */}
-        <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+        <div className="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
           {demanda.categoria && (
-            <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5">
+            <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300">
               <Tag className="h-3 w-3" />
               {demanda.categoria}
             </Badge>
           )}
           
           {demanda.responsavel && (
-            <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5">
+            <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300">
               <User className="h-3 w-3" />
               {demanda.responsavel}
             </Badge>
           )}
           
-          <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5">
+          <Badge variant="outline" className="flex items-center gap-1 px-2 py-0 h-5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300">
             <Calendar className="h-3 w-3" />
             {formatDistanceToNow(new Date(demanda.criacao), { addSuffix: true, locale: ptBR })}
           </Badge>
@@ -206,3 +206,4 @@ export const DemandaCard = ({
     </Card>
   );
 };
+
