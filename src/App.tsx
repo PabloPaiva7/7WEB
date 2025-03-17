@@ -1,4 +1,3 @@
-
 import React, { Suspense, lazy, Component, ReactNode } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
@@ -18,6 +17,7 @@ import Calculadora from "./pages/Calculadora";
 import Relatorios from "./pages/Relatorios";
 import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
+import Operacional from "./pages/Operacional";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
@@ -97,6 +97,7 @@ function App() {
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/feedback" element={<Feedback />} />
+              <Route path="/operacional" element={<Operacional />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

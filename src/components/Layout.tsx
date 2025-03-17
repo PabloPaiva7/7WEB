@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
 import { 
@@ -14,7 +13,8 @@ import {
   Calculator, 
   FileText, 
   PieChart,
-  MessageSquare 
+  MessageSquare,
+  Briefcase
 } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -26,7 +26,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
     agenda: 4,
     tickets: 3,
     tarefas: 5,
-    mural: 1
+    mural: 1,
+    operacional: 7
   };
   
   return (
@@ -150,6 +151,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <span>Painel</span>
                   </Link>
                 </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location.pathname === "/operacional"}>
+                  <Link to="/operacional" className="flex items-center gap-3">
+                    <Briefcase className="h-5 w-5" />
+                    <span>Operacional</span>
+                  </Link>
+                </SidebarMenuButton>
+                {notificationCounts.operacional > 0 && (
+                  <SidebarMenuBadge className="bg-red-500">
+                    {notificationCounts.operacional}
+                  </SidebarMenuBadge>
+                )}
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/feedback"}>
