@@ -8,12 +8,13 @@ interface EvolucaoCarteiraCardProps {
 
 export const EvolucaoCarteiraCard = ({ dadosTendencia }: EvolucaoCarteiraCardProps) => {
   return (
-    <ChartCard 
-      title="Evolução da Carteira" 
-      description="Valores totais nos últimos 6 meses"
-      className="dark:bg-gray-800 dark:border-gray-700"
-    >
-      <EvolucaoLineChart dados={dadosTendencia} />
-    </ChartCard>
+    <div className="dark:bg-gray-800 dark:border-gray-700 rounded-lg border">
+      <ChartCard 
+        title="Evolução da Carteira" 
+        description="Valores totais nos últimos 6 meses"
+      >
+        <EvolucaoLineChart dados={dadosTendencia} />
+      </ChartCard>
+    </div>
   );
 };
