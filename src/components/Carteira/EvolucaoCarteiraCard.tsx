@@ -11,6 +11,7 @@ export const EvolucaoCarteiraCard = ({ dadosTendencia }: EvolucaoCarteiraCardPro
     <ChartCard 
       title="Evolução da Carteira" 
       description="Valores totais nos últimos 6 meses"
+      className="dark:bg-gray-800 dark:border-gray-700"
     >
       <EvolucaoLineChart dados={dadosTendencia} />
     </ChartCard>

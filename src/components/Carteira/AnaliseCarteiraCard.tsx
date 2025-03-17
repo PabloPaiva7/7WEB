@@ -10,7 +10,7 @@ interface AnaliseCarteiraCardProps {
 
 export const AnaliseCarteiraCard = ({ totalClientes, valorTotal, dadosGrafico }: AnaliseCarteiraCardProps) => {
   return (
-    <Card>
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="text-lg font-semibold dark:text-[#D9B300]">Análise da Carteira</CardTitle>
         <CardDescription className="dark:text-[#D9B300]/80">Distribuição de contratos por situação</CardDescription>
