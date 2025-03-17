@@ -1,7 +1,7 @@
 
-import { AnaliseCarteiraCard } from "./Cards/AnaliseCarteiraCard";
-import { DistribuicaoBancoCard } from "./Cards/DistribuicaoBancoCard";
-import { EvolucaoCarteiraCard } from "./Cards/EvolucaoCarteiraCard";
+import { AnaliseCarteiraCard } from "./AnaliseCarteiraCard";
+import { DistribuicaoBancoCard } from "./DistribuicaoBancoCard";
+import { EvolucaoCarteiraCard } from "./EvolucaoCarteiraCard";
 
 interface ChartAnalysisProps {
   estatisticas: {

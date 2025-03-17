@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SituacaoBarChart } from "../Charts/SituacaoBarChart";
+import { SituacaoBarChart } from "./Charts/SituacaoBarChart";
 
 interface AnaliseCarteiraCardProps {
   totalClientes: number;

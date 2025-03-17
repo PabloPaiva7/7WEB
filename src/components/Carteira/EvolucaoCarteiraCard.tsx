@@ -1,6 +1,6 @@
 
 import { ChartCard } from "@/components/Painel/ChartCard";
-import { EvolucaoLineChart } from "../Charts/EvolucaoLineChart";
+import { EvolucaoLineChart } from "./Charts/EvolucaoLineChart";
 
 interface EvolucaoCarteiraCardProps {
   dadosTendencia: { mes: string; valor: number }[];

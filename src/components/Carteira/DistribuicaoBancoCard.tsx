@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BancoBarChart } from "../Charts/BancoBarChart";
+import { BancoBarChart } from "./Charts/BancoBarChart";
 
 interface DistribuicaoBancoCardProps {
   dadosPizza: { name: string; value: number }[];
