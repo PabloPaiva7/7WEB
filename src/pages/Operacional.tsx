@@ -58,7 +58,7 @@ const Operacional = () => {
       <Separator />
       
       <Tabs defaultValue="anotacoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 gap-2 mb-8">
+        <TabsList className="grid grid-cols-4 gap-2 mb-12">
           <div className="col-span-4 grid grid-cols-4 gap-2">
             <TabsTrigger value="anotacoes" className="flex flex-col items-center gap-1 py-2">
               <PencilLine className="h-4 w-4" />
@@ -98,8 +98,8 @@ const Operacional = () => {
           </div>
         </TabsList>
 
-        {/* Conteúdo separado visualmente das abas */}
-        <div className="mt-12 pt-4">
+        {/* Conteúdo separado visualmente das abas - Aumentado o espaçamento */}
+        <div className="mt-16 pt-4">
           {/* Anotações */}
           <TabsContent value="anotacoes" className="space-y-4">
             <div className="flex justify-between items-center">
@@ -573,14 +573,14 @@ const Operacional = () => {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    {Object.entries(selectedItem).map(([key, value]) => {
+                    {Object.entries(selectedItem).map(([key, value]: [string, unknown]) => {
                       // Exclui propriedades que já estão exibidas em outros lugares
                       if (["id", "title", "status"].includes(key)) return null;
                       
                       return (
                         <div key={key} className="flex items-center gap-2">
                           <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}:</span>
-                          <span>{value}</span>
+                          <span>{String(value)}</span>
                         </div>
                       );
                     })}
