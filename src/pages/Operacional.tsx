@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,14 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { PencilLine, FileSignature, ScrollText, Receipt, AlertCircle, KeyRound, FileCheck, FileText, Plus, Check, X } from "lucide-react";
+
 const Operacional = () => {
   const [activeTab, setActiveTab] = useState("anotacoes");
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogType, setDialogType] = useState("");
+
   const handleAddItem = (type: string) => {
     setDialogType(type);
     setOpenDialog(true);
   };
+
   return <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Operacional</h1>
@@ -24,39 +28,44 @@ const Operacional = () => {
       <Separator />
       
       <Tabs defaultValue="anotacoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 md:grid-cols-8 mb-8">
-          <TabsTrigger value="anotacoes" className="flex flex-col items-center gap-1 py-2">
-            <PencilLine className="h-4 w-4" />
-            <span>Anotações</span>
-          </TabsTrigger>
-          <TabsTrigger value="minutas-assinar" className="flex flex-col items-center gap-1 py-2">
-            <FileSignature className="h-4 w-4" />
-            <span>Minutas Para Assinar</span>
-          </TabsTrigger>
-          <TabsTrigger value="procuracoes" className="flex flex-col items-center gap-1 py-2">
-            <ScrollText className="h-4 w-4" />
-            <span>Procurações</span>
-          </TabsTrigger>
-          <TabsTrigger value="boletos" className="flex flex-col items-center gap-1 py-2">
-            <Receipt className="h-4 w-4" />
-            <span>Boletos</span>
-          </TabsTrigger>
-          <TabsTrigger value="prioridades" className="flex flex-col items-center gap-1 py-2">
-            <AlertCircle className="h-4 w-4" />
-            <span>Prioridades</span>
-          </TabsTrigger>
-          <TabsTrigger value="habilitacao" className="flex flex-col items-center gap-1 py-2">
-            <KeyRound className="h-4 w-4" />
-            <span>Habilitação</span>
-          </TabsTrigger>
-          <TabsTrigger value="comprovantes" className="flex flex-col items-center gap-1 py-2">
-            <FileCheck className="h-4 w-4" />
-            <span>Comprovantes</span>
-          </TabsTrigger>
-          <TabsTrigger value="minutas" className="flex flex-col items-center gap-1 py-2">
-            <FileText className="h-4 w-4" />
-            <span>Minutas</span>
-          </TabsTrigger>
+        <TabsList className="grid grid-cols-4 gap-2 mb-8">
+          <div className="col-span-4 grid grid-cols-4 gap-2">
+            <TabsTrigger value="anotacoes" className="flex flex-col items-center gap-1 py-2">
+              <PencilLine className="h-4 w-4" />
+              <span>Anotações</span>
+            </TabsTrigger>
+            <TabsTrigger value="minutas-assinar" className="flex flex-col items-center gap-1 py-2">
+              <FileSignature className="h-4 w-4" />
+              <span>Minutas Para Assinar</span>
+            </TabsTrigger>
+            <TabsTrigger value="procuracoes" className="flex flex-col items-center gap-1 py-2">
+              <ScrollText className="h-4 w-4" />
+              <span>Procurações</span>
+            </TabsTrigger>
+            <TabsTrigger value="boletos" className="flex flex-col items-center gap-1 py-2">
+              <Receipt className="h-4 w-4" />
+              <span>Boletos</span>
+            </TabsTrigger>
+          </div>
+          
+          <div className="col-span-4 grid grid-cols-4 gap-2 mt-2">
+            <TabsTrigger value="prioridades" className="flex flex-col items-center gap-1 py-2">
+              <AlertCircle className="h-4 w-4" />
+              <span>Prioridades</span>
+            </TabsTrigger>
+            <TabsTrigger value="habilitacao" className="flex flex-col items-center gap-1 py-2">
+              <KeyRound className="h-4 w-4" />
+              <span>Habilitação</span>
+            </TabsTrigger>
+            <TabsTrigger value="comprovantes" className="flex flex-col items-center gap-1 py-2">
+              <FileCheck className="h-4 w-4" />
+              <span>Comprovantes</span>
+            </TabsTrigger>
+            <TabsTrigger value="minutas" className="flex flex-col items-center gap-1 py-2">
+              <FileText className="h-4 w-4" />
+              <span>Minutas</span>
+            </TabsTrigger>
+          </div>
         </TabsList>
 
         {/* Anotações */}
@@ -370,4 +379,5 @@ const Operacional = () => {
       </Dialog>
     </div>;
 };
+
 export default Operacional;
