@@ -12,7 +12,8 @@ import { ClienteDialog } from "@/components/Carteira/ClienteDialog";
 import { useClientesCarteira } from "@/hooks/useClientesCarteira";
 import { columnConfig } from "@/config/columnConfig";
 import { Calculadora } from "@/components/Calculadora";
-import { Calculator, BarChart2 } from "lucide-react";
+import { TabelaFipe } from "@/components/TabelaFipe";
+import { Calculator, BarChart2, Car } from "lucide-react";
 
 const Carteira = () => {
   const [activeTab, setActiveTab] = useState<string>("carteira");
@@ -42,7 +43,7 @@ const Carteira = () => {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="grid w-[400px] grid-cols-2">
+        <TabsList className="grid w-[600px] grid-cols-3">
           <TabsTrigger value="carteira" className="flex items-center gap-2">
             <BarChart2 className="h-4 w-4" />
             <span>Carteira</span>
@@ -50,6 +51,10 @@ const Carteira = () => {
           <TabsTrigger value="calculadora" className="flex items-center gap-2">
             <Calculator className="h-4 w-4" />
             <span>Calculadora</span>
+          </TabsTrigger>
+          <TabsTrigger value="tabela-fipe" className="flex items-center gap-2">
+            <Car className="h-4 w-4" />
+            <span>Tabela FIPE</span>
           </TabsTrigger>
         </TabsList>
         
@@ -101,6 +106,10 @@ const Carteira = () => {
         
         <TabsContent value="calculadora" className="mt-6">
           <Calculadora />
+        </TabsContent>
+
+        <TabsContent value="tabela-fipe" className="mt-6">
+          <TabelaFipe />
         </TabsContent>
       </Tabs>
     </div>
