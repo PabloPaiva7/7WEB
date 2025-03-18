@@ -53,7 +53,7 @@ const Carteira = () => {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="carteira" fullWidth={true} className="mt-6">
+        <TabsContent value="carteira" className="mt-6">
           {/* Dialog para adicionar/editar cliente */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <CarteiraHeader 
@@ -99,10 +99,8 @@ const Carteira = () => {
           <HistoricoCard historico={historico} />
         </TabsContent>
         
-        <TabsContent value="calculadora" fullWidth={true} className="mt-6">
-          <div className="max-w-4xl mx-auto">
-            <Calculadora />
-          </div>
+        <TabsContent value="calculadora" className="mt-6">
+          <Calculadora />
         </TabsContent>
       </Tabs>
     </div>
