@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
 import { 
@@ -7,7 +8,6 @@ import {
   Settings, 
   LayoutPanelLeft, 
   CalendarClock, 
-  Ticket, 
   CheckSquare, 
   Megaphone, 
   Calculator, 
@@ -24,8 +24,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const notificationCounts = {
     calendario: 2,
     agenda: 4,
-    tickets: 3,
-    tarefas: 5,
+    tarefas: 8, // Combinamos tickets (3) + tarefas (5)
     mural: 1,
     operacional: 7
   };
@@ -82,23 +81,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 )}
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/tickets"}>
-                  <Link to="/tickets" className="flex items-center gap-3">
-                    <Ticket className="h-5 w-5" />
-                    <span>Tickets</span>
-                  </Link>
-                </SidebarMenuButton>
-                {notificationCounts.tickets > 0 && (
-                  <SidebarMenuBadge className="bg-red-500">
-                    {notificationCounts.tickets}
-                  </SidebarMenuBadge>
-                )}
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/tarefas"}>
                   <Link to="/tarefas" className="flex items-center gap-3">
                     <CheckSquare className="h-5 w-5" />
-                    <span>Tarefas</span>
+                    <span>Tarefas e Tickets</span>
                   </Link>
                 </SidebarMenuButton>
                 {notificationCounts.tarefas > 0 && (

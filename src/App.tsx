@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy, Component, ReactNode } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
@@ -10,8 +11,7 @@ import Documentos from "./pages/Documentos";
 import Painel from "./pages/Painel";
 import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
-import Tickets from "./pages/Tickets";
-import Tarefas from "./pages/Tarefas";
+import TarefasTickets from "./pages/TarefasTickets";
 import Mural from "./pages/Mural";
 import Calculadora from "./pages/Calculadora";
 import Relatorios from "./pages/Relatorios";
@@ -90,8 +90,8 @@ function App() {
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/configuracoes" element={<Configuracoes />} />
               <Route path="/cliente/:id" element={<DetalhesCliente />} />
-              <Route path="/tickets" element={<Tickets />} />
-              <Route path="/tarefas" element={<Tarefas />} />
+              <Route path="/tarefas" element={<TarefasTickets />} />
+              <Route path="/tickets" element={<Navigate to="/tarefas" replace />} />
               <Route path="/mural" element={<Mural />} />
               <Route path="/calculadora" element={<Calculadora />} />
               <Route path="/relatorios" element={<Relatorios />} />
