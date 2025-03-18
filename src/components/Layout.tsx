@@ -10,7 +10,6 @@ import {
   CalendarClock, 
   CheckSquare, 
   Megaphone, 
-  Calculator, 
   FileText, 
   PieChart,
   MessageSquare,
@@ -105,14 +104,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     {notificationCounts.mural}
                   </SidebarMenuBadge>
                 )}
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/calculadora"}>
-                  <Link to="/calculadora" className="flex items-center gap-3">
-                    <Calculator className="h-5 w-5" />
-                    <span>Calculadora</span>
-                  </Link>
-                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === "/relatorios"}>

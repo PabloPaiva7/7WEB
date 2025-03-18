@@ -13,7 +13,6 @@ import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
 import TarefasTickets from "./pages/TarefasTickets";
 import Mural from "./pages/Mural";
-import Calculadora from "./pages/Calculadora";
 import Relatorios from "./pages/Relatorios";
 import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
@@ -93,7 +92,7 @@ function App() {
               <Route path="/tarefas" element={<TarefasTickets />} />
               <Route path="/tickets" element={<Navigate to="/tarefas" replace />} />
               <Route path="/mural" element={<Mural />} />
-              <Route path="/calculadora" element={<Calculadora />} />
+              <Route path="/calculadora" element={<Navigate to="/carteira" replace />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/feedback" element={<Feedback />} />
