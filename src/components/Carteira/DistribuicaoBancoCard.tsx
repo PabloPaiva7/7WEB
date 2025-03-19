@@ -8,10 +8,10 @@ interface DistribuicaoBancoCardProps {
 
 export const DistribuicaoBancoCard = ({ dadosPizza }: DistribuicaoBancoCardProps) => {
   return (
-    <Card className="dark:bg-gray-800 dark:border-gray-700">
+    <Card className="dark:bg-gray-800 dark:border-gray-700 animate-fade-in-up delay-100">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold dark:text-[#D9B300]">Distribuição por Banco</CardTitle>
-        <CardDescription className="dark:text-[#D9B300]/80">Análise do volume por instituição financeira</CardDescription>
+        <CardTitle className="text-lg font-semibold gradient-text">Distribuição por Banco</CardTitle>
+        <CardDescription className="dark:text-[#D9B300]/80 tracking-tight">Análise do volume por instituição financeira</CardDescription>
       </CardHeader>
       <CardContent>
         <BancoBarChart dados={dadosPizza} />

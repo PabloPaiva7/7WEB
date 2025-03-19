@@ -34,8 +34,8 @@ const Carteira = () => {
   } = useClientesCarteira();
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold mb-6">Carteira</h1>
+    <div className="space-y-6 animate-fade-in-up">
+      <h1 className="text-3xl font-bold mb-6 gradient-text">Carteira</h1>
       
       <Tabs 
         defaultValue="carteira" 
@@ -43,22 +43,22 @@ const Carteira = () => {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="grid w-[600px] grid-cols-3" aria-label="Opções da carteira">
-          <TabsTrigger value="carteira" className="flex items-center gap-2">
-            <BarChart2 className="h-4 w-4" aria-hidden="true" />
+        <TabsList className="grid w-full max-w-[600px] grid-cols-3 mb-6" aria-label="Opções da carteira">
+          <TabsTrigger value="carteira" className="flex items-center gap-2 text-sm sm:text-base">
+            <BarChart2 className="h-4 w-4 gradient-icon" aria-hidden="true" />
             <span>Carteira</span>
           </TabsTrigger>
-          <TabsTrigger value="calculadora" className="flex items-center gap-2">
-            <Calculator className="h-4 w-4" aria-hidden="true" />
+          <TabsTrigger value="calculadora" className="flex items-center gap-2 text-sm sm:text-base">
+            <Calculator className="h-4 w-4 gradient-icon" aria-hidden="true" />
             <span>Calculadora</span>
           </TabsTrigger>
-          <TabsTrigger value="tabela-fipe" className="flex items-center gap-2">
-            <Car className="h-4 w-4" aria-hidden="true" />
+          <TabsTrigger value="tabela-fipe" className="flex items-center gap-2 text-sm sm:text-base">
+            <Car className="h-4 w-4 gradient-icon" aria-hidden="true" />
             <span>Tabela FIPE</span>
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="carteira" className="mt-6">
+        <TabsContent value="carteira" className="mt-6 animate-fade-in-up">
           {/* Dialog para adicionar/editar cliente */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <CarteiraHeader 
@@ -87,28 +87,36 @@ const Carteira = () => {
           />
 
           {/* Dashboard Cards */}
-          <DashboardCards />
+          <div className="mt-8 mb-8">
+            <DashboardCards />
+          </div>
 
           {/* Charts */}
-          <ChartAnalysis estatisticas={estatisticas} />
+          <div className="mt-8">
+            <ChartAnalysis estatisticas={estatisticas} />
+          </div>
 
           {/* Tabela de Clientes */}
-          <ClientesTable 
-            clientes={filteredClientes}
-            columnConfig={columnConfig}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <div className="mt-8">
+            <ClientesTable 
+              clientes={filteredClientes}
+              columnConfig={columnConfig}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
 
           {/* Histórico */}
-          <HistoricoCard historico={historico} />
+          <div className="mt-8">
+            <HistoricoCard historico={historico} />
+          </div>
         </TabsContent>
         
-        <TabsContent value="calculadora" className="mt-6">
+        <TabsContent value="calculadora" className="mt-6 animate-fade-in-up">
           <Calculadora />
         </TabsContent>
 
-        <TabsContent value="tabela-fipe" className="mt-6">
+        <TabsContent value="tabela-fipe" className="mt-6 animate-fade-in-up">
           <TabelaFipe />
         </TabsContent>
       </Tabs>

@@ -22,15 +22,15 @@ export const CarteiraHeader = ({
   onFileUpload
 }: CarteiraHeaderProps) => {
   return (
-    <div className="sticky top-0 bg-background z-10 pb-2">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <h1 className="text-2xl font-semibold text-foreground">Minha Carteira</h1>
+    <div className="sticky top-0 bg-background z-10 pb-4 animate-fade-in-up">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h1 className="text-2xl font-bold text-foreground gradient-text-gold">Minha Carteira</h1>
         <div className="flex flex-wrap gap-2 items-center">
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Buscar..."
-              className="pl-10"
+              className="pl-10 focus-visible:ring-2 focus-visible:ring-offset-0 text-sm"
               value={searchTerm}
               onChange={(e) => {
                 onSearchChange(e.target.value);
@@ -40,14 +40,14 @@ export const CarteiraHeader = ({
           </div>
           <div className="flex gap-2">
             <DialogTrigger asChild>
-              <Button variant="default" size="sm" className="gap-2">
+              <Button variant="default" size="sm" className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 text-white shadow-md">
                 <Plus className="h-4 w-4" />
                 Novo
               </Button>
             </DialogTrigger>
-            <Button variant="outline" size="sm" className="gap-2" asChild>
+            <Button variant="outline" size="sm" className="gap-2 transition-all hover:shadow-md" asChild>
               <label className="cursor-pointer">
-                <Upload className="h-4 w-4" />
+                <Upload className="h-4 w-4 gradient-icon" />
                 CSV
                 <input
                   type="file"
@@ -57,8 +57,8 @@ export const CarteiraHeader = ({
                 />
               </label>
             </Button>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4" />
+            <Button variant="outline" size="sm" className="transition-all hover:shadow-md">
+              <Download className="h-4 w-4 gradient-icon" />
             </Button>
           </div>
         </div>
