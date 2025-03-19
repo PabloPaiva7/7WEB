@@ -54,7 +54,7 @@ export function TabelaFipe() {
                   value={tipoVeiculo} 
                   onValueChange={(value) => setTipoVeiculo(value as 'carros' | 'motos' | 'caminhoes')}
                 >
-                  <SelectTrigger id="tipoVeiculo">
+                  <SelectTrigger id="tipoVeiculo" aria-label="Selecione o tipo de veículo">
                     <SelectValue placeholder="Selecione o tipo de veículo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -72,7 +72,7 @@ export function TabelaFipe() {
                   value={selectedMarca} 
                   onValueChange={setSelectedMarca}
                 >
-                  <SelectTrigger id="marca">
+                  <SelectTrigger id="marca" aria-label="Selecione a marca do veículo">
                     <SelectValue placeholder="Selecione a marca" />
                   </SelectTrigger>
                   <SelectContent>
@@ -90,7 +90,7 @@ export function TabelaFipe() {
                   value={selectedModelo} 
                   onValueChange={setSelectedModelo}
                 >
-                  <SelectTrigger id="modelo">
+                  <SelectTrigger id="modelo" aria-label="Selecione o modelo do veículo">
                     <SelectValue placeholder="Selecione o modelo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -108,7 +108,7 @@ export function TabelaFipe() {
                   value={selectedAno} 
                   onValueChange={setSelectedAno}
                 >
-                  <SelectTrigger id="ano">
+                  <SelectTrigger id="ano" aria-label="Selecione o ano e combustível do veículo">
                     <SelectValue placeholder="Selecione o ano" />
                   </SelectTrigger>
                   <SelectContent>
@@ -120,11 +120,16 @@ export function TabelaFipe() {
               </div>
             </div>
             
-            <div className="flex flex-col justify-center items-center bg-primary/5 rounded-lg p-6">
+            <div className="flex flex-col justify-center items-center bg-primary/5 rounded-lg p-6" aria-live="polite" aria-atomic="true">
               <div className="text-center">
                 <h2 className="text-lg font-medium text-muted-foreground mb-1">Valor FIPE</h2>
                 <div className="text-4xl font-bold text-primary mb-4">
-                  {isLoading ? <RefreshCw className="animate-spin h-8 w-8 mx-auto" /> : (
+                  {isLoading ? (
+                    <>
+                      <RefreshCw className="animate-spin h-8 w-8 mx-auto" aria-hidden="true" />
+                      <span className="sr-only">Carregando resultado...</span>
+                    </>
+                  ) : (
                     valorFipe ? valorFipe.Valor : "Faça uma consulta"
                   )}
                 </div>
@@ -141,8 +146,9 @@ export function TabelaFipe() {
                     className="gap-2"
                     disabled={!valorFipe || isLoading}
                     onClick={copiarValor}
+                    aria-label="Copiar valor para a área de transferência"
                   >
-                    <Clipboard className="h-4 w-4" />
+                    <Clipboard className="h-4 w-4" aria-hidden="true" />
                     Copiar Valor
                   </Button>
                   <Button 
@@ -150,8 +156,9 @@ export function TabelaFipe() {
                     className="gap-2"
                     disabled={!valorFipe || isLoading}
                     onClick={salvarConsulta}
+                    aria-label="Salvar esta consulta no histórico"
                   >
-                    <Save className="h-4 w-4" />
+                    <Save className="h-4 w-4" aria-hidden="true" />
                     Salvar
                   </Button>
                 </div>
@@ -186,6 +193,8 @@ export function TabelaFipe() {
               variant="outline" 
               size="sm"
               onClick={() => setMostrarHistorico(!mostrarHistorico)}
+              aria-expanded={mostrarHistorico}
+              aria-controls="historico-content"
             >
               {mostrarHistorico ? "Ocultar" : "Mostrar"}
             </Button>
@@ -194,17 +203,18 @@ export function TabelaFipe() {
                 variant="destructive" 
                 size="sm"
                 onClick={limparHistorico}
+                aria-label="Limpar todo o histórico de consultas"
               >
-                <Trash className="h-4 w-4 mr-1" />
+                <Trash className="h-4 w-4 mr-1" aria-hidden="true" />
                 Limpar
               </Button>
             )}
           </div>
         </CardHeader>
         {mostrarHistorico && historico.length > 0 && (
-          <CardContent>
+          <CardContent id="historico-content">
             <div className="rounded-md border overflow-hidden">
-              <Table>
+              <Table aria-label="Histórico de consultas da tabela FIPE">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Veículo</TableHead>
@@ -233,6 +243,7 @@ export function TabelaFipe() {
                             variant="outline" 
                             size="sm"
                             onClick={() => carregarConsulta(record)}
+                            aria-label={`Carregar consulta: ${record.marca} ${record.modelo}`}
                           >
                             Carregar
                           </Button>
@@ -240,8 +251,9 @@ export function TabelaFipe() {
                             variant="destructive" 
                             size="sm"
                             onClick={() => excluirConsulta(record.id)}
+                            aria-label={`Excluir consulta: ${record.marca} ${record.modelo}`}
                           >
-                            <Trash className="h-4 w-4" />
+                            <Trash className="h-4 w-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </TableCell>
@@ -253,9 +265,9 @@ export function TabelaFipe() {
           </CardContent>
         )}
         {mostrarHistorico && historico.length === 0 && (
-          <CardContent>
+          <CardContent id="historico-content">
             <div className="p-8 text-center text-muted-foreground">
-              <Car className="h-12 w-12 mx-auto mb-4 opacity-20" />
+              <Car className="h-12 w-12 mx-auto mb-4 opacity-20" aria-hidden="true" />
               <p>Nenhuma consulta salva. Faça uma consulta e salve-a para visualizar aqui.</p>
             </div>
           </CardContent>

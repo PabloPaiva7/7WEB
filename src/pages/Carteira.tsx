@@ -43,17 +43,17 @@ const Carteira = () => {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="grid w-[600px] grid-cols-3">
+        <TabsList className="grid w-[600px] grid-cols-3" aria-label="Opções da carteira">
           <TabsTrigger value="carteira" className="flex items-center gap-2">
-            <BarChart2 className="h-4 w-4" />
+            <BarChart2 className="h-4 w-4" aria-hidden="true" />
             <span>Carteira</span>
           </TabsTrigger>
           <TabsTrigger value="calculadora" className="flex items-center gap-2">
-            <Calculator className="h-4 w-4" />
+            <Calculator className="h-4 w-4" aria-hidden="true" />
             <span>Calculadora</span>
           </TabsTrigger>
           <TabsTrigger value="tabela-fipe" className="flex items-center gap-2">
-            <Car className="h-4 w-4" />
+            <Car className="h-4 w-4" aria-hidden="true" />
             <span>Tabela FIPE</span>
           </TabsTrigger>
         </TabsList>

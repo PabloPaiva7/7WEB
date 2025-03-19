@@ -43,6 +43,11 @@ export function useFipeTable() {
         })));
       } catch (e) {
         console.error("Erro ao carregar histórico:", e);
+        toast({
+          title: "Erro ao carregar histórico",
+          description: "Não foi possível recuperar seu histórico de consultas.",
+          variant: "destructive",
+        });
       }
     }
   }, []);
@@ -145,6 +150,18 @@ export function useFipeTable() {
         setIsLoading(true);
         const data = await FipeService.getValor(tipoVeiculo, selectedMarca, selectedModelo, selectedAno);
         setValorFipe(data);
+        
+        // Announce to screen readers that the value has been loaded
+        const announceElement = document.createElement('div');
+        announceElement.setAttribute('aria-live', 'assertive');
+        announceElement.setAttribute('class', 'sr-only');
+        announceElement.textContent = `Valor FIPE carregado: ${data.Valor}`;
+        document.body.appendChild(announceElement);
+        
+        setTimeout(() => {
+          document.body.removeChild(announceElement);
+        }, 1000);
+        
       } catch (error) {
         toast({
           title: "Erro",
@@ -191,6 +208,11 @@ export function useFipeTable() {
       title: "Consulta salva",
       description: "A consulta foi salva no histórico.",
     });
+    
+    // Auto-expand history when saving first item
+    if (historico.length === 0 && !mostrarHistorico) {
+      setMostrarHistorico(true);
+    }
   };
 
   const carregarConsulta = async (record: FipeRecord) => {
@@ -267,11 +289,20 @@ export function useFipeTable() {
       return;
     }
 
-    navigator.clipboard.writeText(valorFipe.Valor);
-    toast({
-      title: "Valor copiado",
-      description: "O valor FIPE foi copiado para a área de transferência.",
-    });
+    navigator.clipboard.writeText(valorFipe.Valor)
+      .then(() => {
+        toast({
+          title: "Valor copiado",
+          description: "O valor FIPE foi copiado para a área de transferência.",
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Erro ao copiar",
+          description: "Não foi possível copiar o valor. Verifique as permissões do seu navegador.",
+          variant: "destructive",
+        });
+      });
   };
 
   return {
