@@ -12,7 +12,7 @@ interface PastaCardProps {
 export const PastaCard: React.FC<PastaCardProps> = ({ pasta, onClick }) => {
   return (
     <Card
-      className="p-6 cursor-pointer hover:shadow-lg transition-all"
+      className="p-6 cursor-pointer hover:shadow-lg transition-all card-hover"
       onClick={onClick}
     >
       <div className="space-y-4">

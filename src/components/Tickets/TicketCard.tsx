@@ -65,7 +65,7 @@ export function TicketCard({ ticket, onStatusChange, onAdicionarProgresso }: Tic
   const nextStatusOptions = getNextStatusOptions();
 
   return (
-    <Card className="w-full shadow-md hover:shadow-lg transition-all duration-200">
+    <Card className="w-full shadow-md card-hover">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-semibold">{ticket.clienteNome}</CardTitle>

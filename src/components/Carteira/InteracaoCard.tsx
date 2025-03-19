@@ -41,7 +41,7 @@ export const InteracaoCard = ({
   };
 
   return (
-    <div className={`p-4 rounded-lg border ${getCardColor()} relative hover:shadow-md transition-shadow`}>
+    <div className={`p-4 rounded-lg border ${getCardColor()} relative card-hover`}>
       <Button
         variant="ghost"
         size="icon"

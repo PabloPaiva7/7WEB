@@ -24,7 +24,7 @@ export const ClienteCard = ({ cliente }: ClienteCardProps) => {
 
   return (
     <Card 
-      className="p-4 hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer border-l-4 border-l-primary"
+      className="p-4 card-hover cursor-pointer border-l-4 border-l-primary"
       onClick={handleClick}
     >
       <div className="space-y-4">

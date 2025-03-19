@@ -56,7 +56,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
   };
 
   return (
-    <Card className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} transition-all hover:shadow-md`}>
+    <Card className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} card-hover`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">

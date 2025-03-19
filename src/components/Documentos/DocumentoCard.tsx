@@ -16,7 +16,7 @@ export const DocumentoCard: React.FC<DocumentoCardProps> = ({
   permissionError
 }) => {
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent transition-colors">
+    <div className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent transition-colors card-hover">
       <div className="flex items-center gap-3">
         <File className="h-5 w-5 text-muted-foreground" />
         <div>
