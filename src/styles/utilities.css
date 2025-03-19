@@ -8,3 +8,37 @@
 .dark .bg-dots {
   background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
+
+/* Calendar day with appointment indicator */
+.calendar-day-with-appointment {
+  position: relative;
+}
+
+.calendar-day-with-appointment::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: hsl(var(--primary));
+}
+
+/* Calendar day with important appointment */
+.calendar-day-with-important {
+  position: relative;
+}
+
+.calendar-day-with-important::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: hsl(var(--destructive));
+}
