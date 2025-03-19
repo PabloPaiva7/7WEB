@@ -23,7 +23,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background-color: hsl(var(--primary));
+  background-color: #0EA5E9; /* Blue indicator for regular appointments */
 }
 
 /* Calendar day with important appointment */
@@ -40,5 +40,23 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: hsl(var(--destructive));
+  background-color: #ea384c; /* Red indicator for important appointments */
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translateX(-50%) scale(0.95);
+    box-shadow: 0 0 0 0 rgba(234, 56, 76, 0.7);
+  }
+  
+  70% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 0 0 4px rgba(234, 56, 76, 0);
+  }
+  
+  100% {
+    transform: translateX(-50%) scale(0.95);
+    box-shadow: 0 0 0 0 rgba(234, 56, 76, 0);
+  }
 }

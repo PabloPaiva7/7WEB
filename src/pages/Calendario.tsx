@@ -192,13 +192,44 @@ export default function Calendario() {
     }
   ]);
 
+  // Mostra alerta visual quando a página carrega para compromissos do dia com alerta
+  useEffect(() => {
+    const compromissosImportantes = compromissos.filter(comp => 
+      isToday(comp.data) && comp.alerta && comp.status === "pendente"
+    );
+
+    if (compromissosImportantes.length > 0) {
+      // Espera 1 segundo antes de mostrar o alerta para não aparecer imediatamente na carga da página
+      const timeoutId = setTimeout(() => {
+        compromissosImportantes.forEach(comp => {
+          toast({
+            title: "Compromisso Importante Hoje",
+            description: `${comp.tipo.charAt(0).toUpperCase() + comp.tipo.slice(1)} com ${comp.cliente}: ${comp.descricao}`,
+            variant: "destructive",
+          });
+        });
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, []);
+
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
     if (date) {
-      toast({
-        title: "Data selecionada",
-        description: `Você selecionou ${format(date, 'dd/MM/yyyy', { locale: ptBR })}`,
-      });
+      const compromissosDoDia = compromissos.filter(comp => isSameDay(comp.data, date));
+      
+      if (compromissosDoDia.length > 0) {
+        toast({
+          title: `${compromissosDoDia.length} compromisso(s) para ${format(date, 'dd/MM/yyyy', { locale: ptBR })}`,
+          description: `Clique para ver os detalhes.`,
+        });
+      } else {
+        toast({
+          title: "Data selecionada",
+          description: `Você selecionou ${format(date, 'dd/MM/yyyy', { locale: ptBR })}`,
+        });
+      }
     }
   };
 
@@ -221,6 +252,7 @@ export default function Calendario() {
         toast({
           title: "Alerta configurado",
           description: `Você receberá um alerta para: ${compromisso.descricao}`,
+          variant: "destructive",
         });
       }
     }
@@ -265,7 +297,7 @@ export default function Calendario() {
   const dayModifiers = useMemo(() => {
     return {
       appointment: (date: Date) => {
-        return compromissos.some(comp => isSameDay(comp.data, date));
+        return compromissos.some(comp => isSameDay(comp.data, date) && comp.status === "pendente");
       },
       importantAppointment: (date: Date) => {
         return compromissos.some(comp => 
@@ -362,11 +394,11 @@ export default function Calendario() {
             <div className="flex flex-col gap-4">
               <div className="text-sm flex items-center gap-4 mb-2">
                 <div className="flex items-center gap-1">
-                  <span className="inline-block w-3 h-3 rounded-full bg-primary"></span>
+                  <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
                   <span>Compromisso</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="inline-block w-3 h-3 rounded-full bg-destructive"></span>
+                  <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
                   <span>Compromisso Importante</span>
                 </div>
               </div>
@@ -398,7 +430,9 @@ export default function Calendario() {
                 {compromissosDoDia.map((compromisso) => (
                   <div
                     key={compromisso.id}
-                    className="p-4 rounded-lg border bg-card hover:shadow-md transition-shadow"
+                    className={`p-4 rounded-lg border bg-card hover:shadow-md transition-shadow ${
+                      compromisso.alerta ? 'border-red-400' : ''
+                    }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -412,7 +446,7 @@ export default function Calendario() {
                       </span>
                       <div className="flex items-center gap-2">
                         {compromisso.alerta && (
-                          <Bell className="h-4 w-4 text-yellow-500" />
+                          <Bell className="h-4 w-4 text-red-500 animate-pulse" />
                         )}
                         <Button
                           variant="ghost"
@@ -457,7 +491,7 @@ export default function Calendario() {
                     className={`p-4 rounded-lg border bg-card hover:shadow-md transition-shadow ${
                       selectedDate && isSameDay(compromisso.data, selectedDate) 
                         ? "border-primary" 
-                        : ""
+                        : compromisso.alerta ? 'border-red-400' : ''
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -479,7 +513,7 @@ export default function Calendario() {
                       </div>
                       <div className="flex items-center gap-2">
                         {compromisso.alerta && (
-                          <Bell className="h-4 w-4 text-yellow-500" />
+                          <Bell className="h-4 w-4 text-red-500 animate-pulse" />
                         )}
                         <Button
                           variant="ghost"
