@@ -57,10 +57,10 @@ export const DicaDetalheDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] bg-background">
+      <DialogContent className="sm:max-w-[700px] bg-card text-card-foreground">
         <DialogHeader>
           <div className="flex items-start justify-between">
-            <DialogTitle className="text-2xl">{dica.titulo}</DialogTitle>
+            <DialogTitle className="text-2xl text-foreground">{dica.titulo}</DialogTitle>
             <Badge className={cn("font-normal", getCategoryColor(dica.categoria))}>
               {formatCategoria(dica.categoria)}
             </Badge>
@@ -72,7 +72,7 @@ export const DicaDetalheDialog = ({
             Por {dica.autor} • {formatarData(dica.dataCriacao)}
           </div>
           
-          <div className="whitespace-pre-line text-lg">{dica.conteudo}</div>
+          <div className="whitespace-pre-line text-lg text-foreground">{dica.conteudo}</div>
           
           <div className="flex justify-between pt-4 border-t">
             <div className="flex space-x-2">

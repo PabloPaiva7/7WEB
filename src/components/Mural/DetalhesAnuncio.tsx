@@ -60,7 +60,7 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[700px] bg-background">
+        <DialogContent className="sm:max-w-[700px] bg-card text-card-foreground">
           <DialogHeader>
             <div className="flex items-center gap-2">
               {anuncio.importante && (
@@ -69,7 +69,7 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
                 </Badge>
               )}
             </div>
-            <DialogTitle className="text-2xl mt-2">{anuncio.titulo}</DialogTitle>
+            <DialogTitle className="text-2xl mt-2 text-foreground">{anuncio.titulo}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -80,19 +80,19 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
               {anuncio.dataEvento && (
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-gray-500" />
-                  <span>Data do evento: {format(new Date(anuncio.dataEvento), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
+                  <span className="text-foreground">Data do evento: {format(new Date(anuncio.dataEvento), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
                 </div>
               )}
             </div>
 
-            <div className="whitespace-pre-wrap">{anuncio.conteudo}</div>
+            <div className="whitespace-pre-wrap text-foreground">{anuncio.conteudo}</div>
 
             {anuncio.permitirInscricao && (
               <div className="space-y-4 pt-4 border-t">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-gray-500" />
-                    <span>Participantes: {anuncio.participantes?.length || 0}</span>
+                    <span className="text-foreground">Participantes: {anuncio.participantes?.length || 0}</span>
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -115,13 +115,13 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
                 </div>
 
                 {anuncio.participantes && anuncio.participantes.length > 0 && (
-                  <div className="border rounded-lg p-4 space-y-3">
-                    <h3 className="font-medium">Lista de Participantes</h3>
+                  <div className="border rounded-lg p-4 space-y-3 bg-background">
+                    <h3 className="font-medium text-foreground">Lista de Participantes</h3>
                     <div className="space-y-2">
                       {anuncio.participantes.map((p) => (
                         <div key={p.id} className="flex items-center gap-2 text-sm">
                           <User className="h-4 w-4 text-gray-500" />
-                          <span>{p.nomeCompleto}</span>
+                          <span className="text-foreground">{p.nomeCompleto}</span>
                           <span className="text-gray-500">•</span>
                           <span className="text-gray-500">{p.departamento}</span>
                         </div>

@@ -54,7 +54,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
     return (
       <div className="flex items-center gap-2 text-sm">
         <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-        <span>Data do evento: {dataEventoFormatada}</span>
+        <span className="text-foreground">Data do evento: {dataEventoFormatada}</span>
       </div>
     );
   };
@@ -62,7 +62,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
   return (
     <>
       <Card 
-        className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} card-hover cursor-pointer hover:shadow-md transition-shadow`}
+        className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} card-hover cursor-pointer hover:shadow-md transition-shadow bg-card text-card-foreground`}
         onClick={() => setMostrarDetalhes(true)}
       >
         <CardHeader className="pb-2">
@@ -79,14 +79,14 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
               )}
             </div>
           </div>
-          <CardTitle className="text-xl mt-2">{anuncio.titulo}</CardTitle>
-          <CardDescription className="flex flex-col gap-1">
-            <div className="text-sm text-gray-500 dark:text-gray-400">Publicado em {dataPublicacaoFormatada}</div>
+          <CardTitle className="text-xl mt-2 text-foreground">{anuncio.titulo}</CardTitle>
+          <CardDescription className="flex flex-col gap-1 text-muted-foreground">
+            <div className="text-sm">Publicado em {dataPublicacaoFormatada}</div>
             {renderDataEvento()}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="whitespace-pre-wrap line-clamp-3">{anuncio.conteudo}</div>
+          <div className="whitespace-pre-wrap line-clamp-3 text-foreground">{anuncio.conteudo}</div>
           {anuncio.conteudo.length > 150 && (
             <Button 
               variant="link" 
@@ -100,7 +100,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
             </Button>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between pt-2 text-sm text-gray-500 dark:text-gray-400">
+        <CardFooter className="flex justify-between pt-2 text-sm text-muted-foreground">
           <div>Por: {anuncio.autor}</div>
           <div className="flex gap-2">
             <button 
