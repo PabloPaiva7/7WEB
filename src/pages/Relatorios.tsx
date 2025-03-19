@@ -2,8 +2,9 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { FileSpreadsheet, Users, FileCheck } from "lucide-react";
+import { FileSpreadsheet, Users, FileCheck, BarChart } from "lucide-react";
 import { ReportCard } from "@/components/Relatorios/ReportCard";
+import { DesempenhoReportCard } from "@/components/Relatorios/DesempenhoReportCard";
 
 const Relatorios = () => {
   return (
@@ -18,10 +19,11 @@ const Relatorios = () => {
       <Separator />
       
       <Tabs defaultValue="artes">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="artes">Preenchimento Artes</TabsTrigger>
           <TabsTrigger value="consultores">Consultores</TabsTrigger>
           <TabsTrigger value="aprovados">Aprovados</TabsTrigger>
+          <TabsTrigger value="desempenho">Desempenho</TabsTrigger>
         </TabsList>
         
         <TabsContent value="artes" className="mt-6">
@@ -51,6 +53,15 @@ const Relatorios = () => {
             description="Lista de contratos aprovados e seus detalhes"
             icon={FileCheck}
             alertText="Este relatório contém dados sobre contratos aprovados, incluindo informações do cliente, valores e datas de aprovação."
+          />
+        </TabsContent>
+        
+        <TabsContent value="desempenho" className="mt-6">
+          <DesempenhoReportCard
+            title="Relatório de Desempenho"
+            description="Desempenho do usuário por status de processo"
+            icon={BarChart}
+            alertText="Este relatório contém estatísticas de desempenho do usuário, categorizado por status de processos em períodos diários e mensais."
           />
         </TabsContent>
       </Tabs>
