@@ -22,10 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Calendar as CalendarIcon, Check, Plus, Trash, AlertTriangle } from "lucide-react";
-import { format, isEqual, isToday, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isWithinInterval } from "date-fns";
+import { Bell, Calendar as CalendarIcon, Check, Plus, Trash } from "lucide-react";
+import { format, isEqual, isToday, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isWithinInterval, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
 
 type Compromisso = {
   id: string;
@@ -39,7 +38,6 @@ type Compromisso = {
 
 export default function Calendario() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [novoCompromisso, setNovoCompromisso] = useState<Partial<Compromisso>>({
     data: new Date(),
@@ -47,16 +45,152 @@ export default function Calendario() {
     status: "pendente",
     alerta: true,
   });
-  const [demandas, setDemandas] = useState([
-    "Contrato 12345 - Necessário envio de documentação adicional",
-    "Cliente João Silva - Pendência de assinatura em contrato",
-    "Processo 789/2023 - Prazo de 5 dias para recurso",
-    "Notificação extrajudicial - Cliente Maria Oliveira",
-    "Contrato 56789 - Necessário reconhecimento de firma",
-    "Ação judicial 2022/456 - Audiência marcada",
-  ]);
-  const [selectedDemanda, setSelectedDemanda] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Exemplos de compromissos para demonstração
+  const [compromissos, setCompromissos] = useState<Compromisso[]>([
+    // Exemplos para hoje
+    {
+      id: "1",
+      data: new Date(),
+      tipo: "reuniao",
+      cliente: "João Silva",
+      descricao: "Discussão sobre contrato de financiamento",
+      alerta: true,
+      status: "pendente"
+    },
+    {
+      id: "2",
+      data: new Date(),
+      tipo: "ligacao",
+      cliente: "Maria Oliveira",
+      descricao: "Retorno sobre documentação pendente",
+      alerta: false,
+      status: "pendente"
+    },
+    // Exemplos para amanhã
+    {
+      id: "3",
+      data: addDays(new Date(), 1),
+      tipo: "pagamento",
+      cliente: "Carlos Santos",
+      descricao: "Pagamento de parcela do contrato #4567",
+      alerta: true,
+      status: "pendente"
+    },
+    // Exemplos para demais dias da semana
+    {
+      id: "4",
+      data: addDays(new Date(), 2),
+      tipo: "reuniao",
+      cliente: "Ana Paula Fernandes",
+      descricao: "Assinatura de contrato",
+      alerta: true,
+      status: "pendente"
+    },
+    {
+      id: "5",
+      data: addDays(new Date(), 3),
+      tipo: "ligacao",
+      cliente: "Roberto Almeida",
+      descricao: "Confirmação de dados cadastrais",
+      alerta: false,
+      status: "pendente"
+    },
+    {
+      id: "6",
+      data: addDays(new Date(), 4),
+      tipo: "reuniao",
+      cliente: "Juliana Costa",
+      descricao: "Apresentação de proposta comercial",
+      alerta: true,
+      status: "pendente"
+    },
+    // Exemplos para semana passada (alguns concluídos)
+    {
+      id: "7",
+      data: subDays(new Date(), 2),
+      tipo: "reuniao",
+      cliente: "Fernando Mendes",
+      descricao: "Renegociação de contrato",
+      alerta: false,
+      status: "concluido"
+    },
+    {
+      id: "8",
+      data: subDays(new Date(), 4),
+      tipo: "pagamento",
+      cliente: "Luciana Martins",
+      descricao: "Pagamento de entrada - Contrato #1245",
+      alerta: true,
+      status: "concluido"
+    },
+    // Exemplos para próximas semanas
+    {
+      id: "9",
+      data: addDays(new Date(), 10),
+      tipo: "reuniao",
+      cliente: "Marcelo Souza",
+      descricao: "Reunião sobre novo produto financeiro",
+      alerta: true,
+      status: "pendente"
+    },
+    {
+      id: "10",
+      data: addDays(new Date(), 15),
+      tipo: "ligacao",
+      cliente: "Patricia Lima",
+      descricao: "Follow-up de proposta",
+      alerta: false,
+      status: "pendente"
+    },
+    // Exemplos adicionais para mostrar calendário cheio
+    {
+      id: "11",
+      data: addDays(new Date(), 7),
+      tipo: "reuniao",
+      cliente: "Grupo Investidores SA",
+      descricao: "Apresentação de resultados",
+      alerta: true,
+      status: "pendente"
+    },
+    {
+      id: "12",
+      data: addDays(new Date(), 8),
+      tipo: "ligacao",
+      cliente: "Ricardo Ferreira",
+      descricao: "Esclarecimentos sobre contrato",
+      alerta: false,
+      status: "pendente"
+    },
+    {
+      id: "13",
+      data: addDays(new Date(), 9),
+      tipo: "pagamento",
+      cliente: "Empresa ABC Ltda",
+      descricao: "Pagamento de parcela mensal",
+      alerta: true,
+      status: "pendente"
+    },
+    {
+      id: "14",
+      data: addDays(new Date(), 12),
+      tipo: "reuniao",
+      cliente: "Sandra Vieira",
+      descricao: "Reunião de alinhamento de cronograma",
+      alerta: true,
+      status: "pendente"
+    },
+    {
+      id: "15",
+      data: addDays(new Date(), 14),
+      tipo: "ligacao",
+      cliente: "Bruno Costa",
+      descricao: "Confirmação de assinatura de contrato",
+      alerta: false,
+      status: "pendente"
+    }
+  ]);
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
@@ -108,27 +242,6 @@ export default function Calendario() {
     });
   };
 
-  const handleDemandaSelect = (demanda: string) => {
-    setSelectedDemanda(demanda);
-    toast({
-      title: "Demanda Selecionada",
-      description: `A demanda "${demanda}" foi selecionada e precisa de atenção.`,
-      variant: "destructive",
-    });
-  };
-
-  const handleResolveDemanda = () => {
-    if (selectedDemanda) {
-      const novasDemandas = demandas.filter(d => d !== selectedDemanda);
-      setDemandas(novasDemandas);
-      setSelectedDemanda(null);
-      toast({
-        title: "Demanda resolvida",
-        description: `A demanda foi marcada como resolvida.`,
-      });
-    }
-  };
-
   // Filtrar compromissos do dia selecionado
   const compromissosDoDia = useMemo(() => {
     return compromissos.filter(
@@ -149,37 +262,26 @@ export default function Calendario() {
   }, [compromissos, selectedDate]);
 
   // Função para personalizar o dia do calendário
-  const modifiersClassNames = useMemo(() => {
+  const dayModifiers = useMemo(() => {
     return {
-      day: (day: Date) => {
-        // Verificar se há compromissos no dia
-        const temCompromisso = compromissos.some(comp => isSameDay(comp.data, day));
-        
-        // Verificar se há compromissos importantes no dia
-        const temCompromissoImportante = compromissos.some(comp => 
-          isSameDay(comp.data, day) && comp.alerta && comp.status === "pendente"
+      appointment: (date: Date) => {
+        return compromissos.some(comp => isSameDay(comp.data, date));
+      },
+      importantAppointment: (date: Date) => {
+        return compromissos.some(comp => 
+          isSameDay(comp.data, date) && comp.alerta && comp.status === "pendente"
         );
-
-        if (temCompromissoImportante) {
-          return "calendar-day-with-important";
-        } else if (temCompromisso) {
-          return "calendar-day-with-appointment";
-        }
-        
-        return "";
       }
     };
   }, [compromissos]);
 
+  const modifiersClassNames = {
+    appointment: "calendar-day-with-appointment",
+    importantAppointment: "calendar-day-with-important"
+  };
+
   return (
-    <div className="grid md:grid-cols-[1fr,300px] gap-6 animate-fadeIn">
-      {selectedDemanda && (
-        <DemandaAlert 
-          demanda={selectedDemanda} 
-          onResolve={handleResolveDemanda} 
-        />
-      )}
-      
+    <div className="grid md:grid-cols-[1fr] gap-6 animate-fadeIn">
       <div className="space-y-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -273,6 +375,7 @@ export default function Calendario() {
                 selected={selectedDate}
                 onSelect={handleDateSelect}
                 className="rounded-md border w-full"
+                modifiers={dayModifiers}
                 modifiersClassNames={modifiersClassNames}
                 locale={ptBR}
               />
@@ -417,35 +520,6 @@ export default function Calendario() {
                 )}
               </TabsContent>
             </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Demandas Pendentes</CardTitle>
-            <CardDescription>Clique para selecionar uma demanda e criar um alerta</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {demandas.map((demanda, index) => (
-                <Button 
-                  key={index}
-                  variant="outline"
-                  className="justify-start h-auto py-2 px-3 w-full text-left"
-                  onClick={() => handleDemandaSelect(demanda)}
-                >
-                  <AlertTriangle className="h-4 w-4 mr-2 text-amber-500 flex-shrink-0" />
-                  <span className="truncate">{demanda}</span>
-                </Button>
-              ))}
-              {demandas.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Não há demandas pendentes
-                </p>
-              )}
-            </div>
           </CardContent>
         </Card>
       </div>
