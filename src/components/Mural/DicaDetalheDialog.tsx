@@ -57,7 +57,7 @@ export const DicaDetalheDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[700px] bg-background">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <DialogTitle className="text-2xl">{dica.titulo}</DialogTitle>
