@@ -5,6 +5,9 @@ import { Anuncio, TipoAnuncio } from "@/types/mural.types";
 import { Calendar, Flag, Megaphone, Signpost, Newspaper } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { DetalhesAnuncio } from "./DetalhesAnuncio";
 
 // Map for icon by announcement type
 const iconesPorTipo: Record<TipoAnuncio, React.ReactNode> = {
@@ -41,6 +44,7 @@ interface AnuncioCardProps {
 }
 
 export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCardProps) => {
+  const [mostrarDetalhes, setMostrarDetalhes] = useState(false);
   const dataPublicacaoFormatada = format(new Date(anuncio.dataPublicacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   const temDataEvento = anuncio.dataEvento && anuncio.dataEvento.trim() !== "";
   
@@ -56,47 +60,77 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
   };
 
   return (
-    <Card className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} card-hover`}>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            {iconesPorTipo[anuncio.tipo]}
-            <Badge className={`${corPorTipo[anuncio.tipo]}`}>
-              {labelPorTipo[anuncio.tipo]}
-            </Badge>
-            {anuncio.importante && (
-              <Badge variant="destructive" className="ml-2 flex items-center gap-1">
-                <Flag className="h-3 w-3" /> Importante
+    <>
+      <Card 
+        className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} card-hover cursor-pointer hover:shadow-md transition-shadow`}
+        onClick={() => setMostrarDetalhes(true)}
+      >
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              {iconesPorTipo[anuncio.tipo]}
+              <Badge className={`${corPorTipo[anuncio.tipo]}`}>
+                {labelPorTipo[anuncio.tipo]}
               </Badge>
-            )}
+              {anuncio.importante && (
+                <Badge variant="destructive" className="ml-2 flex items-center gap-1">
+                  <Flag className="h-3 w-3" /> Importante
+                </Badge>
+              )}
+            </div>
           </div>
-        </div>
-        <CardTitle className="text-xl mt-2">{anuncio.titulo}</CardTitle>
-        <CardDescription className="flex flex-col gap-1">
-          <div className="text-sm text-gray-500">Publicado em {dataPublicacaoFormatada}</div>
-          {renderDataEvento()}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="whitespace-pre-wrap">{anuncio.conteudo}</div>
-      </CardContent>
-      <CardFooter className="flex justify-between pt-2 text-sm text-gray-500">
-        <div>Por: {anuncio.autor}</div>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => onEdit(anuncio)} 
-            className="text-blue-600 hover:text-blue-800"
-          >
-            Editar
-          </button>
-          <button 
-            onClick={() => onDelete(anuncio.id)} 
-            className="text-red-600 hover:text-red-800"
-          >
-            Excluir
-          </button>
-        </div>
-      </CardFooter>
-    </Card>
+          <CardTitle className="text-xl mt-2">{anuncio.titulo}</CardTitle>
+          <CardDescription className="flex flex-col gap-1">
+            <div className="text-sm text-gray-500">Publicado em {dataPublicacaoFormatada}</div>
+            {renderDataEvento()}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="whitespace-pre-wrap line-clamp-3">{anuncio.conteudo}</div>
+          {anuncio.conteudo.length > 150 && (
+            <Button 
+              variant="link" 
+              className="mt-2 p-0 h-auto text-sm" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setMostrarDetalhes(true);
+              }}
+            >
+              Ler mais
+            </Button>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-between pt-2 text-sm text-gray-500">
+          <div>Por: {anuncio.autor}</div>
+          <div className="flex gap-2">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(anuncio);
+              }} 
+              className="text-blue-600 hover:text-blue-800"
+            >
+              Editar
+            </button>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(anuncio.id);
+              }} 
+              className="text-red-600 hover:text-red-800"
+            >
+              Excluir
+            </button>
+          </div>
+        </CardFooter>
+      </Card>
+
+      <DetalhesAnuncio
+        anuncio={anuncio}
+        isOpen={mostrarDetalhes}
+        onClose={() => setMostrarDetalhes(false)}
+        onUpdate={onUpdate}
+      />
+    </>
   );
 };

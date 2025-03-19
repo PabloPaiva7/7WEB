@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -150,25 +151,23 @@ export function Configuracoes() {
   };
 
   useEffect(() => {
-    const corSalva = localStorage.getItem('tema-cor');
-    if (corSalva) {
-      setCorSelecionada(corSalva);
-      aplicarCor(corSalva);
-    }
-
+    // Verificar e definir o modo escuro
     const modoSalvo = localStorage.getItem('tema-modo');
     if (modoSalvo === 'escuro') {
       setModoEscuro(true);
-      document.documentElement.classList.add('dark');
     } else {
       setModoEscuro(false);
-      document.documentElement.classList.remove('dark');
+    }
+
+    // Carregar outras configurações salvas
+    const corSalva = localStorage.getItem('tema-cor');
+    if (corSalva) {
+      setCorSelecionada(corSalva);
     }
 
     const fonteSalva = localStorage.getItem('tema-fonte');
     if (fonteSalva) {
       setFonteSelecionada(fonteSalva);
-      aplicarFonte(fonteSalva);
     }
 
     const layoutSalvo = localStorage.getItem('tema-layout');
