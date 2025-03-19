@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -37,15 +36,11 @@ const idiomas = [
 ];
 
 const hexToHsl = (hex: string) => {
-  // Remove o # se existir
   hex = hex.replace(/^#/, '');
-
-  // Converte para RGB
   let r = parseInt(hex.substring(0, 2), 16) / 255;
   let g = parseInt(hex.substring(2, 4), 16) / 255;
   let b = parseInt(hex.substring(4, 6), 16) / 255;
 
-  // Encontra o mínimo e máximo dos valores RGB
   let max = Math.max(r, g, b);
   let min = Math.min(r, g, b);
   
@@ -72,7 +67,6 @@ const hexToHsl = (hex: string) => {
     h /= 6;
   }
 
-  // Converte para os valores que o CSS espera
   h = Math.round(h * 360);
   s = Math.round(s * 100);
   l = Math.round(l * 100);
@@ -90,7 +84,6 @@ export function Configuracoes() {
   const { toast } = useToast();
 
   const aplicarCor = (cor: string) => {
-    // Validar se é uma cor hex válida
     if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(cor)) {
       const hsl = hexToHsl(cor);
       document.documentElement.style.setProperty('--primary', hsl);
@@ -117,7 +110,6 @@ export function Configuracoes() {
     const novoModo = !modoEscuro;
     setModoEscuro(novoModo);
     
-    // Atualiza o atributo data-theme no elemento html
     if (novoModo) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('tema-modo', 'escuro');
@@ -143,7 +135,6 @@ export function Configuracoes() {
 
   const aplicarLayout = (layout: string) => {
     localStorage.setItem('tema-layout', layout);
-    // Aqui você pode adicionar lógica adicional para ajustar o layout conforme necessário
     toast({
       title: "Layout atualizado!",
       description: "O layout da interface foi alterado com sucesso.",
@@ -158,16 +149,13 @@ export function Configuracoes() {
     });
   };
 
-  // Recuperar e aplicar configurações salvas ao carregar a página
   useEffect(() => {
-    // Recuperar cor
     const corSalva = localStorage.getItem('tema-cor');
     if (corSalva) {
       setCorSelecionada(corSalva);
       aplicarCor(corSalva);
     }
 
-    // Recuperar modo escuro/claro
     const modoSalvo = localStorage.getItem('tema-modo');
     if (modoSalvo === 'escuro') {
       setModoEscuro(true);
@@ -177,25 +165,20 @@ export function Configuracoes() {
       document.documentElement.classList.remove('dark');
     }
 
-    // Recuperar fonte
     const fonteSalva = localStorage.getItem('tema-fonte');
     if (fonteSalva) {
       setFonteSelecionada(fonteSalva);
       aplicarFonte(fonteSalva);
     }
 
-    // Recuperar layout
     const layoutSalvo = localStorage.getItem('tema-layout');
     if (layoutSalvo) {
       setLayoutSelecionado(layoutSalvo);
-      // Aplicar layout salvo
     }
 
-    // Recuperar idioma
     const idiomaSalvo = localStorage.getItem('app-idioma');
     if (idiomaSalvo) {
       setIdiomaSelecionado(idiomaSalvo);
-      // Aplicar idioma salvo
     }
   }, []);
 
@@ -204,7 +187,6 @@ export function Configuracoes() {
       <h1 className="text-2xl font-bold mb-6">Configurações</h1>
       
       <div className="grid gap-6">
-        {/* Seção de Tema (Escuro/Claro) */}
         <Card>
           <CardHeader>
             <CardTitle>Tema</CardTitle>
@@ -228,7 +210,6 @@ export function Configuracoes() {
           </CardContent>
         </Card>
 
-        {/* Seção de Cores */}
         <Card>
           <CardHeader>
             <CardTitle>Personalização</CardTitle>
@@ -297,7 +278,6 @@ export function Configuracoes() {
           </CardContent>
         </Card>
 
-        {/* Seção de Fontes e Layout */}
         <Card>
           <CardHeader>
             <CardTitle>Interface</CardTitle>
@@ -306,7 +286,6 @@ export function Configuracoes() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Seleção de Fonte */}
             <div className="space-y-4">
               <Label htmlFor="fonte-select">Fonte</Label>
               <Select
@@ -329,7 +308,6 @@ export function Configuracoes() {
               </Select>
             </div>
 
-            {/* Seleção de Layout */}
             <div className="space-y-4">
               <Label>Densidade do Layout</Label>
               <ToggleGroup 
@@ -353,7 +331,6 @@ export function Configuracoes() {
           </CardContent>
         </Card>
 
-        {/* Seção de Idiomas */}
         <Card>
           <CardHeader>
             <CardTitle>Idioma</CardTitle>

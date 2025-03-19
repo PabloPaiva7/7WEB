@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,7 +70,7 @@ export const AnuncioCarousel = ({ anuncios, onEdit, onDelete, onUpdate }: Anunci
     const dataEventoFormatada = format(new Date(anuncio.dataEvento!), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
     return (
       <div className="flex items-center gap-2 text-sm">
-        <Calendar className="h-4 w-4 text-gray-500" />
+        <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
         <span>Data do evento: {dataEventoFormatada}</span>
       </div>
     );
@@ -94,7 +95,7 @@ export const AnuncioCarousel = ({ anuncios, onEdit, onDelete, onUpdate }: Anunci
           </div>
           <CardTitle className="text-xl mt-2">{anuncio.titulo}</CardTitle>
           <CardDescription className="flex flex-col gap-1">
-            <div className="text-sm text-gray-500">Publicado em {dataPublicacaoFormatada}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Publicado em {dataPublicacaoFormatada}</div>
             {renderDataEvento()}
           </CardDescription>
         </CardHeader>
@@ -108,7 +109,7 @@ export const AnuncioCarousel = ({ anuncios, onEdit, onDelete, onUpdate }: Anunci
             Ler mais
           </Button>
         </CardContent>
-        <CardFooter className="flex justify-between pt-2 text-sm text-gray-500">
+        <CardFooter className="flex justify-between pt-2 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center justify-between w-full">
             <div>Por: {anuncio.autor}</div>
             <div className="flex gap-2">
@@ -125,13 +126,13 @@ export const AnuncioCarousel = ({ anuncios, onEdit, onDelete, onUpdate }: Anunci
               )}
               <button 
                 onClick={() => onEdit(anuncio)} 
-                className="text-blue-600 hover:text-blue-800"
+                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Editar
               </button>
               <button 
                 onClick={() => onDelete(anuncio.id)} 
-                className="text-red-600 hover:text-red-800"
+                className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
               >
                 Excluir
               </button>
@@ -145,7 +146,7 @@ export const AnuncioCarousel = ({ anuncios, onEdit, onDelete, onUpdate }: Anunci
           variant="ghost" 
           size="icon" 
           onClick={handlePrevious}
-          className="h-10 w-10 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full shadow-md"
+          className="h-10 w-10 bg-white dark:bg-gray-800 bg-opacity-70 dark:bg-opacity-70 hover:bg-opacity-100 dark:hover:bg-opacity-100 rounded-full shadow-md"
           disabled={anuncios.length <= 1}
         >
           <ChevronLeft className="h-6 w-6" />
@@ -156,7 +157,7 @@ export const AnuncioCarousel = ({ anuncios, onEdit, onDelete, onUpdate }: Anunci
           variant="ghost" 
           size="icon" 
           onClick={handleNext}
-          className="h-10 w-10 bg-white bg-opacity-70 hover:bg-opacity-100 rounded-full shadow-md"
+          className="h-10 w-10 bg-white dark:bg-gray-800 bg-opacity-70 dark:bg-opacity-70 hover:bg-opacity-100 dark:hover:bg-opacity-100 rounded-full shadow-md"
           disabled={anuncios.length <= 1}
         >
           <ChevronRight className="h-6 w-6" />
@@ -170,7 +171,7 @@ export const AnuncioCarousel = ({ anuncios, onEdit, onDelete, onUpdate }: Anunci
             variant="ghost"
             size="icon"
             className={`w-3 h-3 p-0 rounded-full ${
-              index === currentIndex ? 'bg-primary' : 'bg-gray-300'
+              index === currentIndex ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
             }`}
             onClick={() => setCurrentIndex(index)}
           />

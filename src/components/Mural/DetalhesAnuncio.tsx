@@ -60,7 +60,7 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[700px]">
+        <DialogContent className="sm:max-w-[700px] bg-background">
           <DialogHeader>
             <div className="flex items-center gap-2">
               {anuncio.importante && (
@@ -147,4 +147,3 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
     </>
   );
 };
-
