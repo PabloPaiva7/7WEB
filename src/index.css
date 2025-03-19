@@ -21,3 +21,8 @@
 
 /* Import legacy styles */
 @import './styles/legacy.css';
+
+/* Ensure dark mode works correctly */
+html.dark {
+  color-scheme: dark;
+}

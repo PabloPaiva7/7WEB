@@ -155,8 +155,10 @@ export function Configuracoes() {
     const modoSalvo = localStorage.getItem('tema-modo');
     if (modoSalvo === 'escuro') {
       setModoEscuro(true);
+      document.documentElement.classList.add('dark');
     } else {
       setModoEscuro(false);
+      document.documentElement.classList.remove('dark');
     }
 
     // Carregar outras configurações salvas

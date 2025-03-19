@@ -53,7 +53,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
     const dataEventoFormatada = format(new Date(anuncio.dataEvento!), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
     return (
       <div className="flex items-center gap-2 text-sm">
-        <Calendar className="h-4 w-4 text-gray-500" />
+        <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
         <span>Data do evento: {dataEventoFormatada}</span>
       </div>
     );
@@ -81,7 +81,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
           </div>
           <CardTitle className="text-xl mt-2">{anuncio.titulo}</CardTitle>
           <CardDescription className="flex flex-col gap-1">
-            <div className="text-sm text-gray-500">Publicado em {dataPublicacaoFormatada}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Publicado em {dataPublicacaoFormatada}</div>
             {renderDataEvento()}
           </CardDescription>
         </CardHeader>
@@ -100,7 +100,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
             </Button>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between pt-2 text-sm text-gray-500">
+        <CardFooter className="flex justify-between pt-2 text-sm text-gray-500 dark:text-gray-400">
           <div>Por: {anuncio.autor}</div>
           <div className="flex gap-2">
             <button 
@@ -108,7 +108,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
                 e.stopPropagation();
                 onEdit(anuncio);
               }} 
-              className="text-blue-600 hover:text-blue-800"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
               Editar
             </button>
@@ -117,7 +117,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
                 e.stopPropagation();
                 onDelete(anuncio.id);
               }} 
-              className="text-red-600 hover:text-red-800"
+              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
             >
               Excluir
             </button>
