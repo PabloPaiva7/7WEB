@@ -60,7 +60,7 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[700px] bg-card text-card-foreground">
+        <DialogContent className="sm:max-w-[700px] bg-white dark:bg-gray-900 text-card-foreground">
           <DialogHeader>
             <div className="flex items-center gap-2">
               {anuncio.importante && (
@@ -115,7 +115,7 @@ export const DetalhesAnuncio = ({ anuncio, isOpen, onClose, onUpdate }: Detalhes
                 </div>
 
                 {anuncio.participantes && anuncio.participantes.length > 0 && (
-                  <div className="border rounded-lg p-4 space-y-3 bg-background">
+                  <div className="border rounded-lg p-4 space-y-3 bg-white dark:bg-gray-800">
                     <h3 className="font-medium text-foreground">Lista de Participantes</h3>
                     <div className="space-y-2">
                       {anuncio.participantes.map((p) => (

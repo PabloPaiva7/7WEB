@@ -43,6 +43,14 @@ html.dark {
 .dialog-content,
 .card,
 .modal-content {
+  background-color: white !important;
+  color: hsl(var(--card-foreground));
+}
+
+.dark [role="dialog"],
+.dark .dialog-content,
+.dark .card,
+.dark .modal-content {
   background-color: hsl(var(--card)) !important;
   color: hsl(var(--card-foreground));
 }
@@ -71,7 +79,13 @@ html.dark {
 .dialog-content,
 .modal-content {
   --tw-bg-opacity: 1;
-  background-color: hsl(var(--card));
+  background-color: white !important;
+  color: hsl(var(--card-foreground));
+}
+
+.dark .dialog-content,
+.dark .modal-content {
+  background-color: hsl(var(--card)) !important;
   color: hsl(var(--card-foreground));
 }
 
@@ -79,6 +93,14 @@ html.dark {
 .card, 
 .dialog-content, 
 .modal-content {
+  background-color: white !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.dark .card, 
+.dark .dialog-content, 
+.dark .modal-content {
   background-color: hsl(var(--card)) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;

@@ -62,7 +62,7 @@ export const AnuncioCard = ({ anuncio, onEdit, onDelete, onUpdate }: AnuncioCard
   return (
     <>
       <Card 
-        className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} card-hover cursor-pointer hover:shadow-md transition-shadow bg-card text-card-foreground`}
+        className={`${anuncio.importante ? 'border-l-4 border-l-red-500' : ''} card-hover cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-card text-card-foreground`}
         onClick={() => setMostrarDetalhes(true)}
       >
         <CardHeader className="pb-2">
