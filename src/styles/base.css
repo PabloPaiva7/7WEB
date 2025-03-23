@@ -36,6 +36,13 @@
   .dark [class*="bg-muted"] {
     @apply text-foreground;
   }
+  
+  /* Ensure dialogs and modals have proper background and text color */
+  [role="dialog"],
+  .dialog-content,
+  .modal-content {
+    @apply bg-background text-foreground;
+  }
 }
 
 /* Improve link accessibility */

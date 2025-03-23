@@ -41,8 +41,16 @@ html.dark {
 /* Ensure all dialog, modal and card content is visible */
 [role="dialog"],
 .dialog-content,
-.card {
+.card,
+.modal-content {
   background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+}
+
+/* Fix for dialog and modal content visibility */
+[role="dialog"] *:not(.text-muted-foreground),
+.dialog-content *:not(.text-muted-foreground),
+.modal-content *:not(.text-muted-foreground) {
   color: hsl(var(--card-foreground));
 }
 
@@ -57,4 +65,12 @@ html.dark {
 
 .text-muted-foreground {
   color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Fix for dialog content visibility */
+.dialog-content,
+.modal-content {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
 }
