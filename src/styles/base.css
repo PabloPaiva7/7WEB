@@ -43,6 +43,13 @@
   .modal-content {
     @apply bg-background text-foreground;
   }
+
+  /* Ensure card backgrounds are solid */
+  .card, 
+  .dialog-content,
+  .modal-content {
+    @apply bg-opacity-100 dark:bg-opacity-100;
+  }
 }
 
 /* Improve link accessibility */
