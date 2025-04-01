@@ -105,3 +105,49 @@ html.dark {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+
+/* Fix for dropdown content visibility */
+[data-radix-popper-content-wrapper] {
+  z-index: 50 !important;
+}
+
+.radix-select-content,
+[role="listbox"],
+[data-radix-select-viewport],
+[role="presentation"] div[data-radix-scroll-area-viewport],
+[data-radix-popper-content-wrapper] [role="dialog"] {
+  background-color: white !important;
+  color: black !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .radix-select-content,
+.dark [role="listbox"],
+.dark [data-radix-select-viewport],
+.dark [role="presentation"] div[data-radix-scroll-area-viewport],
+.dark [data-radix-popper-content-wrapper] [role="dialog"] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border-color: hsl(var(--border));
+}
+
+/* Fix for individual select items */
+[role="option"],
+[data-radix-select-item] {
+  color: black !important;
+}
+
+.dark [role="option"],
+.dark [data-radix-select-item] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+/* Ensure items are visible when highlighted */
+[role="option"][data-highlighted],
+[data-radix-select-item][data-highlighted] {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
