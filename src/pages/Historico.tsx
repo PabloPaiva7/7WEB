@@ -48,7 +48,10 @@ const Historico = () => {
   const [tipoFilter, setTipoFilter] = useState('todos');
   const [moduloFilter, setModuloFilter] = useState('todos');
   const [statusFilter, setStatusFilter] = useState('todos');
-  const [dataRange, setDataRange] = useState<{from: Date | undefined, to: Date | undefined}>({
+  const [dataRange, setDataRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
     from: undefined,
     to: undefined
   });
@@ -274,7 +277,7 @@ const Historico = () => {
             
             <DatePickerWithRange 
               value={dataRange}
-              onChange={setDataRange}
+              onChange={(value) => setDataRange(value || {from: undefined, to: undefined})}
             />
           </div>
         </CardContent>
@@ -450,7 +453,7 @@ const Historico = () => {
                 <PaginationItem>
                   <PaginationPrevious 
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
+                    aria-disabled={currentPage === 1}
                   />
                 </PaginationItem>
                 
@@ -491,7 +494,7 @@ const Historico = () => {
                 <PaginationItem>
                   <PaginationNext 
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
+                    aria-disabled={currentPage === totalPages}
                   />
                 </PaginationItem>
               </PaginationContent>
@@ -588,7 +591,7 @@ const Historico = () => {
                 <PaginationItem>
                   <PaginationPrevious 
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
+                    aria-disabled={currentPage === 1}
                   />
                 </PaginationItem>
                 
@@ -629,7 +632,7 @@ const Historico = () => {
                 <PaginationItem>
                   <PaginationNext 
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
+                    aria-disabled={currentPage === totalPages}
                   />
                 </PaginationItem>
               </PaginationContent>
@@ -660,3 +663,4 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 export default Historico;
+

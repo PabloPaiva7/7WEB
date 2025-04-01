@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
 import Footer from "@/components/Footer";
@@ -13,7 +14,8 @@ import {
   FileText, 
   PieChart,
   MessageSquare,
-  Briefcase
+  Briefcase,
+  History
 } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -105,6 +107,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                       {notificationCounts.mural}
                     </SidebarMenuBadge>
                   )}
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={location.pathname === "/historico"}>
+                    <Link to="/historico" className="flex items-center gap-3">
+                      <History className="h-5 w-5" />
+                      <span>Histórico</span>
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={location.pathname === "/relatorios"}>
