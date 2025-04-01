@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
@@ -416,13 +415,14 @@ const Historico = () => {
                         </div>
                       </TableHead>
                       <TableHead>Protocolo</TableHead>
+                      <TableHead>Status Campanha</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {currentItems.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={10} className="h-24 text-center">
+                        <TableCell colSpan={11} className="h-24 text-center">
                           Nenhum registro encontrado com os filtros aplicados.
                         </TableCell>
                       </TableRow>
@@ -457,6 +457,11 @@ const Historico = () => {
                           </TableCell>
                           <TableCell>
                             <div className="font-mono text-xs">{item.protocolo}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={item.statusCampanha ? "default" : "outline"}>
+                              {item.statusCampanha ? "Sim" : "Não"}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
@@ -576,7 +581,12 @@ const Historico = () => {
                         {new Date(item.data).toLocaleDateString('pt-BR')} às {new Date(item.data).toLocaleTimeString('pt-BR')}
                       </CardDescription>
                     </div>
-                    <StatusBadge status={item.status} />
+                    <div className="flex items-center gap-2">
+                      <StatusBadge status={item.status} />
+                      <Badge variant={item.statusCampanha ? "default" : "outline"} className="ml-2">
+                        Campanha: {item.statusCampanha ? "Sim" : "Não"}
+                      </Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

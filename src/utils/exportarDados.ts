@@ -57,8 +57,8 @@ export const exportarParaCSV = (dados: any[], nomeArquivo: string) => {
     [`Exportado por Sistema de Gestão em ${dateTimeStr}`]
   ];
 
-  // Customize the header fields - use these specific columns in this order
-  const customHeaders = ['Data', 'Cliente', 'Contrato', 'Tipo', 'Descrição', 'Usuário'];
+  // Customize the header fields - adicionar o status da campanha
+  const customHeaders = ['Data', 'Cliente', 'Contrato', 'Tipo', 'Descrição', 'Usuário', 'Status da Campanha'];
   
   // Map data to the new custom header format
   const mappedData = dados.map(item => [
@@ -67,7 +67,8 @@ export const exportarParaCSV = (dados: any[], nomeArquivo: string) => {
     item.contrato,
     item.tipo,
     item.descricao,
-    item.usuario
+    item.usuario,
+    item.statusCampanha ? 'Sim' : 'Não'  // Exibir "Sim" se tiver, "Não" se não tiver
   ]);
   
   // Combine all rows
@@ -143,7 +144,7 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
   doc.text('Certificação Digital: Sistema de Gestão - Certificado A3', 14, 49);
   doc.text(`Para validar este documento, acesse: https://sistema-gestao.exemplo.com.br/validar?protocolo=${protocolId}`, 14, 54);
   
-  // Configurar tabela de dados
+  // Configurar tabela de dados - adicionar o status da campanha
   const cabecalhos = [
     'Data', 
     'Cliente', 
@@ -151,7 +152,8 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
     'Tipo', 
     'Descrição', 
     'Usuário',
-    'Protocolo'
+    'Protocolo',
+    'Status da Campanha'  // Nova coluna
   ];
   
   // Mapear dados para o formato da tabela
@@ -162,7 +164,8 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
     item.tipo,
     item.descricao.length > 40 ? item.descricao.substring(0, 40) + '...' : item.descricao,
     item.usuario,
-    item.protocolo
+    item.protocolo,
+    item.statusCampanha ? 'Sim' : 'Não'  // Exibir "Sim" se tiver, "Não" se não tiver
   ]);
   
   // Adicionar tabela ao documento
@@ -175,7 +178,8 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
     alternateRowStyles: { fillColor: [240, 240, 240] },
     columnStyles: {
       4: { cellWidth: 'auto' }, // Descrição com largura automática
-      6: { cellWidth: 30 }      // Protocolo com largura fixa
+      6: { cellWidth: 30 },     // Protocolo com largura fixa
+      7: { cellWidth: 25 }      // Status da Campanha com largura fixa
     },
     margin: { top: 60 }
   });

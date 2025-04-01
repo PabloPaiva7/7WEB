@@ -59,3 +59,34 @@ export interface PaginaJuridica {
   link: string;
   categoria: string;
 }
+
+export interface Senha {
+  id: string;
+  sistema: string;
+  usuario: string;
+  senha: string;
+  observacoes: string;
+  ultimaAtualizacao: string;
+}
+
+export interface EtapaPagamento {
+  id: string;
+  nome: string;
+  prazo: string;
+  status: string;
+  valor: number;
+}
+
+export interface MovimentacaoHistorico {
+  id: string;
+  data: string;
+  cliente: string;
+  contrato: string;
+  tipo: string;
+  descricao: string;
+  usuario: string;
+  modulo: string;
+  status: string;
+  protocolo: string;
+  statusCampanha?: string; // Novo campo para status da campanha
+}
