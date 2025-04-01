@@ -9,60 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      CARTEIRA: {
-        Row: {
-          BANCO: string | null
-          CÓD: string | null
-          CONTATO: string | null
-          CONTRATO: number | null
-          DATA: string | null
-          ENTRADA: string | null
-          ESCRITÓRIO: string
-          NEGOCIAÇÃO: string | null
-          OBSERVAÇÃO: string | null
-          PRAZO: number | null
-          "PRAZO _1": number | null
-          RESOLUÇÃO: string | null
-          SITUAÇÃO: string | null
-          "ÚLTIMO PAGAMENTO": string | null
-          "VALOR DO CLIENTE": string | null
-        }
-        Insert: {
-          BANCO?: string | null
-          CÓD?: string | null
-          CONTATO?: string | null
-          CONTRATO?: number | null
-          DATA?: string | null
-          ENTRADA?: string | null
-          ESCRITÓRIO: string
-          NEGOCIAÇÃO?: string | null
-          OBSERVAÇÃO?: string | null
-          PRAZO?: number | null
-          "PRAZO _1"?: number | null
-          RESOLUÇÃO?: string | null
-          SITUAÇÃO?: string | null
-          "ÚLTIMO PAGAMENTO"?: string | null
-          "VALOR DO CLIENTE"?: string | null
-        }
-        Update: {
-          BANCO?: string | null
-          CÓD?: string | null
-          CONTATO?: string | null
-          CONTRATO?: number | null
-          DATA?: string | null
-          ENTRADA?: string | null
-          ESCRITÓRIO?: string
-          NEGOCIAÇÃO?: string | null
-          OBSERVAÇÃO?: string | null
-          PRAZO?: number | null
-          "PRAZO _1"?: number | null
-          RESOLUÇÃO?: string | null
-          SITUAÇÃO?: string | null
-          "ÚLTIMO PAGAMENTO"?: string | null
-          "VALOR DO CLIENTE"?: string | null
-        }
-        Relationships: []
-      }
       carteira_clientes: {
         Row: {
           banco: string | null
@@ -155,6 +101,24 @@ export type Database = {
           nome_arquivo?: string
           registros_importados?: number
           status?: Database["public"]["Enums"]["upload_status"] | null
+        }
+        Relationships: []
+      }
+      cities: {
+        Row: {
+          id: number
+          name: string
+          population: number | null
+        }
+        Insert: {
+          id?: never
+          name: string
+          population?: number | null
+        }
+        Update: {
+          id?: never
+          name?: string
+          population?: number | null
         }
         Relationships: []
       }
