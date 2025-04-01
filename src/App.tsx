@@ -17,6 +17,7 @@ import Relatorios from "./pages/Relatorios";
 import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
 import Operacional from "./pages/Operacional";
+import Historico from "./pages/Historico";
 import { Toaster } from "./components/ui/toaster";
 
 import "./App.css";
@@ -153,6 +154,7 @@ function App() {
               <Route path="/tarefas" element={<TarefasTickets />} />
               <Route path="/tickets" element={<Navigate to="/tarefas" replace />} />
               <Route path="/mural" element={<Mural />} />
+              <Route path="/historico" element={<Historico />} />
               <Route path="/calculadora" element={<Navigate to="/carteira" replace />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/dashboard" element={<Dashboard />} />
