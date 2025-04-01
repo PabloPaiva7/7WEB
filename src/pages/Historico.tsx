@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
@@ -48,6 +49,7 @@ const Historico = () => {
   const [tipoFilter, setTipoFilter] = useState('todos');
   const [moduloFilter, setModuloFilter] = useState('todos');
   const [statusFilter, setStatusFilter] = useState('todos');
+  const [contratoClienteFilter, setContratoClienteFilter] = useState('todos');
   const [dataRange, setDataRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined
@@ -84,12 +86,14 @@ const Historico = () => {
         const matchesTipo = tipoFilter === 'todos' || item.tipo === tipoFilter;
         const matchesModulo = moduloFilter === 'todos' || item.modulo === moduloFilter;
         const matchesStatus = statusFilter === 'todos' || item.status === statusFilter;
+        const matchesContratoCliente = contratoClienteFilter === 'todos' || 
+          `${item.contrato} - ${item.cliente}` === contratoClienteFilter;
         
         const matchesDateRange = dataRange?.from && dataRange?.to 
           ? new Date(item.data) >= dataRange.from && new Date(item.data) <= dataRange.to
           : true;
         
-        return matchesSearch && matchesTipo && matchesModulo && matchesStatus && matchesDateRange;
+        return matchesSearch && matchesTipo && matchesModulo && matchesStatus && matchesContratoCliente && matchesDateRange;
       })
       .sort((a, b) => {
         const aValue = sortConfig.key === 'data' ? new Date(a.data).getTime() : String(a[sortConfig.key as keyof typeof a]);
@@ -131,7 +135,7 @@ const Historico = () => {
       setSelectedItems(currentItems.map(item => item.id));
     }
   };
-
+  
   const handleExportCSV = () => {
     const itemsToExport = selectedItems.length > 0 
       ? historicoMovimentacoes.filter(item => selectedItems.includes(item.id))
@@ -186,6 +190,32 @@ const Historico = () => {
   const tiposUnicos = Array.from(new Set(historicoMovimentacoes.map(item => item.tipo)));
   const modulosUnicos = Array.from(new Set(historicoMovimentacoes.map(item => item.modulo)));
   const statusUnicos = Array.from(new Set(historicoMovimentacoes.map(item => item.status)));
+  const contratosClientesUnicos = Array.from(
+    new Set(historicoMovimentacoes.map(item => `${item.contrato} - ${item.cliente}`))
+  ).sort();
+
+  const exportarMovimentacoesContrato = (contratoCliente: string) => {
+    const [contrato, cliente] = contratoCliente.split(' - ');
+    const movimentacoes = historicoMovimentacoes.filter(item => 
+      item.contrato === contrato && item.cliente === cliente
+    );
+    
+    if (movimentacoes.length === 0) {
+      toast({
+        title: "Nenhuma movimentação encontrada",
+        description: "Não foram encontradas movimentações para este contrato/cliente.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    exportarParaPDF(movimentacoes, `movimentacoes-${contrato}`);
+    
+    toast({
+      title: "Exportação concluída",
+      description: `${movimentacoes.length} movimentações do contrato ${contrato} exportadas para PDF com sucesso.`,
+    });
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-8">
@@ -215,7 +245,7 @@ const Historico = () => {
           <CardDescription>Refine a busca por movimentações de contratos</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -226,6 +256,35 @@ const Historico = () => {
               />
             </div>
             
+            <Select value={contratoClienteFilter} onValueChange={setContratoClienteFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Contrato/Cliente" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os contratos</SelectItem>
+                {contratosClientesUnicos.map(contratoCliente => (
+                  <SelectItem key={contratoCliente} value={contratoCliente}>
+                    {contratoCliente}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <div className="flex gap-2">
+              {contratoClienteFilter !== 'todos' && (
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => exportarMovimentacoesContrato(contratoClienteFilter)}
+                  title="Exportar todas as movimentações deste contrato"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Select value={tipoFilter} onValueChange={setTipoFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Tipo de movimentação" />
