@@ -9,7 +9,8 @@ import {
   Building, 
   Phone, 
   Mail, 
-  FileText
+  FileText,
+  UserCheck
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,12 +39,16 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
   const [escritorioFilter, setEscritorioFilter] = useState("todos");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [tipoContratoFilter, setTipoContratoFilter] = useState("todos");
+  const [usuarioFilter, setUsuarioFilter] = useState("todos"); // Novo filtro para usuário
   const [visualizacao, setVisualizacao] = useState("lista");
 
   // Obter valores únicos para os filtros
   const regioes = Array.from(new Set(clientesExemplo.map(cliente => cliente.regiao)));
   const escritorios = Array.from(new Set(clientesExemplo.map(cliente => cliente.escritorio)));
   const tiposContrato = Array.from(new Set(clientesExemplo.map(cliente => cliente.tipoContrato)));
+  
+  // Lista de usuários para o filtro (poderia vir de uma API em uma implementação real)
+  const usuarios = ["Ana Silva", "Carlos Mendes", "Juliana Costa", "Felipe Oliveira", "Mariana Santos"];
 
   // Filtrar clientes com base nos critérios
   const clientesFiltrados = clientesExemplo.filter(cliente => {
@@ -58,7 +63,10 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
     const matchesStatus = statusFilter === "todos" || cliente.status === statusFilter;
     const matchesTipoContrato = tipoContratoFilter === "todos" || cliente.tipoContrato === tipoContratoFilter;
     
-    return matchesSearch && matchesRegiao && matchesEscritorio && matchesStatus && matchesTipoContrato;
+    // Implementando o filtro por usuário (assumimos que cliente.responsavel contém o nome do usuário)
+    const matchesUsuario = usuarioFilter === "todos" || cliente.responsavel === usuarioFilter;
+    
+    return matchesSearch && matchesRegiao && matchesEscritorio && matchesStatus && matchesTipoContrato && matchesUsuario;
   });
 
   const handleClienteClick = (id: string) => {
@@ -72,8 +80,8 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
           <CardTitle className="text-lg font-medium">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="relative lg:col-span-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Buscar por nome, email..."
@@ -149,6 +157,22 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
                 ))}
               </SelectContent>
             </Select>
+            
+            {/* Novo filtro de Usuário */}
+            <Select value={usuarioFilter} onValueChange={setUsuarioFilter}>
+              <SelectTrigger>
+                <div className="flex items-center">
+                  <UserCheck className="w-4 h-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="Usuário" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os usuários</SelectItem>
+                {usuarios.map((usuario) => (
+                  <SelectItem key={usuario} value={usuario}>{usuario}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -167,7 +191,14 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
               </TabsList>
             </Tabs>
             
-            <Button onClick={() => setSearchTerm("")} variant="outline" size="sm">
+            <Button onClick={() => {
+              setSearchTerm("");
+              setRegiaoFilter("todas");
+              setEscritorioFilter("todos");
+              setStatusFilter("todos");
+              setTipoContratoFilter("todos");
+              setUsuarioFilter("todos");
+            }} variant="outline" size="sm">
               Limpar filtros
             </Button>
           </div>
@@ -187,6 +218,7 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
                       <TableHead>Email</TableHead>
                       <TableHead>Região/Escritório</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Responsável</TableHead>
                       <TableHead>Próximo Contato</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
@@ -194,7 +226,7 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
                   <TableBody>
                     {clientesFiltrados.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={9} className="text-center h-24 text-muted-foreground">
+                        <TableCell colSpan={10} className="text-center h-24 text-muted-foreground">
                           Nenhum cliente encontrado com os filtros selecionados.
                         </TableCell>
                       </TableRow>
@@ -224,6 +256,12 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
                           </TableCell>
                           <TableCell>
                             <StatusBadge status={cliente.status} />
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <User className="w-3 h-3 mr-1 text-muted-foreground" />
+                              {cliente.responsavel || "Não atribuído"}
+                            </div>
                           </TableCell>
                           <TableCell>
                             {new Date(cliente.proximoContato).toLocaleDateString('pt-BR')}
@@ -287,6 +325,12 @@ const ClientesTab = ({ searchTerm, setSearchTerm }: ClientesTabProps) => {
                         <span>{cliente.regiao}</span>
                         <span className="text-muted-foreground mx-1">-</span>
                         <span>{cliente.escritorio}</span>
+                      </div>
+
+                      {/* Adicionando o campo de Responsável */}
+                      <div className="flex items-start text-sm">
+                        <User className="w-4 h-4 mr-2 text-muted-foreground" />
+                        <span>{cliente.responsavel || "Não atribuído"}</span>
                       </div>
 
                       <div className="flex items-center justify-between text-sm pt-2 border-t">
