@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
@@ -40,6 +39,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { historicoMovimentacoes } from '@/data/historicoData';
 import { exportarParaCSV, exportarParaPDF } from '@/utils/exportarDados';
+import { DateRange } from 'react-day-picker';
 
 const Historico = () => {
   const { toast } = useToast();
@@ -48,10 +48,7 @@ const Historico = () => {
   const [tipoFilter, setTipoFilter] = useState('todos');
   const [moduloFilter, setModuloFilter] = useState('todos');
   const [statusFilter, setStatusFilter] = useState('todos');
-  const [dataRange, setDataRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  const [dataRange, setDataRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined
   });
@@ -66,7 +63,6 @@ const Historico = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Usar o searchParams se vier da URL
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const contrato = query.get('contrato');
@@ -75,7 +71,6 @@ const Historico = () => {
     }
   }, [location]);
 
-  // Filtragem e ordenação dos dados
   const dadosFiltrados = () => {
     return historicoMovimentacoes
       .filter(item => {
@@ -90,7 +85,7 @@ const Historico = () => {
         const matchesModulo = moduloFilter === 'todos' || item.modulo === moduloFilter;
         const matchesStatus = statusFilter === 'todos' || item.status === statusFilter;
         
-        const matchesDateRange = dataRange.from && dataRange.to 
+        const matchesDateRange = dataRange?.from && dataRange?.to 
           ? new Date(item.data) >= dataRange.from && new Date(item.data) <= dataRange.to
           : true;
         
@@ -108,13 +103,11 @@ const Historico = () => {
       });
   };
 
-  // Paginação
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = dadosFiltrados().slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(dadosFiltrados().length / itemsPerPage);
 
-  // Funções de ordenação
   const requestSort = (key: string) => {
     let direction: 'ascending' | 'descending' = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -123,7 +116,6 @@ const Historico = () => {
     setSortConfig({ key, direction });
   };
 
-  // Função para lidar com a seleção de itens
   const handleSelectItem = (id: string) => {
     setSelectedItems(prev => 
       prev.includes(id) 
@@ -132,7 +124,6 @@ const Historico = () => {
     );
   };
 
-  // Função para selecionar todos os itens
   const handleSelectAll = () => {
     if (selectedItems.length === currentItems.length) {
       setSelectedItems([]);
@@ -141,7 +132,6 @@ const Historico = () => {
     }
   };
 
-  // Gerar CSV
   const handleExportCSV = () => {
     const itemsToExport = selectedItems.length > 0 
       ? historicoMovimentacoes.filter(item => selectedItems.includes(item.id))
@@ -164,7 +154,6 @@ const Historico = () => {
     });
   };
 
-  // Gerar PDF
   const handleExportPDF = () => {
     const itemsToExport = selectedItems.length > 0 
       ? historicoMovimentacoes.filter(item => selectedItems.includes(item.id))
@@ -187,7 +176,6 @@ const Historico = () => {
     });
   };
 
-  // Função para verificar autenticidade
   const verificarAutenticidade = (protocolo: string) => {
     toast({
       title: "Autenticidade verificada",
@@ -195,7 +183,6 @@ const Historico = () => {
     });
   };
 
-  // Obter os valores únicos para os filtros
   const tiposUnicos = Array.from(new Set(historicoMovimentacoes.map(item => item.tipo)));
   const modulosUnicos = Array.from(new Set(historicoMovimentacoes.map(item => item.modulo)));
   const statusUnicos = Array.from(new Set(historicoMovimentacoes.map(item => item.status)));
@@ -277,7 +264,7 @@ const Historico = () => {
             
             <DatePickerWithRange 
               value={dataRange}
-              onChange={(value) => setDataRange(value || {from: undefined, to: undefined})}
+              onChange={(value) => setDataRange(value)}
             />
           </div>
         </CardContent>
@@ -644,7 +631,6 @@ const Historico = () => {
   );
 };
 
-// Componente para exibir o status com cores diferentes
 const StatusBadge = ({ status }: { status: string }) => {
   let variant: "default" | "secondary" | "destructive" | "outline" = "default";
   
@@ -663,4 +649,3 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 export default Historico;
-
