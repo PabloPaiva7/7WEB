@@ -1,269 +1,192 @@
-import { DemandaAlert } from "@/components/Documentos/DemandaAlert";
-import { useState } from "react";
-import { Demanda } from "@/types/demanda";
-import { StatisticsSection } from "@/components/Painel/StatisticsSection";
-import { ChartSection } from "@/components/Painel/ChartSection";
-import { DemandasBoard } from "@/components/Painel/DemandasBoard";
-import { useToast } from "@/hooks/use-toast";
-import { DemandaDialog } from "@/components/Painel/DemandaDialog";
-import { Button } from "@/components/ui/button";
-import { Plus, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { v4 as uuidv4 } from "uuid";
-import { GoalsSection } from "@/components/Painel/GoalsSection";
 
-export default function Painel() {
-  const [demandas, setDemandas] = useState<Demanda[]>([
-    {
-      id: '1',
-      titulo: 'Contrato 12345 - Documentação adicional',
-      descricao: 'Necessário envio de documentação adicional para o contrato 12345',
-      status: 'pendente',
-      prioridade: 'alta',
-      criacao: new Date(2023, 5, 15),
-      categoria: 'Contratos',
-      responsavel: 'Ana Silva'
-    },
-    {
-      id: '2',
-      titulo: 'Cliente João Silva - Assinatura',
-      descricao: 'Pendência de assinatura em contrato do cliente João Silva',
-      status: 'em_andamento',
-      prioridade: 'media',
-      criacao: new Date(2023, 6, 20),
-      inicioProcessamento: new Date(2023, 6, 21),
-      categoria: 'Assinaturas',
-      responsavel: 'Carlos Oliveira'
-    },
-    {
-      id: '3',
-      titulo: 'Processo 789/2023 - Recurso',
-      descricao: 'Prazo de 5 dias para recurso no processo 789/2023',
-      status: 'pendente',
-      prioridade: 'alta',
-      criacao: new Date(2023, 7, 1),
-      categoria: 'Processos',
-      responsavel: 'Pedro Santos'
-    },
-    {
-      id: '4',
-      titulo: 'Notificação extrajudicial - Maria Oliveira',
-      descricao: 'Notificação extrajudicial para cliente Maria Oliveira',
-      status: 'finalizado',
-      prioridade: 'baixa',
-      criacao: new Date(2023, 4, 10),
-      inicioProcessamento: new Date(2023, 4, 11),
-      conclusao: new Date(2023, 4, 15),
-      tempoProcessamento: 4 * 24 * 60 * 60 * 1000, // 4 dias em ms
-      categoria: 'Notificações',
-      responsavel: 'Juliana Pereira'
-    },
-    {
-      id: '5',
-      titulo: 'Contrato 56789 - Reconhecimento de firma',
-      descricao: 'Necessário reconhecimento de firma no contrato 56789',
-      status: 'encaminhado',
-      prioridade: 'media',
-      criacao: new Date(2023, 7, 5),
-      inicioProcessamento: new Date(2023, 7, 6),
-      categoria: 'Cartório',
-      responsavel: 'Rafael Costa'
-    },
-    {
-      id: '6',
-      titulo: 'Ação judicial 2022/456 - Audiência',
-      descricao: 'Audiência marcada para ação judicial 2022/456',
-      status: 'confirmado',
-      prioridade: 'alta',
-      criacao: new Date(2023, 8, 15),
-      inicioProcessamento: new Date(2023, 8, 16),
-      categoria: 'Audiências',
-      responsavel: 'Mariana Lima'
-    },
-  ]);
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  CircleDollarSign,
+  ClipboardList,
+  Users,
+  Calendar,
+  PieChart,
+  TrendingUp,
+  FileText,
+  CheckCircle,
+  Clock,
+  AlertCircle
+} from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
-  const [selectedDemanda, setSelectedDemanda] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentDemanda, setCurrentDemanda] = useState<Partial<Demanda>>({});
-  const [isEditing, setIsEditing] = useState(false);
-  const { toast } = useToast();
-
-  const filteredDemandas = demandas.filter(demanda => 
-    demanda.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    demanda.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (demanda.categoria && demanda.categoria.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (demanda.responsavel && demanda.responsavel.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  const handleDemandaSelect = (demandaId: string) => {
-    const demanda = demandas.find(d => d.id === demandaId);
-    if (demanda) {
-      setSelectedDemanda(demanda.titulo);
-      toast({
-        title: "Demanda Selecionada",
-        description: `A demanda "${demanda.titulo}" foi selecionada e precisa de atenção.`,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleResolveDemanda = () => {
-    setSelectedDemanda(null);
-    toast({
-      title: "Demanda resolvida",
-      description: `A demanda foi marcada como resolvida.`,
-    });
-  };
-
-  const handleChangeDemandaStatus = (id: string, status: Demanda['status']) => {
-    setDemandas(prevDemandas => 
-      prevDemandas.map(d => {
-        if (d.id === id) {
-          let updates: Partial<Demanda> = { status };
-          
-          // Se estamos iniciando o processamento
-          if ((status === 'em_andamento' || status === 'encaminhado') && !d.inicioProcessamento) {
-            updates.inicioProcessamento = new Date();
-          }
-          
-          // Se estamos finalizando
-          if ((status === 'finalizado' || status === 'concluida') && d.inicioProcessamento && !d.conclusao) {
-            const conclusao = new Date();
-            updates.conclusao = conclusao;
-            updates.tempoProcessamento = conclusao.getTime() - d.inicioProcessamento.getTime();
-          }
-          
-          return { ...d, ...updates };
-        }
-        return d;
-      })
-    );
-    toast({
-      title: "Status atualizado",
-      description: `O status da demanda foi atualizado para ${status}.`,
-    });
-  };
-
-  const handleAddDemanda = () => {
-    setCurrentDemanda({
-      prioridade: 'media',
-      status: 'pendente',
-      criacao: new Date()
-    });
-    setIsEditing(false);
-    setIsDialogOpen(true);
-  };
-
-  const handleEditDemanda = (demanda: Demanda) => {
-    setCurrentDemanda(demanda);
-    setIsEditing(true);
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteDemanda = (id: string) => {
-    setDemandas(prevDemandas => prevDemandas.filter(d => d.id !== id));
-    toast({
-      title: "Demanda removida",
-      description: `A demanda foi removida com sucesso.`,
-      variant: "default",
-    });
-  };
-
-  const handleSaveDemanda = () => {
-    if (!currentDemanda.titulo || !currentDemanda.descricao) {
-      toast({
-        title: "Erro ao salvar",
-        description: "Título e descrição são obrigatórios.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (isEditing) {
-      // Editing existing demanda
-      setDemandas(prevDemandas => 
-        prevDemandas.map(d => 
-          d.id === currentDemanda.id ? { ...d, ...currentDemanda as Demanda } : d
-        )
-      );
-      toast({
-        title: "Demanda atualizada",
-        description: `A demanda "${currentDemanda.titulo}" foi atualizada com sucesso.`,
-      });
-    } else {
-      // Adding new demanda
-      const newDemanda: Demanda = {
-        ...currentDemanda as Demanda,
-        id: uuidv4(),
-        criacao: new Date()
-      };
-      setDemandas(prevDemandas => [...prevDemandas, newDemanda]);
-      toast({
-        title: "Demanda criada",
-        description: `A demanda "${newDemanda.titulo}" foi criada com sucesso.`,
-      });
-    }
-    
-    setIsDialogOpen(false);
-    setCurrentDemanda({});
-  };
-
+const Painel = () => {
   return (
-    <div className="space-y-6 pb-8">
-      {selectedDemanda && (
-        <DemandaAlert 
-          demanda={selectedDemanda} 
-          onResolve={handleResolveDemanda} 
-        />
-      )}
+    <div className="p-4 space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Painel de Controle</h1>
       
-      <StatisticsSection />
-      
-      <GoalsSection />
-      
-      <ChartSection />
-      
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Demandas</h2>
-          <div className="flex gap-2 items-center">
-            <div className="relative w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar demandas..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Button onClick={handleAddDemanda}>
-              <Plus className="h-4 w-4 mr-2" />
-              Nova Demanda
-            </Button>
-          </div>
-        </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+            <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">R$ 1.456.578,00</div>
+            <p className="text-xs text-muted-foreground">+20% em relação ao mês anterior</p>
+          </CardContent>
+        </Card>
         
-        <DemandasBoard 
-          demandas={filteredDemandas} 
-          setDemandas={setDemandas}
-          onSelectDemanda={handleDemandaSelect}
-          onChangeDemandaStatus={handleChangeDemandaStatus}
-          onEditDemanda={handleEditDemanda}
-          onDeleteDemanda={handleDeleteDemanda}
-          onAddDemanda={handleAddDemanda}
-        />
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Contratos Ativos</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">325</div>
+            <p className="text-xs text-muted-foreground">+5 novos esta semana</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Processos</CardTitle>
+            <ClipboardList className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">123</div>
+            <p className="text-xs text-muted-foreground">98 com pagamento em dia</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Agendamentos</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">Para essa semana</p>
+          </CardContent>
+        </Card>
       </div>
 
-      <DemandaDialog
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        demanda={currentDemanda}
-        setDemanda={setCurrentDemanda}
-        onSave={handleSaveDemanda}
-        title={isEditing ? "Editar Demanda" : "Nova Demanda"}
-        actionText={isEditing ? "Atualizar" : "Criar"}
-      />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="lg:col-span-4">
+          <CardHeader>
+            <CardTitle>Desempenho por Mês</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] flex items-center justify-center">
+              <PieChart className="h-16 w-16 text-muted-foreground" />
+              <span className="ml-4 text-sm text-muted-foreground">
+                Gráfico de desempenho mensal (visualização real será implementada)
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Tendências</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] flex items-center justify-center">
+              <TrendingUp className="h-16 w-16 text-muted-foreground" />
+              <span className="ml-4 text-sm text-muted-foreground">
+                Gráfico de tendências (visualização real será implementada)
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Contratos Recentes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((item) => (
+                <div key={item} className="flex items-center gap-4">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none">Contrato #{1000 + item}</p>
+                    <p className="text-xs text-muted-foreground">Cliente {item} • Adicionado há {item} dias</p>
+                  </div>
+                  <div className={`text-xs ${item % 2 === 0 ? "text-green-500" : "text-amber-500"}`}>
+                    {item % 2 === 0 ? "Em dia" : "Pendente"}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Status de Aprovações</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  <span className="text-sm">Aprovados</span>
+                  <span className="ml-auto text-sm">65%</span>
+                </div>
+                <Progress value={65} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 text-amber-500 mr-2" />
+                  <span className="text-sm">Em análise</span>
+                  <span className="ml-auto text-sm">25%</span>
+                </div>
+                <Progress value={25} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <AlertCircle className="h-4 w-4 text-destructive mr-2" />
+                  <span className="text-sm">Recusados</span>
+                  <span className="ml-auto text-sm">10%</span>
+                </div>
+                <Progress value={10} className="h-2" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Resumo Financeiro</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <CircleDollarSign className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm">Total a receber</span>
+                <span className="ml-auto font-bold">R$ 876.435,00</span>
+              </div>
+              <div className="flex items-center">
+                <CircleDollarSign className="h-4 w-4 text-green-500 mr-2" />
+                <span className="text-sm">Recebido este mês</span>
+                <span className="ml-auto font-bold text-green-500">R$ 123.456,00</span>
+              </div>
+              <div className="flex items-center">
+                <CircleDollarSign className="h-4 w-4 text-amber-500 mr-2" />
+                <span className="text-sm">Pendente</span>
+                <span className="ml-auto font-bold text-amber-500">R$ 45.678,00</span>
+              </div>
+              <div className="flex items-center">
+                <CircleDollarSign className="h-4 w-4 text-destructive mr-2" />
+                <span className="text-sm">Em atraso</span>
+                <span className="ml-auto font-bold text-destructive">R$ 12.345,00</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
-}
+};
+
+export default Painel;
