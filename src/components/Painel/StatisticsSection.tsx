@@ -1,16 +1,18 @@
 
 import { StatisticCard } from "./StatisticCard";
-import { Users, Clock, CheckCircle, BellRing } from "lucide-react";
+import { Briefcase, Clock, CheckCircle, BellRing } from "lucide-react";
 
 export const StatisticsSection = () => {
   const statistics = [
     {
-      title: "Clientes Ativos",
+      title: "Contratos Ativos",
       value: "253", 
-      icon: Users,
+      icon: Briefcase,
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
       iconColor: "text-blue-500",
+      change: "12%",
+      positive: true
     },
     {
       title: "Pendências",
@@ -19,6 +21,8 @@ export const StatisticsSection = () => {
       bgColor: "bg-amber-50",
       borderColor: "border-amber-200",
       iconColor: "text-amber-500",
+      change: "5%",
+      positive: false
     },
     {
       title: "Concluídos",
@@ -27,6 +31,8 @@ export const StatisticsSection = () => {
       bgColor: "bg-emerald-50",
       borderColor: "border-emerald-200",
       iconColor: "text-emerald-500",
+      change: "18%",
+      positive: true
     },
     {
       title: "Notificações",
@@ -49,6 +55,8 @@ export const StatisticsSection = () => {
           bgColor={stat.bgColor}
           borderColor={stat.borderColor}
           iconColor={stat.iconColor}
+          change={stat.change}
+          positive={stat.positive}
         />
       ))}
     </div>

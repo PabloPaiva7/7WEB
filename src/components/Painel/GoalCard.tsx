@@ -2,7 +2,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface GoalCardProps {
   title: string;
@@ -13,40 +12,33 @@ interface GoalCardProps {
   bgColor: string;
 }
 
-export const GoalCard = ({ 
-  title, 
-  current, 
-  target, 
-  icon: Icon,
-  color,
-  bgColor,
-}: GoalCardProps) => {
-  const percentage = Math.min(Math.round((current / target) * 100), 100);
+export const GoalCard = ({ title, current, target, icon: Icon, color, bgColor }: GoalCardProps) => {
+  const progress = Math.min(Math.round((current / target) * 100), 100);
   
   return (
-    <Card className={cn("border", bgColor)}>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="font-medium text-sm dark:text-[#D9B300]/90">{title}</h3>
-          <div className={cn("p-2 rounded-full", color, "bg-white/80 dark:bg-gray-800/80")}>
-            <Icon className="h-4 w-4" />
+    <Card className="card-hover group animate-fade-in-up transition-all duration-200 hover:shadow-md">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div className={`p-3 rounded-full ${bgColor}`}>
+            <Icon className={`h-5 w-5 ${color}`} />
           </div>
+          <span className={`text-sm font-semibold ${color}`}>{progress}%</span>
         </div>
         
-        <div className="flex justify-between items-baseline mb-1">
-          <span className="text-2xl font-bold text-foreground dark:text-[#D9B300]">{current}</span>
-          <span className="text-sm text-muted-foreground dark:text-[#D9B300]/80">de {target}</span>
-        </div>
+        <h3 className="text-base font-medium mt-4 mb-2 dark:text-[#D9B300]">{title}</h3>
         
         <Progress 
-          value={percentage} 
-          className="h-2 mt-2"
-          indicatorClassName={color.replace("text-", "bg-")}
+          value={progress} 
+          className="h-2 mb-2" 
+          indicatorClassName={color === 'text-emerald-500' ? 'bg-emerald-500' : 
+                             color === 'text-blue-500' ? 'bg-blue-500' : 
+                             color === 'text-amber-500' ? 'bg-amber-500' : ''}
         />
         
-        <p className="text-xs text-right mt-1 text-muted-foreground dark:text-[#D9B300]/80">
-          {percentage}% concluído
-        </p>
+        <div className="flex justify-between items-center text-xs text-muted-foreground">
+          <span>Meta: {target}</span>
+          <span>Atual: {current}</span>
+        </div>
       </CardContent>
     </Card>
   );
