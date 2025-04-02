@@ -67,6 +67,8 @@ export interface Senha {
   senha: string;
   observacoes: string;
   ultimaAtualizacao: string;
+  nome: string; // Added this property
+  url: string;  // Added this property
 }
 
 export interface EtapaPagamento {
@@ -75,6 +77,12 @@ export interface EtapaPagamento {
   prazo: string;
   status: string;
   valor: number;
+  descricao?: string; // Added this property
+  concluido?: boolean; // Added this property
+  porcentagemConcluida?: number; // Added this property
+  clienteId?: string; // Added this property
+  dataInicio?: string; // Added this property
+  dataConclusao?: string; // Added this property
 }
 
 export interface MovimentacaoHistorico {
@@ -88,5 +96,5 @@ export interface MovimentacaoHistorico {
   modulo: string;
   status: string;
   protocolo: string;
-  statusCampanha?: string; // Novo campo para status da campanha
+  statusCampanha?: string; // Added this property
 }

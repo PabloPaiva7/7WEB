@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,7 +59,6 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
       if (salvo) {
         return JSON.parse(salvo);
       } else {
-        // Criar etapas predefinidas se não houver dados salvos
         const etapasPredefinidas = tiposEtapas.map(tipo => ({
           id: uuidv4(),
           nome: tipo.nome,
@@ -72,7 +70,6 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
           dataConclusao: undefined
         }));
         
-        // Salvar as etapas predefinidas no localStorage
         localStorage.setItem(`etapas-pagamento-${clienteId}`, JSON.stringify(etapasPredefinidas));
         return etapasPredefinidas;
       }
@@ -89,10 +86,15 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     defaultValues: {
       id: "",
       nome: "",
+      prazo: "",
+      status: "",
+      valor: 0,
       descricao: "",
       concluido: false,
       porcentagemConcluida: 0,
-      clienteId: clienteId
+      clienteId: clienteId,
+      dataInicio: "",
+      dataConclusao: ""
     }
   });
   
@@ -119,10 +121,15 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
       form.reset({
         id: uuidv4(),
         nome: "",
+        prazo: "",
+        status: "",
+        valor: 0,
         descricao: "",
         concluido: false,
         porcentagemConcluida: 0,
         clienteId: clienteId,
+        dataInicio: "",
+        dataConclusao: ""
       });
     }
     setIsDialogOpen(true);
@@ -172,7 +179,6 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     });
   };
   
-  // Modificado para usar o Checkbox em vez do Slider
   const toggleEtapaConcluida = (id: string, concluido: boolean) => {
     const novasEtapas = etapas.map(etapa => {
       if (etapa.id === id) {
@@ -196,7 +202,6 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     }
   };
   
-  // Encontrar ícone para cada etapa com base no nome
   const getIconForEtapa = (nome: string) => {
     const tipoEtapa = tiposEtapas.find(tipo => 
       nome.toLowerCase().includes(tipo.id.replace("_", "")) || 
@@ -206,15 +211,11 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     return tipoEtapa?.icon || CalendarCheck;
   };
   
-  // Calculando progresso total com base no número de etapas concluídas
-  // Cada etapa vale exatamente 20% (100% / 5 etapas = 20%)
   const getProgressoTotal = () => {
     if (etapas.length === 0) return 0;
     
-    // Contar o número de etapas concluídas
     const etapasConcluidas = etapas.filter(etapa => etapa.concluido).length;
     
-    // Cada etapa vale 20% (5 etapas = 100%)
     return Math.round((etapasConcluidas / 5) * 100);
   };
   
@@ -477,4 +478,3 @@ export const EtapasPagamentoCard = ({ clienteId }: EtapasPagamentoCardProps) => 
     </>
   );
 };
-

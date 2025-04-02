@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { 
   Card, 
@@ -40,7 +39,9 @@ const senhasExemplo: Senha[] = [
     url: "https://mail.google.com",
     usuario: "usuario@gmail.com",
     senha: "senha123",
-    ultimaAtualizacao: "2023-10-15"
+    sistema: "Email",
+    ultimaAtualizacao: "2023-10-15",
+    observacoes: ""
   },
   {
     id: "2",
@@ -48,6 +49,7 @@ const senhasExemplo: Senha[] = [
     url: "https://www.itau.com.br",
     usuario: "123456789",
     senha: "senhabanco456",
+    sistema: "Banco",
     observacoes: "Agência: 1234 / Conta: 56789-0",
     ultimaAtualizacao: "2023-11-20"
   },
@@ -57,6 +59,7 @@ const senhasExemplo: Senha[] = [
     url: "https://intranet.empresa.com.br",
     usuario: "funcionario123",
     senha: "empresaXYZ!",
+    sistema: "Intranet",
     observacoes: "Acesso à intranet da empresa",
     ultimaAtualizacao: "2023-12-05"
   }

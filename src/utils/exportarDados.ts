@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { MovimentacaoHistorico } from '@/data/historicoData';
+import { MovimentacaoHistorico } from '@/types/agenda.types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Generate a unique protocol ID based on timestamp and UUID
