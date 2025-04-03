@@ -1,3 +1,4 @@
+
 import { Cliente } from "@/components/Carteira/ClientesTable";
 
 export interface FilterState {
