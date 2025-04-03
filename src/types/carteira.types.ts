@@ -1,4 +1,3 @@
-
 import { Cliente } from "@/components/Carteira/ClientesTable";
 
 export interface FilterState {
@@ -28,3 +27,17 @@ export interface ColumnConfigItem {
 }
 
 export type ColumnConfig = Record<string, ColumnConfigItem>;
+
+export interface EtapaPagamento {
+  id: string;
+  nome: string;
+  prazo: string;
+  status: string;
+  valor: number;
+  descricao?: string;
+  concluido?: boolean;
+  porcentagemConcluida?: number;
+  clienteId?: string;
+  dataInicio?: string;
+  dataConclusao?: string;
+}

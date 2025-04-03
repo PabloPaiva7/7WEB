@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 
 export interface MovimentacaoHistorico {
@@ -12,6 +11,7 @@ export interface MovimentacaoHistorico {
   usuario: string;
   status: string;
   protocolo: string;
+  statusCampanha?: boolean;
 }
 
 // Função para gerar um protocolo único
@@ -153,6 +153,7 @@ export const historicoMovimentacoes: MovimentacaoHistorico[] = Array.from({ leng
     descricao: descricoes[Math.floor(Math.random() * descricoes.length)],
     usuario: usuarios[Math.floor(Math.random() * usuarios.length)],
     status: statusPossiveis[Math.floor(Math.random() * statusPossiveis.length)],
-    protocolo: gerarProtocolo()
+    protocolo: gerarProtocolo(),
+    statusCampanha: Math.random() > 0.5
   };
 }).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
@@ -40,6 +41,22 @@ import { useToast } from '@/hooks/use-toast';
 import { historicoMovimentacoes } from '@/data/historicoData';
 import { exportarParaCSV, exportarParaPDF } from '@/utils/exportarDados';
 import { DateRange } from 'react-day-picker';
+import { DocumentosTab } from '@/components/Historico/DocumentosTab';
+
+// Add statusCampanha field to MovimentacaoHistorico interface in data/historicoData.ts
+interface MovimentacaoHistorico {
+  id: string;
+  data: string;
+  contrato: string;
+  cliente: string;
+  tipo: string;
+  modulo: string;
+  descricao: string;
+  usuario: string;
+  status: string;
+  protocolo: string;
+  statusCampanha?: boolean;
+}
 
 const Historico = () => {
   const { toast } = useToast();
@@ -333,6 +350,7 @@ const Historico = () => {
           <TabsList>
             <TabsTrigger value="tabela">Tabela</TabsTrigger>
             <TabsTrigger value="detalhes">Detalhes</TabsTrigger>
+            <TabsTrigger value="documentos">Documentos</TabsTrigger>
           </TabsList>
           <div className="text-sm text-muted-foreground">
             {dadosFiltrados().length} registros encontrados
@@ -694,6 +712,11 @@ const Historico = () => {
               </PaginationContent>
             </Pagination>
           )}
+        </TabsContent>
+        
+        {/* New Documents Tab */}
+        <TabsContent value="documentos" fullWidth>
+          <DocumentosTab clienteFilter={contratoClienteFilter !== 'todos' ? contratoClienteFilter.split(' - ')[0] : undefined} />
         </TabsContent>
       </Tabs>
     </div>

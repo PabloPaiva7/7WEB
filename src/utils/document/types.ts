@@ -5,6 +5,12 @@ export interface Documento {
   data: string;
   tipo: string;
   url?: string;
+  // Add new fields for document authentication
+  protocolo?: string;
+  autenticado?: boolean;
+  dataAutenticacao?: string;
+  hash?: string;
+  conteudo?: string;
 }
 
 export interface Pasta {

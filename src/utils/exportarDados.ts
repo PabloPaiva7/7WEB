@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { MovimentacaoHistorico } from '@/types/agenda.types';
@@ -18,6 +17,21 @@ const generateVerificationHash = (data: any[]) => {
   // For this example, we'll use a simple string for demonstration
   return Math.random().toString(16).substring(2, 10);
 };
+
+// Add missing property to MovimentacaoHistorico interface
+interface MovimentacaoHistorico {
+  id: string;
+  data: string;
+  contrato: string;
+  cliente: string;
+  tipo: string;
+  modulo: string;
+  descricao: string;
+  usuario: string;
+  status: string;
+  protocolo: string;
+  statusCampanha?: boolean;
+}
 
 // Função para exportar dados para CSV
 export const exportarParaCSV = (dados: any[], nomeArquivo: string) => {
@@ -108,9 +122,9 @@ export const exportarParaCSV = (dados: any[], nomeArquivo: string) => {
 };
 
 // Função para exportar dados para PDF
-export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: string) => {
+export const exportarParaPDF = (data: any[], filename: string) => {
   // Verificar se existem dados
-  if (!dados || dados.length === 0) {
+  if (!data || data.length === 0) {
     console.error('Não há dados para exportar para PDF');
     return;
   }
@@ -122,7 +136,7 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
   const dateTimeStr = `${formattedDate} ${formattedTime}`;
   const protocolId = generateProtocolId();
   const authCode = uuidv4().toUpperCase();
-  const verificationHash = generateVerificationHash(dados);
+  const verificationHash = generateVerificationHash(data);
 
   // Criar um novo documento PDF
   const doc = new jsPDF();
@@ -134,7 +148,7 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
   doc.setFontSize(11);
   doc.text(`Protocolo Jurídico: ${protocolId}`, 14, 22);
   doc.text(`Gerado em: ${dateTimeStr}`, 14, 27);
-  doc.text(`Total de registros: ${dados.length}`, 14, 32);
+  doc.text(`Total de registros: ${data.length}`, 14, 32);
   
   // Adicionar informações de autenticação
   doc.setFontSize(9);
@@ -145,45 +159,50 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
   doc.text(`Para validar este documento, acesse: https://sistema-gestao.exemplo.com.br/validar?protocolo=${protocolId}`, 14, 54);
   
   // Configurar tabela de dados - adicionar o status da campanha
-  const cabecalhos = [
-    'Data', 
-    'Cliente', 
-    'Contrato', 
-    'Tipo', 
-    'Descrição', 
-    'Usuário',
-    'Protocolo',
-    'Status da Campanha'  // Nova coluna
-  ];
-  
-  // Mapear dados para o formato da tabela
-  const corpoTabela = dados.map(item => [
-    new Date(item.data).toLocaleString('pt-BR'),
-    item.cliente,
-    item.contrato,
-    item.tipo,
-    item.descricao.length > 40 ? item.descricao.substring(0, 40) + '...' : item.descricao,
-    item.usuario,
-    item.protocolo,
-    item.statusCampanha ? 'Sim' : 'Não'  // Exibir "Sim" se tiver, "Não" se não tiver
-  ]);
-  
-  // Adicionar tabela ao documento
-  autoTable(doc, {
-    head: [cabecalhos],
-    body: corpoTabela,
-    startY: 60,
-    styles: { fontSize: 8, cellPadding: 3 },
-    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-    alternateRowStyles: { fillColor: [240, 240, 240] },
-    columnStyles: {
-      4: { cellWidth: 'auto' }, // Descrição com largura automática
-      6: { cellWidth: 30 },     // Protocolo com largura fixa
-      7: { cellWidth: 25 }      // Status da Campanha com largura fixa
-    },
-    margin: { top: 60 }
-  });
-  
+  if (filename.includes('movimentacoes')) {
+    const movimentacoes = data as MovimentacaoHistorico[];
+    
+    // Format data for tables
+    const tableData = movimentacoes.map((item) => [
+      new Date(item.data).toLocaleString('pt-BR'),
+      item.contrato,
+      item.cliente,
+      item.tipo,
+      item.modulo,
+      item.descricao.slice(0, 40) + (item.descricao.length > 40 ? '...' : ''),
+      item.usuario,
+      item.status,
+      item.protocolo,
+      item.statusCampanha ? 'Sim' : 'Não'
+    ]);
+    
+    // Adicionar tabela ao documento
+    autoTable(doc, {
+      head: [
+        'Data', 
+        'Cliente', 
+        'Contrato', 
+        'Tipo', 
+        'Modulo', 
+        'Descrição', 
+        'Usuário',
+        'Protocolo',
+        'Status da Campanha'
+      ],
+      body: tableData,
+      startY: 60,
+      styles: { fontSize: 8, cellPadding: 3 },
+      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+      columnStyles: {
+        4: { cellWidth: 'auto' }, // Descrição com largura automática
+        6: { cellWidth: 30 },     // Protocolo com largura fixa
+        7: { cellWidth: 25 }      // Status da Campanha com largura fixa
+      },
+      margin: { top: 60 }
+    });
+  }
+
   // Adicionar rodapé com informações de autenticidade
   const totalPaginas = (doc as any).internal.getNumberOfPages();
   
@@ -217,5 +236,5 @@ export const exportarParaPDF = (dados: MovimentacaoHistorico[], nomeArquivo: str
   }
   
   // Salvar o PDF
-  doc.save(`${nomeArquivo}.pdf`);
+  doc.save(`${filename}.pdf`);
 };

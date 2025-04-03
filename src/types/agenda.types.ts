@@ -1,4 +1,3 @@
-
 export interface Cliente {
   id: string;
   nome: string;
@@ -63,12 +62,12 @@ export interface PaginaJuridica {
 export interface Senha {
   id: string;
   sistema: string;
+  nome: string;
+  url: string;
   usuario: string;
   senha: string;
   observacoes: string;
   ultimaAtualizacao: string;
-  nome: string; // Added this property
-  url: string;  // Added this property
 }
 
 export interface EtapaPagamento {
