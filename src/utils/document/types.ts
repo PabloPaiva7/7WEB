@@ -26,6 +26,7 @@ export const pastasPredefinidas = [
   "prints",
   "boletos",
   "comprovantes",
+  "termos_de_distratos",
   "notificacoes_extrajudiciais"
 ];
 
@@ -36,5 +37,6 @@ export const pastasDisplay: Record<string, string> = {
   "prints": "PRINTS",
   "boletos": "BOLETOS",
   "comprovantes": "COMPROVANTES",
+  "termos_de_distratos": "TERMOS DE DISTRATOS",
   "notificacoes_extrajudiciais": "NOTIFICAÇÕES EXTRAJUDICIAIS"
 };

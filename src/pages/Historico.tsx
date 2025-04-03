@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
@@ -43,7 +42,6 @@ import { exportarParaCSV, exportarParaPDF } from '@/utils/exportarDados';
 import { DateRange } from 'react-day-picker';
 import { DocumentosTab } from '@/components/Historico/DocumentosTab';
 
-// Add statusCampanha field to MovimentacaoHistorico interface in data/historicoData.ts
 interface MovimentacaoHistorico {
   id: string;
   data: string;
@@ -714,7 +712,6 @@ const Historico = () => {
           )}
         </TabsContent>
         
-        {/* New Documents Tab */}
         <TabsContent value="documentos" fullWidth>
           <DocumentosTab clienteFilter={contratoClienteFilter !== 'todos' ? contratoClienteFilter.split(' - ')[0] : undefined} />
         </TabsContent>
