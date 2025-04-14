@@ -1,4 +1,6 @@
-
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge } from "@/components/ui/sidebar";
 import Footer from "@/components/Footer";
@@ -20,16 +22,39 @@ import {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   
-  // Simulação de contadores de notificações - em um cenário real, esses valores viriam de um contexto ou API
+  useEffect(() => {
+    if (!loading) {
+      if (!user && location.pathname !== '/auth') {
+        navigate('/auth');
+      } else if (user && location.pathname === '/auth') {
+        navigate('/');
+      }
+    }
+  }, [user, loading, location.pathname, navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+
+  if (!user && location.pathname === '/auth') {
+    return children;
+  }
+
   const notificationCounts = {
     calendario: 2,
     agenda: 4,
-    tarefas: 8, // Combinamos tickets (3) + tarefas (5)
+    tarefas: 8,
     mural: 1,
     operacional: 7
   };
-  
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full bg-background">
