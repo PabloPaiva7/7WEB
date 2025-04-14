@@ -38,7 +38,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon, PencilIcon, TrashIcon, CopyIcon } from '@radix-ui/react-icons';
+import { MoreHorizontal, Copy, Pencil, Trash2 } from 'lucide-react';
 import { Senha } from "@/types/agenda.types";
 
 interface SenhasTabProps {
@@ -291,7 +291,7 @@ export const SenhasTab = ({ searchTerm, setSearchTerm }: SenhasTabProps) => {
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                           <span className="sr-only">Abrir menu</span>
-                          <DotsHorizontalIcon className="h-4 w-4" />
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -300,14 +300,14 @@ export const SenhasTab = ({ searchTerm, setSearchTerm }: SenhasTabProps) => {
                           setSelectedSenhaId(senha.id);
                           handleEditClick(senha);
                         }}>
-                          <PencilIcon className="mr-2 h-4 w-4" /> Editar
+                          <Pencil className="mr-2 h-4 w-4" /> Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => copyToClipboard(senha.senha)}>
-                          <CopyIcon className="mr-2 h-4 w-4" /> Copiar Senha
+                          <Copy className="mr-2 h-4 w-4" /> Copiar Senha
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => handleDeleteSenha(senha.id)}>
-                          <TrashIcon className="mr-2 h-4 w-4" /> Deletar
+                          <Trash2 className="mr-2 h-4 w-4" /> Deletar
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
