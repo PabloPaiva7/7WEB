@@ -1,19 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-
-export interface MovimentacaoHistorico {
-  id: string;
-  data: string;
-  contrato: string;
-  cliente: string;
-  tipo: string;
-  modulo: string;
-  descricao: string;
-  usuario: string;
-  status: string;
-  protocolo: string;
-  statusCampanha?: boolean;
-}
+import { MovimentacaoHistorico } from '@/types/agenda.types';
 
 // Função para gerar um protocolo único
 const gerarProtocolo = () => {
@@ -155,6 +141,6 @@ export const historicoMovimentacoes: MovimentacaoHistorico[] = Array.from({ leng
     usuario: usuarios[Math.floor(Math.random() * usuarios.length)],
     status: statusPossiveis[Math.floor(Math.random() * statusPossiveis.length)],
     protocolo: gerarProtocolo(),
-    statusCampanha: Math.random() > 0.5
+    statusCampanha: Math.random() > 0.5 ? "Sim" : "Não"
   };
 }).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());

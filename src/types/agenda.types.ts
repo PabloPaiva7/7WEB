@@ -77,12 +77,12 @@ export interface EtapaPagamento {
   prazo: string;
   status: string;
   valor: number;
-  descricao?: string; // Added this property
-  concluido?: boolean; // Added this property
-  porcentagemConcluida?: number; // Added this property
-  clienteId?: string; // Added this property
-  dataInicio?: string; // Added this property
-  dataConclusao?: string; // Added this property
+  descricao?: string;
+  concluido?: boolean;
+  porcentagemConcluida?: number;
+  clienteId?: string;
+  dataInicio?: string;
+  dataConclusao?: string;
 }
 
 export interface MovimentacaoHistorico {
@@ -96,5 +96,5 @@ export interface MovimentacaoHistorico {
   modulo: string;
   status: string;
   protocolo: string;
-  statusCampanha?: string; // Added this property
+  statusCampanha?: string;
 }

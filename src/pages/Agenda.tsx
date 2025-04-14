@@ -13,7 +13,7 @@ import AssessoriasTab from "@/components/Agenda/AssessoriasTab";
 import BancosTab from "@/components/Agenda/BancosTab";
 import LinksUteisTab from "@/components/Agenda/LinksUteisTab";
 import PaginasJuridicasTab from "@/components/Agenda/PaginasJuridicasTab";
-import SenhasTab from "@/components/Agenda/SenhasTab";
+import { SenhasTab } from "@/components/Agenda/SenhasTab";
 
 // Tipos de dados
 import { 

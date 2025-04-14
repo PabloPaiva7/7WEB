@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -36,26 +37,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon, PencilIcon, TrashIcon, CopyIcon } from '@radix-ui/react-icons';
-
-interface Senha {
-  id: string;
-  nome: string;
-  sistema: string;
-  url: string;
-  usuario: string;
-  senha: string;
-  observacoes: string;
-  ultimaAtualizacao: string;
-}
+import { Senha } from "@/types/agenda.types";
 
 interface SenhasTabProps {
-  senhas: Senha[];
-  setSenhas: React.Dispatch<React.SetStateAction<Senha[]>>;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const SenhasTab = ({ senhas, setSenhas }: SenhasTabProps) => {
+export const SenhasTab = ({ searchTerm, setSearchTerm }: SenhasTabProps) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -75,7 +66,8 @@ export const SenhasTab = ({ senhas, setSenhas }: SenhasTabProps) => {
     senha: "",
     observacoes: ""
   });
-  const [searchTerm, setSearchTerm] = useState("");
+  const [senhas, setSenhas] = useState<Senha[]>([]);
+  const [selectedSenhaId, setSelectedSenhaId] = useState<string | null>(null);
 
   const handleAddSenha = () => {
     if (!newSenha.nome || !newSenha.sistema || !newSenha.usuario || !newSenha.senha) {
@@ -162,8 +154,6 @@ export const SenhasTab = ({ senhas, setSenhas }: SenhasTabProps) => {
       description: "A senha foi atualizada com sucesso.",
     });
   };
-
-  const [selectedSenhaId, setSelectedSenhaId] = useState<string | null>(null);
 
   const handleDeleteSenha = (id: string) => {
     setSenhas(senhas.filter(senha => senha.id !== id));

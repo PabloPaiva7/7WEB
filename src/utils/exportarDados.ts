@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { MovimentacaoHistorico } from '@/types/agenda.types';
@@ -17,21 +18,6 @@ const generateVerificationHash = (data: any[]) => {
   // For this example, we'll use a simple string for demonstration
   return Math.random().toString(16).substring(2, 10);
 };
-
-// Add missing property to MovimentacaoHistorico interface
-interface MovimentacaoHistorico {
-  id: string;
-  data: string;
-  contrato: string;
-  cliente: string;
-  tipo: string;
-  modulo: string;
-  descricao: string;
-  usuario: string;
-  status: string;
-  protocolo: string;
-  statusCampanha?: boolean;
-}
 
 // Função para exportar dados para CSV
 export const exportarParaCSV = (dados: any[], nomeArquivo: string) => {
@@ -82,7 +68,7 @@ export const exportarParaCSV = (dados: any[], nomeArquivo: string) => {
     item.tipo,
     item.descricao,
     item.usuario,
-    item.statusCampanha ? 'Sim' : 'Não'  // Exibir "Sim" se tiver, "Não" se não tiver
+    item.statusCampanha || 'Não'  // Exibir "Sim" se tiver, "Não" se não tiver
   ]);
   
   // Combine all rows
@@ -173,21 +159,22 @@ export const exportarParaPDF = (data: any[], filename: string) => {
       item.usuario,
       item.status,
       item.protocolo,
-      item.statusCampanha ? 'Sim' : 'Não'
+      item.statusCampanha || 'Não'
     ]);
     
     // Adicionar tabela ao documento
     autoTable(doc, {
       head: [
-        'Data', 
+        ['Data', 
         'Cliente', 
         'Contrato', 
         'Tipo', 
         'Modulo', 
         'Descrição', 
         'Usuário',
+        'Status',
         'Protocolo',
-        'Status da Campanha'
+        'Status da Campanha']
       ],
       body: tableData,
       startY: 60,
