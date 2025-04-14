@@ -35,7 +35,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
     agenda: 4,
     tarefas: 8,
     mural: 1,
-    operacional: 7
+    operacional: 7,
+    demandas: 5 // Adicionamos notificações para a página de demandas
   };
 
   return (

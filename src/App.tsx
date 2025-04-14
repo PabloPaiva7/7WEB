@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy, Component, ReactNode, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
@@ -17,6 +18,7 @@ import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
 import Operacional from "./pages/Operacional";
 import Historico from "./pages/Historico";
+import Demandas from "./pages/Demandas"; // Importar nova página
 import { Toaster } from "./components/ui/toaster";
 import { AuthProvider } from "./contexts/AuthContext";
 import Auth from "./pages/Auth";
@@ -145,6 +147,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/feedback" element={<Feedback />} />
                 <Route path="/operacional" element={<Operacional />} />
+                <Route path="/demandas" element={<Demandas />} /> {/* Nova rota */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

@@ -13,7 +13,8 @@ import {
   PieChart,
   MessageSquare,
   Briefcase,
-  History
+  History,
+  ListTodo
 } from "lucide-react";
 import { 
   SidebarContent, 
@@ -29,6 +30,7 @@ const navigationItems = [
   { path: "/calendario", label: "Calendário", icon: Calendar, notificationKey: "calendario" },
   { path: "/agenda", label: "Agenda", icon: CalendarClock, notificationKey: "agenda" },
   { path: "/tarefas", label: "Tarefas e Tickets", icon: CheckSquare, notificationKey: "tarefas" },
+  { path: "/demandas", label: "Demandas", icon: ListTodo, notificationKey: "demandas" }, // Nova opção de menu
   { path: "/mural", label: "Mural", icon: Megaphone, notificationKey: "mural" },
   { path: "/historico", label: "Histórico", icon: History },
   { path: "/relatorios", label: "Relatórios", icon: FileText },
