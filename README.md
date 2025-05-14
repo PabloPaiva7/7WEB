@@ -39,11 +39,11 @@ Outras Integrações: Google Calendar (agenda), WhatsApp (com API futura), Googl
 🛠️ Público-Alvo e Escalabilidade
 A aplicação está sendo desenvolvida inicialmente para um time de 50 colaboradores. Com o sucesso do MVP, será expandida para setores de:
 
-Cobrança (boletos)
+Cobrança 
 
-Monitoramento jurídico (busca e apreensão)
+Monitoramento jurídico 
 
-Atendimento (WhatsApp)
+Atendimento 
 
 Com essa expansão, estima-se atender até 80 usuários ativos na plataforma.
 
