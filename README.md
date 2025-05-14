@@ -1,69 +1,72 @@
-# Welcome to your Lovable project
+📘 Carteira de Clientes – Micro SaaS para Quitação de Dívidas
+Este projeto é um micro SaaS desenvolvido para substituir o uso de planilhas Google Sheets na gestão de carteiras de clientes da empresa, focada em quitação de dívidas bancárias. A aplicação centraliza o gerenciamento de contatos, histórico de atendimentos, agendamentos, indicadores de performance e documentos de forma organizada, acessível e escalável.
 
-## Project info
+🚀 Funcionalidades Principais
+📋 Página de Clientes
+Cadastro e visualização de clientes com informações como nome, contrato, telefone, e-mail, saldo devedor, percentual de desconto e assessoria responsável.
 
-**URL**: https://lovable.dev/projects/b75eee6f-efab-4ca5-87d2-09e7bdd551f3
+💼 Carteira
+Visualização da carteira por assessoria, banco, status ou responsável. Filtros dinâmicos para facilitar a atuação dos times.
 
-## How can I edit this code?
+📆 Agenda / Calendário
+Ferramenta de agendamento de contatos e lembretes, integrada com os dados da carteira para facilitar o acompanhamento de cada cliente.
 
-There are several ways of editing your application.
+📎 Documentos
+Upload e visualização de arquivos importantes, como termos de quitação, comprovantes ou documentos pessoais.
 
-**Use Lovable**
+⚙️ Configurações
+Área de personalização da ferramenta, como definição de permissões, categorias, bancos, e perfis de usuário.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b75eee6f-efab-4ca5-87d2-09e7bdd551f3) and start prompting.
+🧮 Calculadora de Descontos
+Cálculo automático de saldo atualizado e valor com desconto, a partir dos parâmetros definidos por banco ou assessoria.
 
-Changes made via Lovable will be committed automatically to this repo.
+🎫 Tickets (Suporte Interno)
+Sistema de abertura e acompanhamento de tickets entre os colaboradores, para tratar inconsistências, dúvidas ou demandas internas.
 
-**Use your preferred IDE**
+🧑‍💻 Tecnologias Utilizadas
+Frontend: Lovable.so
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Backend e Autenticação: Supabase
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Banco de Dados: PostgreSQL (via Supabase)
 
-Follow these steps:
+Automação de Processos: n8n
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Design UI/UX: Figma
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Outras Integrações: Google Calendar (agenda), WhatsApp (com API futura), Google Drive (documentos)
 
-# Step 3: Install the necessary dependencies.
-npm i
+🛠️ Público-Alvo e Escalabilidade
+A aplicação está sendo desenvolvida inicialmente para um time de 50 colaboradores. Com o sucesso do MVP, será expandida para setores de:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Cobrança (boletos)
 
-**Edit a file directly in GitHub**
+Monitoramento jurídico (busca e apreensão)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Atendimento (WhatsApp)
 
-**Use GitHub Codespaces**
+Com essa expansão, estima-se atender até 80 usuários ativos na plataforma.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+🧩 Visão de Longo Prazo
+Criar painéis gerenciais e dashboards integrados com BI
 
-## What technologies are used for this project?
+Implementar IA para classificação automática de leads quentes
 
-This project is built with .
+Oferecer API para integração com sistemas bancários
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Criar versão white-label para outras empresas do setor
 
-## How can I deploy this project?
+📌 Como Rodar o Projeto (para Devs)
+Clonar o repositório (caso tenha código versionado)
 
-Simply open [Lovable](https://lovable.dev/projects/b75eee6f-efab-4ca5-87d2-09e7bdd551f3) and click on Share -> Publish.
+Configurar o banco Supabase e variáveis de ambiente
 
-## I want to use a custom domain - is that possible?
+Conectar ao Lovable e importar o projeto base
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+Integrar com os serviços externos necessários via n8n
+
+Deploy e testes com usuários internos
+
+🤝 Contribuição
+Este projeto é mantido por um cientista de dados que também atua como dev e administrador da plataforma. Caso queira contribuir, entre em contato para mais informações sobre estrutura, roadmap ou sugestões.
+
