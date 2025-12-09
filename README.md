@@ -1,3 +1,5 @@
+https://wallet-minder-app-68.lovable.app
+
 📘 Carteira de Clientes – Micro SaaS para Quitação de Dívidas
 Este projeto é um micro SaaS desenvolvido para substituir o uso de planilhas Google Sheets na gestão de carteiras de clientes da empresa, focada em quitação de dívidas bancárias. A aplicação centraliza o gerenciamento de contatos, histórico de atendimentos, agendamentos, indicadores de performance e documentos de forma organizada, acessível e escalável.
 
